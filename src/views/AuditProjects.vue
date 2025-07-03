@@ -418,13 +418,16 @@ onMounted(async () => {
 }
 
 .projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 20px;
   margin-bottom: 24px;
 }
 
 .project-card {
+  flex: 1 1 350px;
+  max-width: 480px;
+  min-width: 300px;
   transition: transform 0.2s;
 }
 
@@ -523,7 +526,14 @@ onMounted(async () => {
 /* 响应式设计 */
 @media (max-width: 768px) {
   .projects-grid {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .project-card {
+    flex: 1 1 auto;
+    max-width: none;
+    min-width: auto;
   }
 
   .page-header {
@@ -535,6 +545,20 @@ onMounted(async () => {
   .header-right {
     width: 100%;
     justify-content: flex-end;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1200px) {
+  .project-card {
+    flex: 1 1 calc(50% - 10px);
+    max-width: calc(50% - 10px);
+  }
+}
+
+@media (min-width: 1201px) {
+  .project-card {
+    flex: 1 1 350px;
+    max-width: 420px;
   }
 }
 </style>

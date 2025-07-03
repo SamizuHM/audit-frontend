@@ -318,4 +318,16 @@ onMounted(() => {
     padding: 16px;
   }
 }
+
+@media (min-width: 1200px) {
+  .main-content {
+    padding: 24px 32px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .main-content {
+    padding: 24px 48px;
+  }
+}
 </style>
