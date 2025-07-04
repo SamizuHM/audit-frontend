@@ -77,8 +77,7 @@ export const usePermissionStore = defineStore('permission', () => {
             { id: '3', name: '数据分析', code: 'user:data:analysis', type: 'menu', path: '/dashboard/data-analysis', icon: 'Histogram', sort: 3 },
             { id: '4', name: '法律法规查询', code: 'user:audit:assistant', type: 'menu', path: '/dashboard/audit-assistant', icon: 'ChatLineSquare', sort: 4 },
             { id: '5', name: '知识库', code: 'user:knowledge:list', type: 'menu', path: '/dashboard/knowledge-management', icon: 'Reading', sort: 5 },
-            { id: '6', name: '知识问答', code: 'user:knowledge:qa', type: 'menu', path: '/dashboard/knowledge-qa', icon: 'ChatDotSquare', sort: 6 },
-            { id: '7', name: 'OCR识别', code: 'user:ocr:recognition', type: 'menu', path: '/dashboard/ocr-recognition', icon: 'Rank', sort: 7 },
+            { id: '6', name: 'OCR识别', code: 'user:ocr:recognition', type: 'menu', path: '/dashboard/ocr-recognition', icon: 'Rank', sort: 6 },
           ],
           buttons: [
             'user:project:add', 'user:project:edit', 'user:project:view',

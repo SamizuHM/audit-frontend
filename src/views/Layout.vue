@@ -120,7 +120,6 @@ const pageTitleMap: Record<string, string> = {
   '/dashboard/audit-text': '审计文本处理',
   '/dashboard/data-analysis': '数据分析',
   '/dashboard/knowledge-management': '知识库管理',
-  '/dashboard/knowledge-qa': '知识问答',
   '/dashboard/project-edit': '项目编辑',
   '/dashboard/knowledge-edit': '知识编辑',
   '/dashboard/evidence-group-edit': '证据组编辑'

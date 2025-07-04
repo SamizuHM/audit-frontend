@@ -55,12 +55,6 @@ const routes: Array<RouteRecordRaw> = [
         meta: { requiresAuth: true, permission: 'user:knowledge:list' }
       },
       {
-        path: 'knowledge-qa',
-        name: 'KnowledgeQA',
-        component: () => import('../views/KnowledgeQA.vue'),
-        meta: { requiresAuth: true, permission: 'user:knowledge:qa' }
-      },
-      {
         path: 'ocr-recognition',
         name: 'OcrRecognition',
         component: () => import('../views/OcrRecognition.vue'),
