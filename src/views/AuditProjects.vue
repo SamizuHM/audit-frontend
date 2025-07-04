@@ -420,6 +420,11 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+:deep(.el-form-item) {
+  margin-bottom: 0px;
+}
+
+
 .audit-projects-container {
   padding: 0;
 }
@@ -479,40 +484,6 @@ onMounted(async () => {
   font-size: 12px;
 }
 
-/* Element Plus 组件自定义样式 */
-:deep(.el-card__header) {
-  padding: 16px 20px;
-  border-bottom: 1px solid #ebeef5;
-}
-
-:deep(.el-card__body) {
-  padding: 0;
-}
-
-:deep(.el-table) {
-  border: none;
-}
-
-:deep(.el-table__header-wrapper) {
-  border-top: none;
-}
-
-:deep(.el-table td, .el-table th) {
-  border-bottom: 1px solid #ebeef5;
-}
-
-:deep(.el-button-group .el-button) {
-  margin: 0 2px;
-}
-
-:deep(.el-tag) {
-  margin: 1px;
-}
-
-/* 表格行悬停效果 */
-:deep(.el-table__row:hover) {
-  background-color: #f5f7fa;
-}
 
 /* 响应式设计 */
 @media (max-width: 768px) {
