@@ -294,7 +294,7 @@ const handleLogout = async () => {
 :deep(.el-menu-item) {
   margin: 4px 8px;
   border-radius: 6px;
-  font-size: 14px;
+  height: 45px;
 }
 
 :deep(.el-menu-item:hover) {
