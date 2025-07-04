@@ -2,8 +2,8 @@
   <div class="login-container">
     <div class="login-box">
       <div class="login-header">
-        <h1 class="login-title">自然资源智能审计系统</h1>
-        <p class="login-subtitle">Natural Resources Intelligent Audit System</p>
+        <h1 class="login-title">自然资源和生态环境智能审计系统</h1>
+        <p class="login-subtitle">Natural Resources and Ecological Environment Intelligent Audit System</p>
       </div>
 
       <el-form
@@ -34,6 +34,18 @@
             clearable
             @keyup.enter="handleLogin"
           />
+        </el-form-item>
+
+        <el-form-item prop="role">
+          <el-select
+            v-model="loginForm.role"
+            placeholder="请选择登录角色"
+            size="large"
+            style="width: 100%"
+          >
+            <el-option label="用户端" value="user" />
+            <el-option label="管理端" value="admin" />
+          </el-select>
         </el-form-item>
 
         <el-form-item>
@@ -76,7 +88,8 @@ const loginFormRef = ref<FormInstance>()
 // 表单数据
 const loginForm = reactive<LoginRequest>({
   username: '',
-  password: ''
+  password: '',
+  role: 'user'
 })
 
 // 表单验证规则
@@ -88,6 +101,9 @@ const loginRules = {
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
     { min: 6, max: 20, message: '密码长度应在6-20字符之间', trigger: 'blur' }
+  ],
+  role: [
+    { required: true, message: '请选择登录角色', trigger: 'change' }
   ]
 }
 
@@ -102,7 +118,13 @@ const handleLogin = async () => {
     await authStore.login(loginForm)
 
     ElMessage.success('登录成功')
-    router.push('/dashboard')
+
+    // 根据角色跳转到不同的页面
+    if (loginForm.role === 'admin') {
+      router.push('/admin/user-management')
+    } else {
+      router.push('/dashboard/projects')
+    }
   } catch (error) {
     ElMessage.error(error instanceof Error ? error.message : '登录失败')
   }

@@ -1,181 +1,176 @@
 <template>
   <div class="audit-projects-container">
-    <!-- 页面标题和操作按钮 -->
-    <div class="page-header">
-      <div class="header-left">
-        <h2 class="page-title">审计项目管理</h2>
-        <p class="page-description">管理和监控所有审计项目的进度和状态</p>
-      </div>
-      <div class="header-right">
-        <el-button
-          type="primary"
-          @click="handleCreateProject"
-        >
-          <el-icon><Plus /></el-icon>
-          新建项目
+    <!-- 搜索区域 -->
+    <div class="search-section">
+      <div class="search-row">
+        <span class="search-label">项目名称：</span>
+        <el-input
+          v-model="searchForm.keyword"
+          placeholder="请输入项目名称"
+          style="width: 200px"
+          clearable
+          @input="handleSearch"
+        />
+        <el-button type="primary" @click="handleSearch">
+          <el-icon><Search /></el-icon>
+          搜索
         </el-button>
       </div>
     </div>
 
-    <!-- 搜索和筛选区域 -->
-    <div class="search-section">
-      <el-card shadow="never">
-        <el-row :gutter="16">
-          <el-col :span="8">
-            <el-input
-              v-model="searchForm.keyword"
-              placeholder="搜索项目名称或描述"
-              clearable
-              @input="handleSearch"
-            >
-              <template #prefix>
-                <el-icon><Search /></el-icon>
-              </template>
-            </el-input>
-          </el-col>
-          <el-col :span="6">
-            <el-select
-              v-model="searchForm.status"
-              placeholder="项目状态"
-              clearable
-              @change="handleSearch"
-            >
-              <el-option label="全部" value="" />
-              <el-option label="草稿" value="draft" />
-              <el-option label="进行中" value="active" />
-              <el-option label="已完成" value="completed" />
-              <el-option label="已归档" value="archived" />
-            </el-select>
-          </el-col>
-          <el-col :span="6">
-            <el-select
-              v-model="searchForm.auditType"
-              placeholder="审计类型"
-              clearable
-              @change="handleSearch"
-            >
-              <el-option label="全部" value="" />
-              <el-option label="土地利用审计" value="土地利用审计" />
-              <el-option label="矿产资源审计" value="矿产资源审计" />
-              <el-option label="环境保护审计" value="环境保护审计" />
-              <el-option label="其他" value="其他" />
-            </el-select>
-          </el-col>
-          <el-col :span="4">
-            <el-button @click="handleReset">重置</el-button>
-          </el-col>
-        </el-row>
-      </el-card>
+    <!-- 我主审的项目 -->
+    <div class="project-category">
+      <div class="category-header">
+        <el-icon><UserFilled /></el-icon>
+        我主审的项目
+      </div>
+      <div class="table-container">
+        <el-table
+          v-loading="loading"
+          :data="leaderProjects"
+          style="width: 100%"
+          row-key="id"
+        >
+          <el-table-column type="index" label="序号" width="80" />
+
+          <el-table-column prop="name" label="审计项目" min-width="200">
+            <template #default="{ row }">
+              <span class="project-name">{{ row.name }}</span>
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="content" label="审计内容" min-width="300">
+            <template #default="{ row }">
+              <div class="project-content">{{ row.content }}</div>
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="auditDate" label="审计日期" width="120">
+            <template #default="{ row }">
+              {{ formatDate(row.auditDate) }}
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="participants" label="参与人" width="120">
+            <template #default="{ row }">
+              {{ row.participants.join(', ') }}
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="status" label="状态" width="100">
+            <template #default="{ row }">
+              <span
+                class="status-badge"
+                :class="getStatusClass(row.status)"
+              >
+                {{ getStatusText(row.status) }}
+              </span>
+            </template>
+          </el-table-column>
+
+          <el-table-column label="操作" width="200" fixed="right">
+            <template #default="{ row }">
+              <div class="operation-buttons">
+                <el-button
+                  type="primary"
+                  size="small"
+                  @click="handleEditProject(row)"
+                >
+                  编辑
+                </el-button>
+                <el-button
+                  type="success"
+                  size="small"
+                  @click="handleViewProject(row)"
+                >
+                  查看
+                </el-button>
+                <el-button
+                  type="danger"
+                  size="small"
+                  @click="handleDeleteProject(row)"
+                >
+                  删除
+                </el-button>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
     </div>
 
-    <!-- 项目列表 -->
-    <div class="projects-section">
-      <el-card shadow="never">
-        <div v-if="projectStore.loading" class="loading-container">
-          <el-skeleton :rows="5" animated />
-        </div>
+    <!-- 我参与的项目 -->
+    <div class="project-category">
+      <div class="category-header participant">
+        <el-icon><User /></el-icon>
+        我参与的项目
+      </div>
+      <div class="table-container">
+        <el-table
+          v-loading="loading"
+          :data="participantProjects"
+          style="width: 100%"
+          row-key="id"
+        >
+          <el-table-column type="index" label="序号" width="80" />
 
-        <div v-else-if="filteredProjects.length === 0" class="empty-container">
-          <el-empty description="暂无项目数据" />
-        </div>
+          <el-table-column prop="name" label="审计项目" min-width="200">
+            <template #default="{ row }">
+              <span class="project-name">{{ row.name }}</span>
+            </template>
+          </el-table-column>
 
-        <div v-else class="projects-grid">
-          <div
-            v-for="project in paginatedProjects"
-            :key="project.id"
-            class="project-card"
-          >
-            <el-card shadow="hover" class="project-item">
-              <div class="project-header">
-                <div class="project-title">
-                  <h3>{{ project.name }}</h3>
-                  <el-tag
-                    :type="getStatusTagType(project.status)"
-                    size="small"
-                  >
-                    {{ getStatusText(project.status) }}
-                  </el-tag>
-                </div>
-                <div class="project-actions">
-                  <el-dropdown @command="(command) => handleProjectAction(command, project)">
-                    <el-button
-                      type="text"
-                      size="small"
-                      @click.stop
-                    >
-                      <el-icon><More /></el-icon>
-                    </el-button>
-                    <template #dropdown>
-                      <el-dropdown-menu>
-                        <el-dropdown-item command="edit">
-                          <el-icon><Edit /></el-icon>
-                          编辑
-                        </el-dropdown-item>
-                        <el-dropdown-item command="view">
-                          <el-icon><View /></el-icon>
-                          查看详情
-                        </el-dropdown-item>
-                        <el-dropdown-item command="archive" divided>
-                          <el-icon><Box /></el-icon>
-                          归档
-                        </el-dropdown-item>
-                        <el-dropdown-item command="delete">
-                          <el-icon><Delete /></el-icon>
-                          删除
-                        </el-dropdown-item>
-                      </el-dropdown-menu>
-                    </template>
-                  </el-dropdown>
-                </div>
+          <el-table-column prop="content" label="审计内容" min-width="300">
+            <template #default="{ row }">
+              <div class="project-content">{{ row.content }}</div>
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="auditDate" label="审计日期" width="120">
+            <template #default="{ row }">
+              {{ formatDate(row.auditDate) }}
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="manager" label="负责人" width="120">
+            <template #default="{ row }">
+              {{ row.manager }}
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="status" label="状态" width="100">
+            <template #default="{ row }">
+              <span
+                class="status-badge"
+                :class="getStatusClass(row.status)"
+              >
+                {{ getStatusText(row.status) }}
+              </span>
+            </template>
+          </el-table-column>
+
+          <el-table-column label="操作" width="150" fixed="right">
+            <template #default="{ row }">
+              <div class="operation-buttons">
+                <el-button
+                  type="success"
+                  size="small"
+                  @click="handleViewProject(row)"
+                >
+                  查看
+                </el-button>
+                <el-button
+                  type="primary"
+                  size="small"
+                  @click="handleParticipateProject(row)"
+                >
+                  参与
+                </el-button>
               </div>
-
-              <div class="project-content">
-                <p class="project-description">{{ project.description }}</p>
-
-                <div class="project-meta">
-                  <div class="meta-item">
-                    <el-icon><Calendar /></el-icon>
-                    <span>创建时间：{{ formatDate(project.createTime) }}</span>
-                  </div>
-                  <div class="meta-item">
-                    <el-icon><User /></el-icon>
-                    <span>负责人：{{ project.creator }}</span>
-                  </div>
-                  <div class="meta-item">
-                    <el-icon><Document /></el-icon>
-                    <span>类型：{{ project.auditType }}</span>
-                  </div>
-                </div>
-
-                <div class="project-progress">
-                  <div class="progress-label">
-                    <span>进度</span>
-                    <span>{{ project.progress }}%</span>
-                  </div>
-                  <el-progress
-                    :percentage="project.progress"
-                    :color="getProgressColor(project.progress)"
-                    :stroke-width="6"
-                  />
-                </div>
-              </div>
-            </el-card>
-          </div>
-        </div>
-
-        <!-- 分页 -->
-        <div v-if="filteredProjects.length > 0" class="pagination-container">
-          <el-pagination
-            v-model:current-page="currentPage"
-            v-model:page-size="pageSize"
-            :page-sizes="[6, 12, 18, 24]"
-            :total="filteredProjects.length"
-            layout="total, sizes, prev, pager, next, jumper"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-          />
-        </div>
-      </el-card>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
     </div>
   </div>
 </template>
@@ -185,73 +180,70 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
-  Plus,
   Search,
-  Edit,
-  View,
-  More,
-  Delete,
-  Box,
-  Calendar,
-  User,
-  Document
+  UserFilled,
+  User
 } from '@element-plus/icons-vue'
 import { useProjectStore } from '@/stores/project'
-import type { AuditProject } from '@/services/api'
 
 const router = useRouter()
 const projectStore = useProjectStore()
 
+interface ProjectData {
+  id: string
+  name: string
+  content: string
+  auditDate: string
+  manager: string
+  participants: string[]
+  status: 'ongoing' | 'completed'
+  role: 'leader' | 'participant'
+}
+
+// 响应式数据
+const loading = ref(false)
+const projects = ref<ProjectData[]>([])
+
 // 搜索表单
 const searchForm = reactive({
-  keyword: '',
-  status: '',
-  auditType: ''
+  keyword: ''
 })
 
-// 分页数据
-const currentPage = ref(1)
-const pageSize = ref(6)
+// 过滤后的主审项目
+const leaderProjects = computed(() => {
+  let result = projects.value.filter(p => p.role === 'leader')
 
-// 过滤后的项目列表
-const filteredProjects = computed(() => {
-  let projects = projectStore.projects
-
-  // 关键字搜索
   if (searchForm.keyword) {
-    projects = projects.filter(p =>
-      p.name.toLowerCase().includes(searchForm.keyword.toLowerCase()) ||
-      p.description.toLowerCase().includes(searchForm.keyword.toLowerCase())
+    const keyword = searchForm.keyword.toLowerCase()
+    result = result.filter(p =>
+      p.name.toLowerCase().includes(keyword) ||
+      p.content.toLowerCase().includes(keyword)
     )
   }
 
-  // 状态筛选
-  if (searchForm.status) {
-    projects = projects.filter(p => p.status === searchForm.status)
-  }
-
-  // 审计类型筛选
-  if (searchForm.auditType) {
-    projects = projects.filter(p => p.auditType === searchForm.auditType)
-  }
-
-  return projects
+  return result
 })
 
-// 分页后的项目列表
-const paginatedProjects = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value
-  const end = start + pageSize.value
-  return filteredProjects.value.slice(start, end)
+// 过滤后的参与项目
+const participantProjects = computed(() => {
+  let result = projects.value.filter(p => p.role === 'participant')
+
+  if (searchForm.keyword) {
+    const keyword = searchForm.keyword.toLowerCase()
+    result = result.filter(p =>
+      p.name.toLowerCase().includes(keyword) ||
+      p.content.toLowerCase().includes(keyword)
+    )
+  }
+
+  return result
 })
 
-// 获取状态标签类型
-const getStatusTagType = (status: string) => {
+// 获取状态样式类
+const getStatusClass = (status: string) => {
   const statusMap: Record<string, string> = {
-    draft: '',
-    active: 'success',
-    completed: 'info',
-    archived: 'warning'
+    ongoing: 'status-ongoing',
+    completed: 'status-completed'
   }
   return statusMap[status] || ''
 }
@@ -259,113 +251,248 @@ const getStatusTagType = (status: string) => {
 // 获取状态文本
 const getStatusText = (status: string) => {
   const statusMap: Record<string, string> = {
-    draft: '草稿',
-    active: '进行中',
-    completed: '已完成',
-    archived: '已归档'
+    ongoing: '进行中',
+    completed: '已完成'
   }
   return statusMap[status] || status
-}
-
-// 获取进度颜色
-const getProgressColor = (progress: number) => {
-  if (progress < 30) return '#f56c6c'
-  if (progress < 70) return '#e6a23c'
-  return '#67c23a'
 }
 
 // 格式化日期
 const formatDate = (dateString: string) => {
   const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN')
+  return date.toLocaleDateString('zh-CN', {
+    month: '2-digit',
+    day: '2-digit'
+  })
 }
 
 // 处理搜索
 const handleSearch = () => {
-  currentPage.value = 1
+  // 搜索逻辑已在计算属性中实现
 }
 
-// 重置搜索
-const handleReset = () => {
-  searchForm.keyword = ''
-  searchForm.status = ''
-  searchForm.auditType = ''
-  currentPage.value = 1
+// 编辑项目
+const handleEditProject = (project: ProjectData) => {
+  router.push(`/dashboard/project-edit/${project.id}`)
 }
 
-// 处理分页大小变化
-const handleSizeChange = (size: number) => {
-  pageSize.value = size
-  currentPage.value = 1
+// 查看项目
+const handleViewProject = (project: ProjectData) => {
+  // TODO: 实现查看项目详情
+  ElMessage.info('查看项目详情功能正在开发中')
 }
 
-// 处理当前页变化
-const handleCurrentChange = (page: number) => {
-  currentPage.value = page
-}
-
-// 创建新项目
-const handleCreateProject = () => {
-  router.push('/dashboard/project-edit')
-}
-
-// 处理项目操作
-const handleProjectAction = async (command: string, project: AuditProject) => {
-  switch (command) {
-    case 'edit':
-      router.push(`/dashboard/project-edit/${project.id}`)
-      break
-
-    case 'view':
-      // TODO: 实现查看项目详情
-      ElMessage.info('查看项目详情功能正在开发中')
-      break
-
-    case 'archive':
-      try {
-        await ElMessageBox.confirm('确定要归档这个项目吗？', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-
-        await projectStore.updateProject(project.id, { status: 'archived' })
-        ElMessage.success('项目已归档')
-      } catch (error) {
-        if (error !== 'cancel') {
-          ElMessage.error('归档失败')
-        }
+// 删除项目
+const handleDeleteProject = async (project: ProjectData) => {
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除项目"${project.name}"吗？删除后无法恢复。`,
+      '警告',
+      {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       }
-      break
+    )
 
-    case 'delete':
-      try {
-        await ElMessageBox.confirm('确定要删除这个项目吗？删除后无法恢复。', '警告', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-
-        await projectStore.deleteProject(project.id)
-        ElMessage.success('项目已删除')
-      } catch (error) {
-        if (error !== 'cancel') {
-          ElMessage.error('删除失败')
-        }
-      }
-      break
+    // TODO: 调用删除接口
+    await deleteProject(project.id)
+    ElMessage.success('项目已删除')
+    await fetchProjects()
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('删除失败')
+    }
   }
+}
+
+// 参与项目
+const handleParticipateProject = (project: ProjectData) => {
+  // TODO: 实现参与项目功能
+  ElMessage.info('参与项目功能正在开发中')
+}
+
+// API 方法（模拟）
+const fetchProjects = async () => {
+  loading.value = true
+  try {
+    // TODO: 调用实际的项目列表接口
+    // const response = await api.getProjects()
+
+    // 模拟数据
+    await new Promise(resolve => setTimeout(resolve, 500))
+    projects.value = [
+      {
+        id: '1',
+        name: '2024年度森林资源审计项目',
+        content: '针对全市森林资源保护和利用情况进行专项审计，重点关注森林覆盖率变化、林地使用合规性、森林防火措施执行情况等关键指标。',
+        auditDate: '2024-05-16',
+        manager: '张三',
+        participants: ['李四'],
+        status: 'ongoing',
+        role: 'leader'
+      },
+      {
+        id: '2',
+        name: '矿产资源开发利用审计',
+        content: '对全市矿产资源开发许可、环境保护措施执行情况进行审计，确保资源合理开发利用，检查开采许可证办理流程。',
+        auditDate: '2024-05-21',
+        manager: '张三',
+        participants: ['孙七'],
+        status: 'ongoing',
+        role: 'leader'
+      },
+      {
+        id: '3',
+        name: '水资源保护专项审计',
+        content: '审查水资源保护政策执行情况，水质监测数据真实性，以及水污染治理项目实施效果，重点关注饮用水源地保护。',
+        auditDate: '2024-06-01',
+        manager: '李四',
+        participants: [],
+        status: 'ongoing',
+        role: 'participant'
+      },
+      {
+        id: '4',
+        name: '土地利用变更审计',
+        content: '对农用地转为建设用地的审批程序、用地指标使用情况、土地收益分配等进行审计，确保土地利用的合法性和合理性。',
+        auditDate: '2024-04-12',
+        manager: '王五',
+        participants: [],
+        status: 'completed',
+        role: 'participant'
+      }
+    ]
+  } catch (error) {
+    ElMessage.error('获取项目数据失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+const deleteProject = async (projectId: string) => {
+  // TODO: 调用实际的删除接口
+  console.log('删除项目:', projectId)
+  await new Promise(resolve => setTimeout(resolve, 500))
 }
 
 // 组件挂载时获取项目数据
 onMounted(async () => {
-  try {
-    await projectStore.fetchProjects()
-  } catch (error) {
-    ElMessage.error('获取项目数据失败')
-  }
+  await fetchProjects()
 })
 </script>
+
+<style scoped>
+.audit-projects-container {
+  padding: 0;
+}
+
+/* 搜索区域 */
+.search-section {
+  background: #fff;
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.search-label {
+  font-size: 14px;
+  color: #333;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+/* 项目分类 */
+.project-category {
+  background: #fff;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.category-header {
+  background: linear-gradient(135deg, #40a9ff);
+  color: white;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.category-header.participant {
+  background: linear-gradient(135deg, #73d13d);
+}
+
+/* 表格容器 */
+.table-container {
+  background: #fff;
+  border-radius: 0 0 6px 6px;
+  overflow: hidden;
+}
+
+.project-name {
+  font-weight: 500;
+  color: #1890ff;
+}
+
+.project-content {
+  max-width: 300px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.operation-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* 状态标签 */
+.status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-ongoing {
+  background: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+}
+
+.status-completed {
+  background: #f6ffed;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .search-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .operation-buttons {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+</style>
+
 
 <style scoped>
 .audit-projects-container {

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { authApi, type LoginRequest, type LoginResponse } from '@/services/api'
+import { usePermissionStore } from './permission'
 
 export const useAuthStore = defineStore('auth', () => {
   // 状态
@@ -45,6 +46,11 @@ export const useAuthStore = defineStore('auth', () => {
       localStorage.setItem('token', response.token)
       localStorage.setItem('user', JSON.stringify(response.user))
 
+      // 获取用户权限
+      const permissionStore = usePermissionStore()
+      permissionStore.setUserRole(loginData.role)
+      await permissionStore.fetchUserPermissions()
+
       return response
     } catch (error) {
       throw error
@@ -66,6 +72,10 @@ export const useAuthStore = defineStore('auth', () => {
       // 清除localStorage
       localStorage.removeItem('token')
       localStorage.removeItem('user')
+
+      // 清除权限信息
+      const permissionStore = usePermissionStore()
+      permissionStore.clearPermissions()
     } catch (error) {
       console.error('Logout failed:', error)
     } finally {
@@ -79,6 +89,10 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null
     localStorage.removeItem('token')
     localStorage.removeItem('user')
+
+    // 清除权限信息
+    const permissionStore = usePermissionStore()
+    permissionStore.clearPermissions()
   }
 
   return {

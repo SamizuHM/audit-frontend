@@ -46,6 +46,7 @@ export default api
 export interface LoginRequest {
   username: string
   password: string
+  role: 'user' | 'admin'
 }
 
 export interface LoginResponse {

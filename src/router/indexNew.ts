@@ -31,6 +31,12 @@ const routes: Array<RouteRecordRaw> = [
         meta: { requiresAuth: true, permission: 'user:project:list' }
       },
       {
+        path: 'audit-assistant',
+        name: 'AuditAssistant',
+        component: () => import('../views/AuditAssistant.vue'),
+        meta: { requiresAuth: true, permission: 'user:audit:assistant' }
+      },
+      {
         path: 'audit-text',
         name: 'AuditText',
         component: () => import('../views/AuditText.vue'),
@@ -41,12 +47,6 @@ const routes: Array<RouteRecordRaw> = [
         name: 'DataAnalysis',
         component: () => import('../views/DataAnalysis.vue'),
         meta: { requiresAuth: true, permission: 'user:data:analysis' }
-      },
-      {
-        path: 'audit-assistant',
-        name: 'AuditAssistant',
-        component: () => import('../views/AuditAssistant.vue'),
-        meta: { requiresAuth: true, permission: 'user:audit:assistant' }
       },
       {
         path: 'knowledge-management',
@@ -126,13 +126,47 @@ const router = createRouter({
 
 // 路由守卫
 router.beforeEach(async (to, from, next) => {
-  // 如果是登录页面，直接放行
-  if (to.path === '/login') {
-    next()
+  const authStore = useAuthStore()
+  const permissionStore = usePermissionStore()
+
+  // 初始化认证状态
+  if (!authStore.isAuthenticated) {
+    authStore.initAuth()
+  }
+
+  // 如果是登录页面，且已经登录，则重定向到对应的首页
+  if (to.path === '/login' && authStore.isAuthenticated) {
+    if (permissionStore.userRole === 'admin') {
+      next('/admin/user-management')
+    } else {
+      next('/dashboard/projects')
+    }
     return
   }
 
-  // 对于其他页面，暂时也直接放行，避免循环依赖
+  // 检查是否需要认证
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    next('/login')
+    return
+  }
+
+  // 检查角色权限
+  if (to.meta.role && to.meta.role !== permissionStore.userRole) {
+    next('/login')
+    return
+  }
+
+  // 检查具体权限
+  if (to.meta.permission && !permissionStore.hasButtonPermission(to.meta.permission as string)) {
+    // 权限不足，重定向到首页
+    if (permissionStore.userRole === 'admin') {
+      next('/admin/user-management')
+    } else {
+      next('/dashboard/projects')
+    }
+    return
+  }
+
   next()
 })
 
