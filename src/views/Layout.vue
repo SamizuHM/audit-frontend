@@ -297,7 +297,6 @@ onMounted(() => {
 .main-content {
   padding: 24px;
   background: #f5f5f5;
-  min-height: calc(100vh - 60px);
 }
 
 /* 响应式设计 */
