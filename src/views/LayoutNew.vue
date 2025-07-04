@@ -1,63 +1,93 @@
 <template>
-  <div class="app-container">
+  <el-container class="app-container">
     <!-- 侧边栏 -->
-    <div class="sidebar">
+    <el-aside width="240px" class="sidebar">
       <div class="sidebar-header">
         <h1>{{ systemTitle }}</h1>
       </div>
 
-      <nav class="sidebar-nav">
-        <div
+      <!-- Element Plus 菜单 -->
+      <el-menu
+        :default-active="currentMenuIndex"
+        class="sidebar-menu"
+        @select="handleMenuSelect"
+        router
+        :collapse="false"
+        background-color="#ffffff"
+        text-color="#666666"
+        active-text-color="#409EFF"
+      >
+        <el-menu-item
           v-for="menu in accessibleMenus"
           :key="menu.id"
-          class="nav-item"
+          :index="menu.path!"
         >
-          <router-link
-            :to="menu.path!"
-            class="nav-link"
-            active-class="active"
-          >
-            <el-icon class="nav-icon">
-              <component :is="menu.icon" />
-            </el-icon>
-            {{ menu.name }}
-          </router-link>
-        </div>
+          <el-icon>
+            <component :is="menu.icon" />
+          </el-icon>
+          <span>{{ menu.name }}</span>
+        </el-menu-item>
+
+        <div class="menu-divider"></div>
 
         <!-- 退出登录 -->
-        <div class="nav-item">
-          <a href="#" class="nav-link" @click.prevent="handleLogout">
-            <el-icon class="nav-icon">
-              <SwitchButton />
-            </el-icon>
-            退出登录
-          </a>
-        </div>
-      </nav>
-    </div>
+        <el-menu-item index="logout" @click="handleLogout">
+          <el-icon>
+            <SwitchButton />
+          </el-icon>
+          <span>退出登录</span>
+        </el-menu-item>
+      </el-menu>
+    </el-aside>
 
     <!-- 主内容区域 -->
-    <div class="main-content">
+    <el-container class="main-content">
       <!-- 头部 -->
-      <div class="header">
-        <div class="header-left">
-          <h2>{{ pageTitle }}</h2>
-          <div class="breadcrumb">{{ breadcrumb }}</div>
-        </div>
+      <el-header class="header" height="auto">
+        <div class="header-content">
+          <div class="header-left">
+            <h2>{{ pageTitle }}</h2>
+            <el-breadcrumb separator=">" class="breadcrumb">
+              <el-breadcrumb-item>首页</el-breadcrumb-item>
+              <el-breadcrumb-item v-if="pageTitle !== '首页'">{{ pageTitle }}</el-breadcrumb-item>
+            </el-breadcrumb>
+          </div>
 
-        <!-- 用户信息 -->
-        <div class="user-info">
-          <div class="user-avatar">{{ userInitial }}</div>
-          <span class="user-name">{{ authStore.userName || '用户' }}</span>
+          <!-- 用户信息 -->
+          <el-dropdown class="user-dropdown" @command="handleUserCommand">
+            <div class="user-info">
+              <el-avatar :size="32" class="user-avatar">{{ userInitial }}</el-avatar>
+              <span class="user-name">{{ authStore.userName || '用户' }}</span>
+              <el-icon class="el-icon--right">
+                <ArrowDown />
+              </el-icon>
+            </div>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="profile">
+                  <el-icon><User /></el-icon>
+                  个人资料
+                </el-dropdown-item>
+                <el-dropdown-item command="settings">
+                  <el-icon><Setting /></el-icon>
+                  系统设置
+                </el-dropdown-item>
+                <el-dropdown-item divided command="logout">
+                  <el-icon><SwitchButton /></el-icon>
+                  退出登录
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </div>
-      </div>
+      </el-header>
 
       <!-- 内容区域 -->
-      <div class="content">
+      <el-main class="content">
         <router-view />
-      </div>
-    </div>
-  </div>
+      </el-main>
+    </el-container>
+  </el-container>
 </template>
 
 <script setup lang="ts">
@@ -73,7 +103,9 @@ import {
   Rank,
   User,
   Coin,
-  SwitchButton
+  SwitchButton,
+  ArrowDown,
+  Setting
 } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { usePermissionStore } from '@/stores/permission'
@@ -95,16 +127,15 @@ const accessibleMenus = computed(() => {
   return permissionStore.accessibleMenus.sort((a, b) => (a.sort || 0) - (b.sort || 0))
 })
 
+// 当前激活的菜单索引
+const currentMenuIndex = computed(() => {
+  return route.path
+})
+
 // 页面标题
 const pageTitle = computed(() => {
   const currentMenu = accessibleMenus.value.find(menu => menu.path === route.path)
   return currentMenu?.name || '首页'
-})
-
-// 面包屑导航
-const breadcrumb = computed(() => {
-  const currentMenu = accessibleMenus.value.find(menu => menu.path === route.path)
-  return currentMenu ? `首页 > ${currentMenu.name}` : '首页'
 })
 
 // 用户名首字母
@@ -112,6 +143,28 @@ const userInitial = computed(() => {
   const name = authStore.userName || '用户'
   return name.charAt(0).toUpperCase()
 })
+
+// 处理菜单选择
+const handleMenuSelect = (index: string) => {
+  if (index !== 'logout') {
+    router.push(index)
+  }
+}
+
+// 处理用户下拉菜单命令
+const handleUserCommand = (command: string) => {
+  switch (command) {
+    case 'profile':
+      ElMessage.info('个人资料功能正在开发中')
+      break
+    case 'settings':
+      ElMessage.info('系统设置功能正在开发中')
+      break
+    case 'logout':
+      handleLogout()
+      break
+  }
+}
 
 // 退出登录
 const handleLogout = async () => {
@@ -135,22 +188,20 @@ const handleLogout = async () => {
 
 <style scoped>
 .app-container {
-  display: flex;
   height: 100vh;
 }
 
 /* 侧边栏样式 */
 .sidebar {
-  width: 200px;
   background: #fff;
-  border-right: 1px solid #e0e0e0;
+  border-right: 1px solid #e4e7ed;
   display: flex;
   flex-direction: column;
 }
 
 .sidebar-header {
   padding: 20px 16px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e4e7ed;
   background: #fff;
 }
 
@@ -163,59 +214,34 @@ const handleLogout = async () => {
   line-height: 1.4;
 }
 
-.sidebar-nav {
+.sidebar-menu {
+  border: none;
   flex: 1;
-  padding: 16px 0;
 }
 
-.nav-item {
-  margin: 0 8px 4px;
-}
-
-.nav-link {
-  display: flex;
-  align-items: center;
-  padding: 10px 12px;
-  color: #666;
-  text-decoration: none;
-  border-radius: 6px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.nav-link:hover {
-  background-color: #f0f0f0;
-  color: #1890ff;
-}
-
-.nav-link.active {
-  background-color: #e6f7ff;
-  color: #1890ff;
-  font-weight: 500;
-}
-
-.nav-icon {
-  width: 16px;
-  height: 16px;
-  margin-right: 8px;
+.menu-divider {
+  height: 1px;
+  background-color: #e4e7ed;
+  margin: 8px 16px;
 }
 
 /* 主内容区域 */
 .main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   background: #fff;
 }
 
 .header {
   background: #fff;
-  padding: 16px 24px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e4e7ed;
+  padding: 0;
+  height: auto;
+}
+
+.header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 16px 24px;
   min-height: 60px;
 }
 
@@ -223,59 +249,115 @@ const handleLogout = async () => {
   font-size: 18px;
   color: #333;
   font-weight: 500;
-  margin: 0 0 2px 0;
+  margin: 0 0 4px 0;
 }
 
 .breadcrumb {
-  color: #999;
-  font-size: 12px;
+  margin: 0;
 }
 
 /* 用户信息 */
+.user-dropdown {
+  cursor: pointer;
+}
+
 .user-info {
   display: flex;
   align-items: center;
-  padding: 6px 12px;
-  background: #f0f0f0;
-  border-radius: 16px;
-  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 20px;
+  transition: background-color 0.3s ease;
   font-size: 14px;
 }
 
+.user-info:hover {
+  background-color: #f5f7fa;
+}
+
 .user-avatar {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #1890ff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 500;
-  font-size: 12px;
-  margin-right: 6px;
+  margin-right: 8px;
 }
 
 .user-name {
   color: #333;
   font-weight: 500;
+  margin-right: 4px;
 }
 
 .content {
-  flex: 1;
-  padding: 20px 24px;
-  overflow-y: auto;
-  background-color: #f5f5f5;
+  background-color: #f5f7fa;
+  min-height: calc(100vh - 60px);
+  padding: 20px;
+}
+
+/* Element Plus Menu 自定义样式 */
+:deep(.el-menu-item) {
+  margin: 4px 8px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+:deep(.el-menu-item:hover) {
+  background-color: #ecf5ff !important;
+  color: #409EFF !important;
+}
+
+:deep(.el-menu-item.is-active) {
+  background-color: #409EFF !important;
+  color: #ffffff !important;
+}
+
+:deep(.el-menu-item.is-active .el-icon) {
+  color: #ffffff !important;
+}
+
+/* Element Plus Breadcrumb 自定义样式 */
+:deep(.el-breadcrumb__inner) {
+  color: #909399;
+  font-size: 12px;
+}
+
+:deep(.el-breadcrumb__inner.is-link) {
+  color: #409EFF;
+}
+
+/* Element Plus Dropdown 自定义样式 */
+:deep(.el-dropdown-menu__item) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+:deep(.el-dropdown-menu__item .el-icon) {
+  font-size: 14px;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
   .sidebar {
-    width: 180px;
+    width: 200px !important;
+  }
+
+  .header-content {
+    padding: 12px 16px;
   }
 
   .content {
     padding: 16px;
+  }
+
+  .sidebar-header h1 {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-info {
+    padding: 6px 8px;
+  }
+
+  .user-name {
+    display: none;
   }
 }
 </style>

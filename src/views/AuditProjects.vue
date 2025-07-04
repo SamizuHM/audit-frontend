@@ -1,36 +1,47 @@
 <template>
   <div class="audit-projects-container">
     <!-- 搜索区域 -->
-    <div class="search-section">
-      <div class="search-row">
-        <span class="search-label">项目名称：</span>
-        <el-input
-          v-model="searchForm.keyword"
-          placeholder="请输入项目名称"
-          style="width: 200px"
-          clearable
-          @input="handleSearch"
-        />
-        <el-button type="primary" @click="handleSearch">
-          <el-icon><Search /></el-icon>
-          搜索
-        </el-button>
-      </div>
-    </div>
+    <el-card class="search-section" shadow="never">
+      <el-form :model="searchForm" inline>
+        <el-form-item label="项目名称">
+          <el-input
+            v-model="searchForm.keyword"
+            placeholder="请输入项目名称"
+            style="width: 200px"
+            clearable
+            @input="handleSearch"
+            :prefix-icon="Search"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" :icon="Search" @click="handleSearch">
+            搜索
+          </el-button>
+          <el-button @click="searchForm.keyword = ''">
+            重置
+          </el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
 
     <!-- 我主审的项目 -->
-    <div class="project-category">
-      <div class="category-header">
-        <el-icon><UserFilled /></el-icon>
-        我主审的项目
-      </div>
-      <div class="table-container">
-        <el-table
-          v-loading="loading"
-          :data="leaderProjects"
-          style="width: 100%"
-          row-key="id"
-        >
+    <el-card class="project-category" shadow="never">
+      <template #header>
+        <div class="category-header">
+          <el-icon><UserFilled /></el-icon>
+          <span>我主审的项目</span>
+          <el-badge :value="leaderProjects.length" class="badge-count" />
+        </div>
+      </template>
+
+      <el-table
+        v-loading="loading"
+        :data="leaderProjects"
+        style="width: 100%"
+        row-key="id"
+        stripe
+        :header-cell-style="{ background: '#fafafa' }"
+      >
           <el-table-column type="index" label="序号" width="80" />
 
           <el-table-column prop="name" label="审计项目" min-width="200">
@@ -53,27 +64,37 @@
 
           <el-table-column prop="participants" label="参与人" width="120">
             <template #default="{ row }">
-              {{ row.participants.join(', ') }}
+              <el-tag
+                v-for="participant in row.participants"
+                :key="participant"
+                size="small"
+                type="info"
+                style="margin-right: 4px;"
+              >
+                {{ participant }}
+              </el-tag>
+              <span v-if="row.participants.length === 0" class="text-muted">无</span>
             </template>
           </el-table-column>
 
           <el-table-column prop="status" label="状态" width="100">
             <template #default="{ row }">
-              <span
-                class="status-badge"
-                :class="getStatusClass(row.status)"
+              <el-tag
+                :type="row.status === 'ongoing' ? 'success' : 'info'"
+                size="small"
               >
                 {{ getStatusText(row.status) }}
-              </span>
+              </el-tag>
             </template>
           </el-table-column>
 
           <el-table-column label="操作" width="200" fixed="right">
             <template #default="{ row }">
-              <div class="operation-buttons">
+              <el-button-group class="operation-buttons">
                 <el-button
                   type="primary"
                   size="small"
+                  :icon="Edit"
                   @click="handleEditProject(row)"
                 >
                   编辑
@@ -81,37 +102,51 @@
                 <el-button
                   type="success"
                   size="small"
+                  :icon="View"
                   @click="handleViewProject(row)"
                 >
                   查看
                 </el-button>
-                <el-button
-                  type="danger"
-                  size="small"
-                  @click="handleDeleteProject(row)"
+                <el-popconfirm
+                  title="确定要删除这个项目吗？"
+                  @confirm="handleDeleteProject(row)"
+                  confirm-button-text="确定"
+                  cancel-button-text="取消"
                 >
-                  删除
-                </el-button>
-              </div>
+                  <template #reference>
+                    <el-button
+                      type="danger"
+                      size="small"
+                      :icon="Delete"
+                    >
+                      删除
+                    </el-button>
+                  </template>
+                </el-popconfirm>
+              </el-button-group>
             </template>
           </el-table-column>
         </el-table>
-      </div>
-    </div>
+      </el-card>
 
     <!-- 我参与的项目 -->
-    <div class="project-category">
-      <div class="category-header participant">
-        <el-icon><User /></el-icon>
-        我参与的项目
-      </div>
-      <div class="table-container">
-        <el-table
-          v-loading="loading"
-          :data="participantProjects"
-          style="width: 100%"
-          row-key="id"
-        >
+    <el-card class="project-category" shadow="never">
+      <template #header>
+        <div class="category-header participant">
+          <el-icon><User /></el-icon>
+          <span>我参与的项目</span>
+          <el-badge :value="participantProjects.length" class="badge-count" />
+        </div>
+      </template>
+
+      <el-table
+        v-loading="loading"
+        :data="participantProjects"
+        style="width: 100%"
+        row-key="id"
+        stripe
+        :header-cell-style="{ background: '#fafafa' }"
+      >
           <el-table-column type="index" label="序号" width="80" />
 
           <el-table-column prop="name" label="审计项目" min-width="200">
@@ -170,8 +205,7 @@
             </template>
           </el-table-column>
         </el-table>
-      </div>
-    </div>
+      </el-card>
   </div>
 </template>
 
@@ -182,7 +216,10 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   Search,
   UserFilled,
-  User
+  User,
+  Edit,
+  View,
+  Delete
 } from '@element-plus/icons-vue'
 import { useProjectStore } from '@/stores/project'
 
@@ -387,305 +424,105 @@ onMounted(async () => {
   padding: 0;
 }
 
-/* 搜索区域 */
+/* 搜索区域样式 */
 .search-section {
-  background: #fff;
-  border-radius: 6px;
-  padding: 16px 20px;
-  margin-bottom: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
 }
 
-.search-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.search-label {
-  font-size: 14px;
-  color: #333;
-  white-space: nowrap;
-  font-weight: 500;
-}
-
-/* 项目分类 */
+/* 项目分类样式 */
 .project-category {
-  background: #fff;
-  border-radius: 6px;
-  margin-bottom: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  overflow: hidden;
+  margin-bottom: 24px;
 }
 
 .category-header {
-  background: linear-gradient(135deg, #40a9ff);
-  color: white;
-  padding: 12px 20px;
-  font-size: 16px;
-  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
 }
 
 .category-header.participant {
-  background: linear-gradient(135deg, #73d13d);
+  color: #67c23a;
 }
 
-/* 表格容器 */
-.table-container {
-  background: #fff;
-  border-radius: 0 0 6px 6px;
-  overflow: hidden;
+.badge-count {
+  margin-left: auto;
 }
 
+/* 表格样式优化 */
 .project-name {
   font-weight: 500;
-  color: #1890ff;
+  color: #333;
 }
 
 .project-content {
+  color: #666;
+  line-height: 1.5;
   max-width: 300px;
-  line-height: 1.5;
-  color: #333;
-}
-
-.operation-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-/* 状态标签 */
-.status-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.status-ongoing {
-  background: #e6f7ff;
-  color: #1890ff;
-  border: 1px solid #91d5ff;
-}
-
-.status-completed {
-  background: #f6ffed;
-  color: #52c41a;
-  border: 1px solid #b7eb8f;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .search-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-  }
-
-  .operation-buttons {
-    flex-direction: column;
-    gap: 4px;
-  }
-}
-</style>
-
-
-<style scoped>
-.audit-projects-container {
-  padding: 0;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 24px;
-}
-
-.header-left {
-  flex: 1;
-}
-
-.page-title {
-  font-size: 24px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 8px 0;
-}
-
-.page-description {
-  color: #666;
-  font-size: 14px;
-  margin: 0;
-}
-
-.header-right {
-  display: flex;
-  gap: 12px;
-}
-
-.search-section {
-  margin-bottom: 24px;
-}
-
-.projects-section {
-  margin-bottom: 24px;
-}
-
-.loading-container {
-  padding: 24px;
-}
-
-.empty-container {
-  padding: 60px 0;
-}
-
-.projects-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  margin-bottom: 24px;
-}
-
-.project-card {
-  flex: 1 1 350px;
-  max-width: 480px;
-  min-width: 300px;
-  transition: transform 0.2s;
-}
-
-.project-card:hover {
-  transform: translateY(-2px);
-}
-
-.project-item {
-  height: 100%;
-  border-radius: 8px;
-}
-
-.project-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
-}
-
-.project-title {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.project-title h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  margin: 0;
-  flex: 1;
-}
-
-.project-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.project-content {
-  padding: 0;
-}
-
-.project-description {
-  color: #666;
-  font-size: 14px;
-  line-height: 1.5;
-  margin: 0 0 16px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   line-clamp: 2;
-  overflow: hidden;
 }
 
-.project-meta {
-  margin-bottom: 16px;
-}
-
-.meta-item {
+.operation-buttons {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #666;
-  font-size: 12px;
-  margin-bottom: 8px;
+  gap: 4px;
 }
 
-.meta-item:last-child {
-  margin-bottom: 0;
-}
-
-.meta-item .el-icon {
+.text-muted {
   color: #999;
-}
-
-.project-progress {
-  margin-top: 16px;
-}
-
-.progress-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
   font-size: 12px;
-  color: #666;
 }
 
-.pagination-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 24px;
+/* Element Plus 组件自定义样式 */
+:deep(.el-card__header) {
+  padding: 16px 20px;
+  border-bottom: 1px solid #ebeef5;
+}
+
+:deep(.el-card__body) {
+  padding: 0;
+}
+
+:deep(.el-table) {
+  border: none;
+}
+
+:deep(.el-table__header-wrapper) {
+  border-top: none;
+}
+
+:deep(.el-table td, .el-table th) {
+  border-bottom: 1px solid #ebeef5;
+}
+
+:deep(.el-button-group .el-button) {
+  margin: 0 2px;
+}
+
+:deep(.el-tag) {
+  margin: 1px;
+}
+
+/* 表格行悬停效果 */
+:deep(.el-table__row:hover) {
+  background-color: #f5f7fa;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .projects-grid {
+  .operation-buttons {
     flex-direction: column;
-    gap: 16px;
+    gap: 4px;
   }
 
-  .project-card {
-    flex: 1 1 auto;
-    max-width: none;
-    min-width: auto;
-  }
-
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
-
-  .header-right {
-    width: 100%;
-    justify-content: flex-end;
-  }
-}
-
-@media (min-width: 769px) and (max-width: 1200px) {
-  .project-card {
-    flex: 1 1 calc(50% - 10px);
-    max-width: calc(50% - 10px);
-  }
-}
-
-@media (min-width: 1201px) {
-  .project-card {
-    flex: 1 1 350px;
-    max-width: 420px;
+  .project-content {
+    max-width: 200px;
   }
 }
 </style>
