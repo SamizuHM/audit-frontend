@@ -6,56 +6,27 @@
         <p class="login-subtitle">Natural Resources and Ecological Environment Intelligent Audit System</p>
       </div>
 
-      <el-form
-        ref="loginFormRef"
-        :model="loginForm"
-        :rules="loginRules"
-        class="login-form"
-        @submit.prevent="handleLogin"
-      >
+      <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" class="login-form"
+        @submit.prevent="handleLogin">
         <el-form-item prop="username">
-          <el-input
-            v-model="loginForm.username"
-            placeholder="请输入用户名"
-            prefix-icon="User"
-            size="large"
-            clearable
-          />
+          <el-input v-model="loginForm.username" placeholder="请输入用户名" prefix-icon="User" size="large" clearable />
         </el-form-item>
 
         <el-form-item prop="password">
-          <el-input
-            v-model="loginForm.password"
-            type="password"
-            placeholder="请输入密码"
-            prefix-icon="Lock"
-            size="large"
-            show-password
-            clearable
-            @keyup.enter="handleLogin"
-          />
+          <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" prefix-icon="Lock" size="large"
+            show-password clearable @keyup.enter="handleLogin" />
         </el-form-item>
 
         <el-form-item prop="role">
-          <el-select
-            v-model="loginForm.role"
-            placeholder="请选择登录角色"
-            size="large"
-            style="width: 100%"
-          >
+          <el-select v-model="loginForm.role" placeholder="请选择登录角色" size="large" style="width: 100%">
             <el-option label="用户端" value="user" />
             <el-option label="管理端" value="admin" />
+            <el-option label="领导大屏" value="leader" />
           </el-select>
         </el-form-item>
 
         <el-form-item>
-          <el-button
-            type="primary"
-            size="large"
-            :loading="authStore.loading"
-            class="login-button"
-            @click="handleLogin"
-          >
+          <el-button type="primary" size="large" :loading="authStore.loading" class="login-button" @click="handleLogin">
             {{ authStore.loading ? '登录中...' : '登录' }}
           </el-button>
         </el-form-item>
@@ -63,7 +34,9 @@
 
       <div class="login-footer">
         <p class="demo-tip">
-          <el-icon><InfoFilled /></el-icon>
+          <el-icon>
+            <InfoFilled />
+          </el-icon>
           演示账号：admin / admin123
         </p>
       </div>
@@ -122,8 +95,10 @@ const handleLogin = async () => {
     // 根据角色跳转到不同的页面
     if (loginForm.role === 'admin') {
       router.push('/admin/user-management')
-    } else {
+    } else if (loginForm.role === 'user') {
       router.push('/dashboard/projects')
+    } else if (loginForm.role === 'leader') {
+      router.push('/data-screen')
     }
   } catch (error) {
     ElMessage.error(error instanceof Error ? error.message : '登录失败')
