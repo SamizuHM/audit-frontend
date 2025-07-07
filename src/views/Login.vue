@@ -3,22 +3,48 @@
     <div class="login-box">
       <div class="login-header">
         <h1 class="login-title">自然资源和生态环境智能审计系统</h1>
-        <p class="login-subtitle">Natural Resources and Ecological Environment Intelligent Audit System</p>
+        <p class="login-subtitle">
+          Natural Resources and Ecological Environment Intelligent Audit System
+        </p>
       </div>
 
-      <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" class="login-form"
-        @submit.prevent="handleLogin">
+      <el-form
+        ref="loginFormRef"
+        :model="loginForm"
+        :rules="loginRules"
+        class="login-form"
+        @submit.prevent="handleLogin"
+      >
         <el-form-item prop="username">
-          <el-input v-model="loginForm.username" placeholder="请输入用户名" prefix-icon="User" size="large" clearable />
+          <el-input
+            v-model="loginForm.username"
+            placeholder="请输入用户名"
+            prefix-icon="User"
+            size="large"
+            clearable
+          />
         </el-form-item>
 
         <el-form-item prop="password">
-          <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" prefix-icon="Lock" size="large"
-            show-password clearable @keyup.enter="handleLogin" />
+          <el-input
+            v-model="loginForm.password"
+            type="password"
+            placeholder="请输入密码"
+            prefix-icon="Lock"
+            size="large"
+            show-password
+            clearable
+            @keyup.enter="handleLogin"
+          />
         </el-form-item>
 
         <el-form-item prop="role">
-          <el-select v-model="loginForm.role" placeholder="请选择登录角色" size="large" style="width: 100%">
+          <el-select
+            v-model="loginForm.role"
+            placeholder="请选择登录角色"
+            size="large"
+            style="width: 100%"
+          >
             <el-option label="用户端" value="user" />
             <el-option label="管理端" value="admin" />
             <el-option label="领导大屏" value="leader" />
@@ -26,7 +52,13 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" size="large" :loading="authStore.loading" class="login-button" @click="handleLogin">
+          <el-button
+            type="primary"
+            size="large"
+            :loading="authStore.loading"
+            class="login-button"
+            @click="handleLogin"
+          >
             {{ authStore.loading ? '登录中...' : '登录' }}
           </el-button>
         </el-form-item>
@@ -62,22 +94,20 @@ const loginFormRef = ref<FormInstance>()
 const loginForm = reactive<LoginRequest>({
   username: '',
   password: '',
-  role: 'user'
+  role: 'user',
 })
 
 // 表单验证规则
 const loginRules = {
   username: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 3, max: 20, message: '用户名长度应在3-20字符之间', trigger: 'blur' }
+    { min: 3, max: 20, message: '用户名长度应在3-20字符之间', trigger: 'blur' },
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '密码长度应在6-20字符之间', trigger: 'blur' }
+    { min: 6, max: 20, message: '密码长度应在6-20字符之间', trigger: 'blur' },
   ],
-  role: [
-    { required: true, message: '请选择登录角色', trigger: 'change' }
-  ]
+  role: [{ required: true, message: '请选择登录角色', trigger: 'change' }],
 }
 
 // 处理登录

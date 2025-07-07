@@ -7,21 +7,9 @@
       </div>
 
       <!-- Element Plus 菜单 -->
-      <el-menu
-        :default-active="currentMenuIndex"
-        class="sidebar-menu"
-        @select="handleMenuSelect"
-        router
-        :collapse="false"
-        background-color="#ffffff"
-        text-color="#666666"
-        active-text-color="#409EFF"
-      >
-        <el-menu-item
-          v-for="menu in accessibleMenus"
-          :key="menu.id"
-          :index="menu.path!"
-        >
+      <el-menu :default-active="currentMenuIndex" class="sidebar-menu" @select="handleMenuSelect" router
+        :collapse="false" background-color="#ffffff" text-color="#666666" active-text-color="#409EFF">
+        <el-menu-item v-for="menu in accessibleMenus" :key="menu.id" :index="menu.path!">
           <el-icon>
             <component :is="menu.icon" />
           </el-icon>
@@ -65,15 +53,21 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="profile">
-                  <el-icon><User /></el-icon>
+                  <el-icon>
+                    <User />
+                  </el-icon>
                   个人资料
                 </el-dropdown-item>
                 <el-dropdown-item command="settings">
-                  <el-icon><Setting /></el-icon>
+                  <el-icon>
+                    <Setting />
+                  </el-icon>
                   系统设置
                 </el-dropdown-item>
                 <el-dropdown-item divided command="logout">
-                  <el-icon><SwitchButton /></el-icon>
+                  <el-icon>
+                    <SwitchButton />
+                  </el-icon>
                   退出登录
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -105,7 +99,7 @@ import {
   Coin,
   SwitchButton,
   ArrowDown,
-  Setting
+  Setting,
 } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { usePermissionStore } from '@/stores/permission'
@@ -134,7 +128,7 @@ const currentMenuIndex = computed(() => {
 
 // 页面标题
 const pageTitle = computed(() => {
-  const currentMenu = accessibleMenus.value.find(menu => menu.path === route.path)
+  const currentMenu = accessibleMenus.value.find((menu) => menu.path === route.path)
   return currentMenu?.name || '首页'
 })
 
@@ -172,7 +166,7 @@ const handleLogout = async () => {
     await ElMessageBox.confirm('确定要退出登录吗？', '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
-      type: 'warning'
+      type: 'warning',
     })
 
     await authStore.logout()
@@ -298,11 +292,11 @@ const handleLogout = async () => {
 
 :deep(.el-menu-item:hover) {
   background-color: #ecf5ff !important;
-  color: #409EFF !important;
+  color: #409eff !important;
 }
 
 :deep(.el-menu-item.is-active) {
-  background-color: #409EFF !important;
+  background-color: #409eff !important;
   color: #ffffff !important;
 }
 
@@ -317,7 +311,7 @@ const handleLogout = async () => {
 }
 
 :deep(.el-breadcrumb__inner.is-link) {
-  color: #409EFF;
+  color: #409eff;
 }
 
 /* Element Plus Dropdown 自定义样式 */

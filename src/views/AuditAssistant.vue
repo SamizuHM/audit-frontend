@@ -78,18 +78,11 @@
         </div>
 
         <div class="results-list">
-          <div
-            v-for="result in paginatedResults"
-            :key="result.id"
-            class="result-item"
-          >
+          <div v-for="result in paginatedResults" :key="result.id" class="result-item">
             <el-card shadow="hover" class="result-card">
               <div class="result-header">
                 <h3 class="result-title">{{ result.title }}</h3>
-                <el-tag
-                  :type="getCategoryTagType(result.category)"
-                  size="small"
-                >
+                <el-tag :type="getCategoryTagType(result.category)" size="small">
                   {{ result.category }}
                 </el-tag>
               </div>
@@ -113,19 +106,11 @@
                 </div>
 
                 <div class="result-actions">
-                  <el-button
-                    type="primary"
-                    size="small"
-                    @click="handleViewDetail(result)"
-                  >
+                  <el-button type="primary" size="small" @click="handleViewDetail(result)">
                     <el-icon><View /></el-icon>
                     查看详情
                   </el-button>
-                  <el-button
-                    type="success"
-                    size="small"
-                    @click="handleDownload(result)"
-                  >
+                  <el-button type="success" size="small" @click="handleDownload(result)">
                     <el-icon><Download /></el-icon>
                     下载文档
                   </el-button>
@@ -213,7 +198,7 @@ import {
   Folder,
   User,
   View,
-  Download
+  Download,
 } from '@element-plus/icons-vue'
 
 interface Regulation {
@@ -244,7 +229,7 @@ const currentRegulation = ref<Regulation | null>(null)
 // 搜索表单
 const searchForm = reactive({
   query: '',
-  category: ''
+  category: '',
 })
 
 // 分页数据
@@ -258,7 +243,7 @@ const quickQueries: QuickQuery[] = [
   { id: '3', title: '环境影响评价', query: '环境影响评价' },
   { id: '4', title: '审计监督法规', query: '审计监督' },
   { id: '5', title: '国有资产管理', query: '国有资产管理' },
-  { id: '6', title: '生态保护红线', query: '生态保护红线' }
+  { id: '6', title: '生态保护红线', query: '生态保护红线' },
 ]
 
 // 分页后的搜索结果
@@ -271,10 +256,10 @@ const paginatedResults = computed(() => {
 // 获取分类标签类型
 const getCategoryTagType = (category: string) => {
   const categoryMap: Record<string, string> = {
-    '土地管理': 'success',
-    '矿产资源': 'warning',
-    '环境保护': 'info',
-    '审计法规': 'danger'
+    土地管理: 'success',
+    矿产资源: 'warning',
+    环境保护: 'info',
+    审计法规: 'danger',
   }
   return categoryMap[category] || ''
 }
@@ -345,40 +330,44 @@ const searchRegulations = async (query: string, category: string) => {
   // const response = await api.searchRegulations({ query, category })
 
   // 模拟数据
-  await new Promise(resolve => setTimeout(resolve, 1000))
+  await new Promise((resolve) => setTimeout(resolve, 1000))
 
   searchResults.value = [
     {
       id: '1',
       title: '中华人民共和国土地管理法',
       category: '土地管理',
-      summary: '为了加强土地管理，维护土地的社会主义公有制，保护、开发土地资源，合理利用土地，切实保护耕地，促进社会经济的可持续发展，制定本法。',
-      content: '第一条 为了加强土地管理，维护土地的社会主义公有制，保护、开发土地资源，合理利用土地，切实保护耕地，促进社会经济的可持续发展，制定本法。<br><br>第二条 中华人民共和国实行土地的社会主义公有制，即全民所有制和劳动群众集体所有制。<br><br>禁止任何单位和个人侵占、买卖或者以其他形式非法转让土地。土地使用权可以依法转让。',
+      summary:
+        '为了加强土地管理，维护土地的社会主义公有制，保护、开发土地资源，合理利用土地，切实保护耕地，促进社会经济的可持续发展，制定本法。',
+      content:
+        '第一条 为了加强土地管理，维护土地的社会主义公有制，保护、开发土地资源，合理利用土地，切实保护耕地，促进社会经济的可持续发展，制定本法。<br><br>第二条 中华人民共和国实行土地的社会主义公有制，即全民所有制和劳动群众集体所有制。<br><br>禁止任何单位和个人侵占、买卖或者以其他形式非法转让土地。土地使用权可以依法转让。',
       documentNumber: '主席令第二十八号',
       publisher: '全国人民代表大会常务委员会',
       publishDate: '2019-08-26',
       effectiveDate: '2020-01-01',
-      status: '有效'
+      status: '有效',
     },
     {
       id: '2',
       title: '中华人民共和国环境保护法',
       category: '环境保护',
-      summary: '为保护和改善环境，防治污染和其他公害，保障公众健康，推进生态文明建设，促进经济社会可持续发展，制定本法。',
-      content: '第一条 为保护和改善环境，防治污染和其他公害，保障公众健康，推进生态文明建设，促进经济社会可持续发展，制定本法。<br><br>第二条 本法所称环境，是指影响人类生存和发展的各种天然的和经过人工改造的自然因素的总体，包括大气、水、海洋、土地、矿藏、森林、草原、湿地、野生生物、自然遗迹、人文遗迹、自然保护区、风景名胜区、城市和乡村等。',
+      summary:
+        '为保护和改善环境，防治污染和其他公害，保障公众健康，推进生态文明建设，促进经济社会可持续发展，制定本法。',
+      content:
+        '第一条 为保护和改善环境，防治污染和其他公害，保障公众健康，推进生态文明建设，促进经济社会可持续发展，制定本法。<br><br>第二条 本法所称环境，是指影响人类生存和发展的各种天然的和经过人工改造的自然因素的总体，包括大气、水、海洋、土地、矿藏、森林、草原、湿地、野生生物、自然遗迹、人文遗迹、自然保护区、风景名胜区、城市和乡村等。',
       documentNumber: '主席令第九号',
       publisher: '全国人民代表大会常务委员会',
       publishDate: '2014-04-24',
       effectiveDate: '2015-01-01',
-      status: '有效'
-    }
+      status: '有效',
+    },
   ]
 }
 
 const downloadRegulation = async (regulationId: string) => {
   // TODO: 调用实际的下载接口
   console.log('下载法规:', regulationId)
-  await new Promise(resolve => setTimeout(resolve, 500))
+  await new Promise((resolve) => setTimeout(resolve, 500))
 }
 
 // 组件挂载时的操作

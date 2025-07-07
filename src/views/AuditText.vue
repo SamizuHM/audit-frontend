@@ -20,11 +20,7 @@
       </div>
       <div class="selection-item">
         <span class="selection-label">审计阶段:</span>
-        <el-select
-          v-model="selectedPhase"
-          placeholder="请选择审计阶段"
-          class="selection-dropdown"
-        >
+        <el-select v-model="selectedPhase" placeholder="请选择审计阶段" class="selection-dropdown">
           <el-option label="准备阶段" value="preparation" />
           <el-option label="实施阶段" value="implementation" />
           <el-option label="报告阶段" value="reporting" />
@@ -51,19 +47,11 @@
       <div class="history-sidebar" :class="{ collapsed: !showHistory }">
         <div class="history-header">
           <span class="history-title">对话历史</span>
-          <el-button
-            text
-            class="toggle-history"
-            @click="showHistory = !showHistory"
-          >
+          <el-button text class="toggle-history" @click="showHistory = !showHistory">
             <el-icon><ArrowLeft /></el-icon>
           </el-button>
         </div>
-        <el-button
-          type="primary"
-          class="new-chat-btn"
-          @click="handleNewChat"
-        >
+        <el-button type="primary" class="new-chat-btn" @click="handleNewChat">
           <el-icon><Plus /></el-icon>
           新建对话
         </el-button>
@@ -79,11 +67,7 @@
               <div class="history-item-title">{{ chat.title }}</div>
               <div class="history-item-time">{{ formatTime(chat.updateTime) }}</div>
             </div>
-            <el-button
-              text
-              class="delete-chat-btn"
-              @click.stop="handleDeleteChat(chat.id)"
-            >
+            <el-button text class="delete-chat-btn" @click.stop="handleDeleteChat(chat.id)">
               <el-icon><Delete /></el-icon>
             </el-button>
           </div>
@@ -165,12 +149,7 @@
               <el-icon><Collection /></el-icon>
               知识库
             </el-button>
-            <el-button
-              size="small"
-              class="toolbar-btn"
-              title="上传文件"
-              @click="handleFileUpload"
-            >
+            <el-button size="small" class="toolbar-btn" title="上传文件" @click="handleFileUpload">
               <el-icon><Upload /></el-icon>
               文件
             </el-button>
@@ -208,11 +187,7 @@
     </div>
 
     <!-- 知识库选择模态框 -->
-    <el-dialog
-      v-model="showKnowledgeModal"
-      title="选择知识库"
-      width="800px"
-    >
+    <el-dialog v-model="showKnowledgeModal" title="选择知识库" width="800px">
       <div class="knowledge-section">
         <h4 class="knowledge-section-title">法规条例</h4>
         <div class="knowledge-list">
@@ -258,11 +233,7 @@
     </el-dialog>
 
     <!-- 提示词模板模态框 -->
-    <el-dialog
-      v-model="showPromptModal"
-      title="提示词模板"
-      width="1000px"
-    >
+    <el-dialog v-model="showPromptModal" title="提示词模板" width="1000px">
       <div class="prompt-templates">
         <div
           v-for="template in promptTemplates"
@@ -277,27 +248,15 @@
     </el-dialog>
 
     <!-- 文档提交模态框 -->
-    <el-dialog
-      v-model="showSubmitModal"
-      title="提交审计文书"
-      width="600px"
-    >
+    <el-dialog v-model="showSubmitModal" title="提交审计文书" width="600px">
       <div v-if="submitStatus === 'form'" class="submit-form">
         <div class="form-group">
           <label class="form-label">文书标题</label>
-          <el-input
-            v-model="submitForm.title"
-            placeholder="请输入文书标题"
-            class="form-input"
-          />
+          <el-input v-model="submitForm.title" placeholder="请输入文书标题" class="form-input" />
         </div>
         <div class="form-group">
           <label class="form-label">审计阶段</label>
-          <el-select
-            v-model="submitForm.phase"
-            placeholder="请选择审计阶段"
-            class="form-input"
-          >
+          <el-select v-model="submitForm.phase" placeholder="请选择审计阶段" class="form-input">
             <el-option label="准备阶段" value="preparation" />
             <el-option label="实施阶段" value="implementation" />
             <el-option label="报告阶段" value="reporting" />
@@ -358,7 +317,7 @@ import {
   Document,
   Position,
   Loading,
-  CircleCheck
+  CircleCheck,
 } from '@element-plus/icons-vue'
 
 // 响应式数据
@@ -380,7 +339,7 @@ const projects = ref([
   { id: '1', name: '某市土地资源开发利用审计项目' },
   { id: '2', name: '某县森林资源保护审计项目' },
   { id: '3', name: '某区矿产资源开采审计项目' },
-  { id: '4', name: '某省水资源管理审计项目' }
+  { id: '4', name: '某省水资源管理审计项目' },
 ])
 
 // 聊天历史
@@ -389,23 +348,24 @@ const chatHistory = ref([
     id: '1',
     title: '土地资源审计通知书',
     updateTime: Date.now() - 1000 * 60 * 30,
-    messages: [] as any[]
+    messages: [] as any[],
   },
   {
     id: '2',
     title: '审计实施方案',
     updateTime: Date.now() - 1000 * 60 * 60 * 2,
-    messages: [] as any[]
-  }
+    messages: [] as any[],
+  },
 ])
 
 // 当前消息
 const currentMessages = ref([
   {
     type: 'ai',
-    content: '您好！我是智能审计文书生成助手。请先选择项目和文书类型，然后告诉我您需要生成什么样的审计文书，我会根据相关法规和模板为您生成专业的文书内容。',
-    time: Date.now()
-  }
+    content:
+      '您好！我是智能审计文书生成助手。请先选择项目和文书类型，然后告诉我您需要生成什么样的审计文书，我会根据相关法规和模板为您生成专业的文书内容。',
+    time: Date.now(),
+  },
 ])
 
 // 知识库数据
@@ -416,14 +376,14 @@ const knowledgeBase = ref({
     { id: '3', name: '土地管理法' },
     { id: '4', name: '森林法' },
     { id: '5', name: '矿产资源法' },
-    { id: '6', name: '水法' }
+    { id: '6', name: '水法' },
   ],
   templates: [
     { id: '7', name: '审计通知书模板' },
     { id: '8', name: '审计实施方案模板' },
     { id: '9', name: '审计报告模板' },
-    { id: '10', name: '审计整改通知书模板' }
-  ]
+    { id: '10', name: '审计整改通知书模板' },
+  ],
 })
 
 const selectedKnowledge = ref<string[]>([])
@@ -433,30 +393,33 @@ const promptTemplates = ref([
   {
     id: '1',
     title: '审计通知书生成',
-    content: '请根据以下信息生成一份审计通知书：被审计单位、审计内容、审计时间、审计组成员等基本信息，要求格式规范、内容完整。'
+    content:
+      '请根据以下信息生成一份审计通知书：被审计单位、审计内容、审计时间、审计组成员等基本信息，要求格式规范、内容完整。',
   },
   {
     id: '2',
     title: '审计实施方案',
-    content: '请生成一份详细的审计实施方案，包括审计目标、审计范围、审计程序、时间安排、人员分工等内容。'
+    content:
+      '请生成一份详细的审计实施方案，包括审计目标、审计范围、审计程序、时间安排、人员分工等内容。',
   },
   {
     id: '3',
     title: '审计报告撰写',
-    content: '请根据审计发现的问题和证据，撰写一份完整的审计报告，包括审计概况、审计发现、审计建议等部分。'
+    content:
+      '请根据审计发现的问题和证据，撰写一份完整的审计报告，包括审计概况、审计发现、审计建议等部分。',
   },
   {
     id: '4',
     title: '法规条文引用',
-    content: '请在文书中恰当引用相关法规条文，确保审计依据充分、引用准确。'
-  }
+    content: '请在文书中恰当引用相关法规条文，确保审计依据充分、引用准确。',
+  },
 ])
 
 // 提交表单数据
 const submitForm = reactive({
   title: '',
   phase: '',
-  remark: ''
+  remark: '',
 })
 
 // 方法
@@ -487,34 +450,37 @@ const handleNewChat = () => {
     id: newChatId,
     title: '新对话',
     updateTime: Date.now(),
-    messages: [] as any[]
+    messages: [] as any[],
   })
   currentChatId.value = newChatId
   currentMessages.value = [
     {
       type: 'ai',
       content: '您好！我是智能审计文书生成助手。请告诉我您需要生成什么类型的审计文书。',
-      time: Date.now()
-    }
+      time: Date.now(),
+    },
   ]
 }
 
 const handleSelectChat = (chatId: string) => {
   currentChatId.value = chatId
-  const chat = chatHistory.value.find(c => c.id === chatId)
+  const chat = chatHistory.value.find((c) => c.id === chatId)
   if (chat) {
-    currentMessages.value = chat.messages.length > 0 ? chat.messages : [
-      {
-        type: 'ai',
-        content: '您好！我是智能审计文书生成助手。请告诉我您需要生成什么类型的审计文书。',
-        time: Date.now()
-      }
-    ]
+    currentMessages.value =
+      chat.messages.length > 0
+        ? chat.messages
+        : [
+            {
+              type: 'ai',
+              content: '您好！我是智能审计文书生成助手。请告诉我您需要生成什么类型的审计文书。',
+              time: Date.now(),
+            },
+          ]
   }
 }
 
 const handleDeleteChat = (chatId: string) => {
-  const index = chatHistory.value.findIndex(c => c.id === chatId)
+  const index = chatHistory.value.findIndex((c) => c.id === chatId)
   if (index > -1) {
     chatHistory.value.splice(index, 1)
     if (currentChatId.value === chatId && chatHistory.value.length > 0) {
@@ -532,7 +498,7 @@ const handleSendMessage = () => {
   const userMessage = {
     type: 'user' as const,
     content: inputMessage.value,
-    time: Date.now()
+    time: Date.now(),
   }
   currentMessages.value.push(userMessage)
 
@@ -555,7 +521,7 @@ const handleSendMessage = () => {
     currentMessages.value.push({
       type: 'ai',
       content: aiResponse,
-      time: Date.now()
+      time: Date.now(),
     })
 
     // 更新聊天历史
@@ -577,7 +543,7 @@ const generateAIResponse = (userInput: string): string => {
       <p><strong>一、审计事项</strong></p>
       <p>对贵单位2023年度土地资源开发利用情况进行审计监督。</p>
       <p><strong>二、审计时间</strong></p>
-      <p>自${new Date().toLocaleDateString()}起至${new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString()}止。</p>
+      <p>自${new Date().toLocaleDateString()}起至${new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}止。</p>
       <p><strong>三、审计组成员</strong></p>
       <p>审计组长：[姓名]<br>审计组成员：[姓名列表]</p>
       <p><strong>四、配合要求</strong></p>
@@ -615,14 +581,16 @@ const generateAIResponse = (userInput: string): string => {
 
 const updateChatHistory = () => {
   if (currentChatId.value) {
-    const chat = chatHistory.value.find(c => c.id === currentChatId.value)
+    const chat = chatHistory.value.find((c) => c.id === currentChatId.value)
     if (chat) {
       chat.messages = [...currentMessages.value]
       chat.updateTime = Date.now()
       // 更新标题为第一条用户消息的摘要
-      const firstUserMessage = currentMessages.value.find(m => m.type === 'user')
+      const firstUserMessage = currentMessages.value.find((m) => m.type === 'user')
       if (firstUserMessage) {
-        chat.title = firstUserMessage.content.substring(0, 20) + (firstUserMessage.content.length > 20 ? '...' : '')
+        chat.title =
+          firstUserMessage.content.substring(0, 20) +
+          (firstUserMessage.content.length > 20 ? '...' : '')
       }
     }
   }
@@ -877,7 +845,7 @@ onMounted(() => {
   background: #fff;
   margin: 16px;
   border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   height: calc(100% - 32px);
 }
 
@@ -989,7 +957,8 @@ onMounted(() => {
   opacity: 0.7;
 }
 
-.refine-btn, .submit-btn {
+.refine-btn,
+.submit-btn {
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid #d9d9d9;
   border-radius: 4px;
@@ -999,7 +968,8 @@ onMounted(() => {
   height: 28px;
 }
 
-.refine-btn:hover, .submit-btn:hover {
+.refine-btn:hover,
+.submit-btn:hover {
   opacity: 1;
   background: #fff;
   border-color: #1890ff;
@@ -1031,12 +1001,22 @@ onMounted(() => {
   animation: typing 1.4s infinite ease-in-out;
 }
 
-.typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-.typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+.typing-indicator span:nth-child(1) {
+  animation-delay: -0.32s;
+}
+.typing-indicator span:nth-child(2) {
+  animation-delay: -0.16s;
+}
 
 @keyframes typing {
-  0%, 80%, 100% { transform: scale(0); }
-  40% { transform: scale(1); }
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+  }
+  40% {
+    transform: scale(1);
+  }
 }
 
 /* 输入区域 */
@@ -1192,7 +1172,8 @@ onMounted(() => {
   color: #333;
 }
 
-.form-input, .form-textarea {
+.form-input,
+.form-textarea {
   width: 100%;
 }
 
@@ -1243,13 +1224,23 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* 响应式设计 */

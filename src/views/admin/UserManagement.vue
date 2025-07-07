@@ -62,10 +62,7 @@
 
         <el-table-column prop="role" label="身份信息" min-width="120">
           <template #default="{ row }">
-            <el-tag
-              :type="getRoleTagType(row.role)"
-              size="small"
-            >
+            <el-tag :type="getRoleTagType(row.role)" size="small">
               {{ getRoleText(row.role) }}
             </el-tag>
           </template>
@@ -130,12 +127,7 @@
       width="500px"
       :before-close="handleCloseEditDialog"
     >
-      <el-form
-        ref="editFormRef"
-        :model="editForm"
-        :rules="editRules"
-        label-width="100px"
-      >
+      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="100px">
         <el-form-item label="姓名" prop="name">
           <el-input v-model="editForm.name" placeholder="请输入姓名" />
         </el-form-item>
@@ -174,13 +166,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
-import {
-  Search,
-  UserFilled,
-  User,
-  Edit,
-  Delete
-} from '@element-plus/icons-vue'
+import { Search, UserFilled, User, Edit, Delete } from '@element-plus/icons-vue'
 import { usePermissionStore } from '@/stores/permission'
 
 const permissionStore = usePermissionStore()
@@ -202,7 +188,7 @@ const editFormRef = ref<FormInstance>()
 
 // 搜索表单
 const searchForm = reactive({
-  keyword: ''
+  keyword: '',
 })
 
 // 分页数据
@@ -215,25 +201,26 @@ const editForm = reactive({
   name: '',
   idCard: '',
   role: 'staff',
-  password: ''
+  password: '',
 })
 
 // 表单验证规则
 const editRules = {
-  name: [
-    { required: true, message: '请输入姓名', trigger: 'blur' }
-  ],
+  name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
   idCard: [
     { required: true, message: '请输入身份证号', trigger: 'blur' },
-    { pattern: /^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/, message: '身份证号格式不正确', trigger: 'blur' }
+    {
+      pattern:
+        /^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/,
+      message: '身份证号格式不正确',
+      trigger: 'blur',
+    },
   ],
-  role: [
-    { required: true, message: '请选择角色', trigger: 'change' }
-  ],
+  role: [{ required: true, message: '请选择角色', trigger: 'change' }],
   password: [
     { required: true, message: '请输入初始密码', trigger: 'blur' },
-    { min: 6, message: '密码长度不能少于6位', trigger: 'blur' }
-  ]
+    { min: 6, message: '密码长度不能少于6位', trigger: 'blur' },
+  ],
 }
 
 // 过滤后的用户列表
@@ -242,9 +229,8 @@ const filteredUsers = computed(() => {
 
   if (searchForm.keyword) {
     const keyword = searchForm.keyword.toLowerCase()
-    result = result.filter(user =>
-      user.name.toLowerCase().includes(keyword) ||
-      user.idCard.includes(keyword)
+    result = result.filter(
+      (user) => user.name.toLowerCase().includes(keyword) || user.idCard.includes(keyword),
     )
   }
 
@@ -262,7 +248,7 @@ const paginatedUsers = computed(() => {
 const getRoleTagType = (role: string) => {
   const roleMap: Record<string, string> = {
     admin: 'warning',
-    staff: 'success'
+    staff: 'success',
   }
   return roleMap[role] || ''
 }
@@ -271,7 +257,7 @@ const getRoleTagType = (role: string) => {
 const getRoleText = (role: string) => {
   const roleMap: Record<string, string> = {
     admin: '管理员',
-    staff: '审计员'
+    staff: '审计员',
   }
   return roleMap[role] || role
 }
@@ -323,7 +309,7 @@ const handleEditUser = (user: UserData) => {
     name: user.name,
     idCard: user.idCard,
     role: user.role,
-    password: ''
+    password: '',
   })
   editDialogVisible.value = true
 }
@@ -331,15 +317,11 @@ const handleEditUser = (user: UserData) => {
 // 删除用户
 const handleDeleteUser = async (user: UserData) => {
   try {
-    await ElMessageBox.confirm(
-      `确定要删除用户"${user.name}"吗？删除后无法恢复。`,
-      '警告',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
-    )
+    await ElMessageBox.confirm(`确定要删除用户"${user.name}"吗？删除后无法恢复。`, '警告', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    })
 
     // TODO: 调用删除接口
     await deleteUser(user.id)
@@ -389,7 +371,7 @@ const resetEditForm = () => {
     name: '',
     idCard: '',
     role: 'staff',
-    password: ''
+    password: '',
   })
   if (editFormRef.value) {
     editFormRef.value.clearValidate()
@@ -404,7 +386,7 @@ const fetchUsers = async () => {
     // const response = await api.getUserList()
 
     // 模拟数据
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
     users.value = [
       {
         id: '1',
@@ -412,7 +394,7 @@ const fetchUsers = async () => {
         idCard: '110101199001011234',
         role: 'staff',
         createTime: '2024-01-15 10:30:00',
-        lastLoginTime: '2024-07-04 09:15:00'
+        lastLoginTime: '2024-07-04 09:15:00',
       },
       {
         id: '2',
@@ -420,15 +402,15 @@ const fetchUsers = async () => {
         idCard: '110101199002022345',
         role: 'admin',
         createTime: '2024-01-10 14:20:00',
-        lastLoginTime: '2024-07-04 08:30:00'
+        lastLoginTime: '2024-07-04 08:30:00',
       },
       {
         id: '3',
         name: '王审计员',
         idCard: '110101199003033456',
         role: 'staff',
-        createTime: '2024-02-01 16:45:00'
-      }
+        createTime: '2024-02-01 16:45:00',
+      },
     ]
   } catch (error) {
     ElMessage.error('获取用户列表失败')
@@ -440,19 +422,19 @@ const fetchUsers = async () => {
 const createUser = async (userData: any) => {
   // TODO: 调用实际的创建用户接口
   console.log('创建用户:', userData)
-  await new Promise(resolve => setTimeout(resolve, 500))
+  await new Promise((resolve) => setTimeout(resolve, 500))
 }
 
 const updateUser = async (userData: any) => {
   // TODO: 调用实际的更新用户接口
   console.log('更新用户:', userData)
-  await new Promise(resolve => setTimeout(resolve, 500))
+  await new Promise((resolve) => setTimeout(resolve, 500))
 }
 
 const deleteUser = async (userId: string) => {
   // TODO: 调用实际的删除用户接口
   console.log('删除用户:', userId)
-  await new Promise(resolve => setTimeout(resolve, 500))
+  await new Promise((resolve) => setTimeout(resolve, 500))
 }
 
 // 组件挂载时获取数据
@@ -472,7 +454,7 @@ onMounted(async () => {
   border-radius: 6px;
   padding: 16px 20px;
   margin-bottom: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -495,7 +477,7 @@ onMounted(async () => {
 .table-container {
   background: #fff;
   border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 

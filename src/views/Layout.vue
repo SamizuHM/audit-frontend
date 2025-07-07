@@ -100,7 +100,7 @@ import {
   User,
   ArrowDown,
   Setting,
-  SwitchButton
+  SwitchButton,
 } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 
@@ -122,7 +122,7 @@ const pageTitleMap: Record<string, string> = {
   '/dashboard/knowledge-management': '知识库管理',
   '/dashboard/project-edit': '项目编辑',
   '/dashboard/knowledge-edit': '知识编辑',
-  '/dashboard/evidence-group-edit': '证据组编辑'
+  '/dashboard/evidence-group-edit': '证据组编辑',
 }
 
 // 当前页面标题
@@ -165,7 +165,7 @@ const handleUserCommand = async (command: string) => {
         await ElMessageBox.confirm('确定要退出登录吗？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          type: 'warning'
+          type: 'warning',
         })
 
         await authStore.logout()

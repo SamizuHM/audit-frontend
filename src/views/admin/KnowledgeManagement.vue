@@ -52,12 +52,7 @@
         知识库列表
       </div>
 
-      <el-table
-        v-loading="loading"
-        :data="paginatedKnowledge"
-        style="width: 100%"
-        row-key="id"
-      >
+      <el-table v-loading="loading" :data="paginatedKnowledge" style="width: 100%" row-key="id">
         <el-table-column type="index" label="序号" width="80" />
 
         <el-table-column prop="title" label="知识标题" min-width="200">
@@ -68,10 +63,7 @@
 
         <el-table-column prop="category" label="分类" width="120">
           <template #default="{ row }">
-            <el-tag
-              :type="getCategoryTagType(row.category)"
-              size="small"
-            >
+            <el-tag :type="getCategoryTagType(row.category)" size="small">
               {{ row.category }}
             </el-tag>
           </template>
@@ -100,11 +92,7 @@
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <div class="operation-buttons">
-              <el-button
-                type="primary"
-                size="small"
-                @click="handleViewKnowledge(row)"
-              >
+              <el-button type="primary" size="small" @click="handleViewKnowledge(row)">
                 <el-icon><View /></el-icon>
                 查看
               </el-button>
@@ -146,11 +134,7 @@
     </div>
 
     <!-- 查看知识详情弹窗 -->
-    <el-dialog
-      v-model="viewDialogVisible"
-      title="知识详情"
-      width="70%"
-    >
+    <el-dialog v-model="viewDialogVisible" title="知识详情" width="70%">
       <div v-if="currentKnowledge" class="knowledge-detail">
         <el-descriptions :column="2" border>
           <el-descriptions-item label="标题">
@@ -183,12 +167,7 @@
       width="80%"
       :before-close="handleCloseEditDialog"
     >
-      <el-form
-        ref="editFormRef"
-        :model="editForm"
-        :rules="editRules"
-        label-width="100px"
-      >
+      <el-form ref="editFormRef" :model="editForm" :rules="editRules" label-width="100px">
         <el-form-item label="知识标题" prop="title">
           <el-input v-model="editForm.title" placeholder="请输入知识标题" />
         </el-form-item>
@@ -225,14 +204,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
-import {
-  Search,
-  Plus,
-  Reading,
-  View,
-  Edit,
-  Delete
-} from '@element-plus/icons-vue'
+import { Search, Plus, Reading, View, Edit, Delete } from '@element-plus/icons-vue'
 import { usePermissionStore } from '@/stores/permission'
 
 const permissionStore = usePermissionStore()
@@ -257,7 +229,7 @@ const currentKnowledge = ref<KnowledgeData | null>(null)
 // 搜索表单
 const searchForm = reactive({
   keyword: '',
-  category: ''
+  category: '',
 })
 
 // 分页数据
@@ -269,20 +241,14 @@ const editForm = reactive({
   id: '',
   title: '',
   category: '',
-  content: ''
+  content: '',
 })
 
 // 表单验证规则
 const editRules = {
-  title: [
-    { required: true, message: '请输入知识标题', trigger: 'blur' }
-  ],
-  category: [
-    { required: true, message: '请选择知识分类', trigger: 'change' }
-  ],
-  content: [
-    { required: true, message: '请输入知识内容', trigger: 'blur' }
-  ]
+  title: [{ required: true, message: '请输入知识标题', trigger: 'blur' }],
+  category: [{ required: true, message: '请选择知识分类', trigger: 'change' }],
+  content: [{ required: true, message: '请输入知识内容', trigger: 'blur' }],
 }
 
 // 过滤后的知识列表
@@ -291,14 +257,14 @@ const filteredKnowledge = computed(() => {
 
   if (searchForm.keyword) {
     const keyword = searchForm.keyword.toLowerCase()
-    result = result.filter(item =>
-      item.title.toLowerCase().includes(keyword) ||
-      item.content.toLowerCase().includes(keyword)
+    result = result.filter(
+      (item) =>
+        item.title.toLowerCase().includes(keyword) || item.content.toLowerCase().includes(keyword),
     )
   }
 
   if (searchForm.category) {
-    result = result.filter(item => item.category === searchForm.category)
+    result = result.filter((item) => item.category === searchForm.category)
   }
 
   return result
@@ -314,10 +280,10 @@ const paginatedKnowledge = computed(() => {
 // 获取分类标签类型
 const getCategoryTagType = (category: string) => {
   const categoryMap: Record<string, string> = {
-    '法律法规': 'danger',
-    '审计准则': 'warning',
-    '操作指南': 'success',
-    '案例分析': 'info'
+    法律法规: 'danger',
+    审计准则: 'warning',
+    操作指南: 'success',
+    案例分析: 'info',
   }
   return categoryMap[category] || ''
 }
@@ -367,7 +333,7 @@ const handleEditKnowledge = (item: KnowledgeData) => {
     id: item.id,
     title: item.title,
     category: item.category,
-    content: item.content
+    content: item.content,
   })
   editDialogVisible.value = true
 }
@@ -375,15 +341,11 @@ const handleEditKnowledge = (item: KnowledgeData) => {
 // 删除知识
 const handleDeleteKnowledge = async (item: KnowledgeData) => {
   try {
-    await ElMessageBox.confirm(
-      `确定要删除知识"${item.title}"吗？删除后无法恢复。`,
-      '警告',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
-    )
+    await ElMessageBox.confirm(`确定要删除知识"${item.title}"吗？删除后无法恢复。`, '警告', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    })
 
     // TODO: 调用删除接口
     await deleteKnowledge(item.id)
@@ -432,7 +394,7 @@ const resetEditForm = () => {
     id: '',
     title: '',
     category: '',
-    content: ''
+    content: '',
   })
   if (editFormRef.value) {
     editFormRef.value.clearValidate()
@@ -447,15 +409,16 @@ const fetchKnowledge = async () => {
     // const response = await api.getKnowledgeList()
 
     // 模拟数据
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
     knowledge.value = [
       {
         id: '1',
         title: '自然资源审计法律法规汇编',
         category: '法律法规',
-        content: '包含《中华人民共和国土地管理法》、《中华人民共和国矿产资源法》等相关法律法规的详细条文解读...',
+        content:
+          '包含《中华人民共和国土地管理法》、《中华人民共和国矿产资源法》等相关法律法规的详细条文解读...',
         createTime: '2024-01-15 10:30:00',
-        updateTime: '2024-07-01 14:20:00'
+        updateTime: '2024-07-01 14:20:00',
       },
       {
         id: '2',
@@ -463,8 +426,8 @@ const fetchKnowledge = async () => {
         category: '操作指南',
         content: '详细介绍环境保护审计的操作流程、注意事项、常见问题及处理方法...',
         createTime: '2024-02-01 16:45:00',
-        updateTime: '2024-06-15 09:30:00'
-      }
+        updateTime: '2024-06-15 09:30:00',
+      },
     ]
   } catch (error) {
     ElMessage.error('获取知识列表失败')
@@ -476,19 +439,19 @@ const fetchKnowledge = async () => {
 const createKnowledge = async (data: any) => {
   // TODO: 调用实际的创建知识接口
   console.log('创建知识:', data)
-  await new Promise(resolve => setTimeout(resolve, 500))
+  await new Promise((resolve) => setTimeout(resolve, 500))
 }
 
 const updateKnowledge = async (data: any) => {
   // TODO: 调用实际的更新知识接口
   console.log('更新知识:', data)
-  await new Promise(resolve => setTimeout(resolve, 500))
+  await new Promise((resolve) => setTimeout(resolve, 500))
 }
 
 const deleteKnowledge = async (id: string) => {
   // TODO: 调用实际的删除知识接口
   console.log('删除知识:', id)
-  await new Promise(resolve => setTimeout(resolve, 500))
+  await new Promise((resolve) => setTimeout(resolve, 500))
 }
 
 // 组件挂载时获取数据
@@ -508,7 +471,7 @@ onMounted(async () => {
   border-radius: 6px;
   padding: 16px 20px;
   margin-bottom: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -531,7 +494,7 @@ onMounted(async () => {
 .table-container {
   background: #fff;
   border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 

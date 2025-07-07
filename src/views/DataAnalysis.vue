@@ -57,11 +57,7 @@
           <!-- 输入区域 -->
           <div class="chat-input">
             <div class="input-container">
-              <el-button
-                circle
-                size="small"
-                @click="handleFileUpload"
-              >
+              <el-button circle size="small" @click="handleFileUpload">
                 <el-icon><Paperclip /></el-icon>
               </el-button>
               <input
@@ -76,16 +72,10 @@
                 placeholder="描述您的数据分析需求..."
                 @keydown.enter="handleSendMessage"
               />
-              <el-button
-                type="primary"
-                @click="handleSendMessage"
-              >
+              <el-button type="primary" @click="handleSendMessage">
                 <el-icon><Position /></el-icon>
               </el-button>
-              <el-button
-                size="small"
-                @click="handleDownload"
-              >
+              <el-button size="small" @click="handleDownload">
                 <el-icon><Download /></el-icon>
               </el-button>
             </div>
@@ -104,7 +94,7 @@
                 type="text"
                 size="small"
                 style="margin-right: 8px"
-                @click.stop="() => showAddDatabaseModal = true"
+                @click.stop="() => (showAddDatabaseModal = true)"
               >
                 <el-icon><Plus /></el-icon>
               </el-button>
@@ -154,7 +144,7 @@
                 type="text"
                 size="small"
                 style="margin-right: 8px"
-                @click.stop="() => showAddModelModal = true"
+                @click.stop="() => (showAddModelModal = true)"
               >
                 <el-icon><Plus /></el-icon>
               </el-button>
@@ -209,7 +199,7 @@
                 type="text"
                 size="small"
                 style="margin-right: 8px"
-                @click.stop="() => showTemplateModal = true"
+                @click.stop="() => (showTemplateModal = true)"
               >
                 <el-icon><Plus /></el-icon>
               </el-button>
@@ -293,7 +283,12 @@
           </el-select>
         </el-form-item>
         <el-form-item label="模型描述">
-          <el-input v-model="modelForm.description" type="textarea" :rows="3" placeholder="请输入模型描述" />
+          <el-input
+            v-model="modelForm.description"
+            type="textarea"
+            :rows="3"
+            placeholder="请输入模型描述"
+          />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -339,7 +334,7 @@ import {
   Position,
   Download,
   ArrowDown,
-  ArrowRight
+  ArrowRight,
 } from '@element-plus/icons-vue'
 
 // 响应式数据
@@ -357,7 +352,7 @@ const showTemplateModal = ref(false)
 const openSections = reactive({
   database: true,
   model: true,
-  template: true
+  template: true,
 })
 
 // 聊天消息
@@ -365,29 +360,29 @@ const messages = ref([
   {
     role: 'assistant',
     content: '您好！我是数据分析助手，可以帮助您进行数据分析。请上传数据文件或描述您的分析需求。',
-    time: new Date()
-  }
+    time: new Date(),
+  },
 ])
 
 // 数据库列表
 const databases = ref([
   { id: '1', name: '审计主数据库', tables: 23, size: '1.2GB', selected: true },
   { id: '2', name: '项目数据库', tables: 15, size: '800MB', selected: false },
-  { id: '3', name: '知识库数据库', tables: 8, size: '500MB', selected: false }
+  { id: '3', name: '知识库数据库', tables: 8, size: '500MB', selected: false },
 ])
 
 // 模型列表
 const models = ref([
   { id: '1', name: '风险评估模型', status: '已训练', accuracy: 92, selected: true },
   { id: '2', name: '异常检测模型', status: '训练中', accuracy: 88, selected: false },
-  { id: '3', name: '合规性分析模型', status: '已训练', accuracy: 95, selected: false }
+  { id: '3', name: '合规性分析模型', status: '已训练', accuracy: 95, selected: false },
 ])
 
 // 模板列表
 const templates = ref([
   { id: '1', name: '财务数据分析', description: '财务指标计算和趋势分析' },
   { id: '2', name: '审计风险评估', description: '基于历史数据的风险评估模板' },
-  { id: '3', name: '合规性检查', description: '法规符合性自动化检查流程' }
+  { id: '3', name: '合规性检查', description: '法规符合性自动化检查流程' },
 ])
 
 // 表单数据
@@ -395,26 +390,26 @@ const databaseForm = reactive({
   name: '',
   type: '',
   host: '',
-  port: ''
+  port: '',
 })
 
 const modelForm = reactive({
   name: '',
   type: '',
-  description: ''
+  description: '',
 })
 
 const templateForm = reactive({
   name: '',
   description: '',
-  steps: ''
+  steps: '',
 })
 
 // 格式化时间
 const formatTime = (time: Date) => {
   return time.toLocaleTimeString('zh-CN', {
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 
@@ -431,7 +426,7 @@ const handleSendMessage = async () => {
   messages.value.push({
     role: 'user',
     content: inputMessage.value,
-    time: new Date()
+    time: new Date(),
   })
 
   const userMessage = inputMessage.value
@@ -448,7 +443,7 @@ const handleSendMessage = async () => {
     messages.value.push({
       role: 'assistant',
       content: generateAIResponse(userMessage),
-      time: new Date()
+      time: new Date(),
     })
     nextTick(() => scrollToBottom())
   }, 2000)
@@ -459,7 +454,7 @@ const generateAIResponse = (userMessage: string) => {
   const responses = [
     '已分析您的数据，发现以下趋势：数据整体呈上升趋势，建议关注异常值。',
     '根据您的分析需求，我为您推荐使用回归分析模型，预计准确率可达85%以上。',
-    '数据质量评估完成：数据完整性98%，建议对缺失值进行处理后再进行深度分析。'
+    '数据质量评估完成：数据完整性98%，建议对缺失值进行处理后再进行深度分析。',
   ]
   return responses[Math.floor(Math.random() * responses.length)]
 }
@@ -482,14 +477,14 @@ const handleFileSelected = (event: Event) => {
     messages.value.push({
       role: 'user',
       content: `已上传文件：${file.name}`,
-      time: new Date()
+      time: new Date(),
     })
 
     setTimeout(() => {
       messages.value.push({
         role: 'assistant',
         content: `文件${file.name}上传成功！检测到${Math.floor(Math.random() * 1000) + 100}行数据，${Math.floor(Math.random() * 20) + 5}个字段。是否开始数据分析？`,
-        time: new Date()
+        time: new Date(),
       })
       nextTick(() => scrollToBottom())
     }, 1000)
@@ -503,22 +498,22 @@ const handleDownload = () => {
 
 // 切换数据库
 const toggleDatabase = (database: any) => {
-  databases.value.forEach(db => db.selected = false)
+  databases.value.forEach((db) => (db.selected = false))
   database.selected = true
 }
 
 // 切换模型
 const toggleModel = (model: any) => {
-  models.value.forEach(m => m.selected = false)
+  models.value.forEach((m) => (m.selected = false))
   model.selected = true
 }
 
 // 获取模型状态类型
 const getModelStatusType = (status: string) => {
   const statusMap: Record<string, string> = {
-    '已训练': 'success',
-    '训练中': 'warning',
-    '待训练': 'info'
+    已训练: 'success',
+    训练中: 'warning',
+    待训练: 'info',
   }
   return statusMap[status] || 'info'
 }
@@ -546,9 +541,9 @@ const handleDatabaseAction = async (command: string, database: any) => {
         await ElMessageBox.confirm('确定要删除这个数据库连接吗？', '警告', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          type: 'warning'
+          type: 'warning',
         })
-        databases.value = databases.value.filter(db => db.id !== database.id)
+        databases.value = databases.value.filter((db) => db.id !== database.id)
         ElMessage.success('数据库连接已删除')
       } catch {
         // 用户取消
@@ -574,9 +569,9 @@ const handleModelAction = async (command: string, model: any) => {
         await ElMessageBox.confirm('确定要删除这个模型吗？', '警告', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          type: 'warning'
+          type: 'warning',
         })
-        models.value = models.value.filter(m => m.id !== model.id)
+        models.value = models.value.filter((m) => m.id !== model.id)
         ElMessage.success('模型已删除')
       } catch {
         // 用户取消
@@ -602,9 +597,9 @@ const handleTemplateAction = async (command: string, template: any) => {
         await ElMessageBox.confirm('确定要删除这个模板吗？', '警告', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          type: 'warning'
+          type: 'warning',
         })
-        templates.value = templates.value.filter(t => t.id !== template.id)
+        templates.value = templates.value.filter((t) => t.id !== template.id)
         ElMessage.success('模板已删除')
       } catch {
         // 用户取消
@@ -625,7 +620,7 @@ const handleAddDatabase = () => {
     name: databaseForm.name,
     tables: Math.floor(Math.random() * 30) + 5,
     size: `${Math.floor(Math.random() * 2000) + 100}MB`,
-    selected: false
+    selected: false,
   })
 
   ElMessage.success('数据库添加成功')
@@ -636,7 +631,7 @@ const handleAddDatabase = () => {
     name: '',
     type: '',
     host: '',
-    port: ''
+    port: '',
   })
 }
 
@@ -652,7 +647,7 @@ const handleAddModel = () => {
     name: modelForm.name,
     status: '待训练',
     accuracy: 0,
-    selected: false
+    selected: false,
   })
 
   ElMessage.success('模型添加成功')
@@ -662,7 +657,7 @@ const handleAddModel = () => {
   Object.assign(modelForm, {
     name: '',
     type: '',
-    description: ''
+    description: '',
   })
 }
 
@@ -676,7 +671,7 @@ const handleAddTemplate = () => {
   templates.value.push({
     id: Date.now().toString(),
     name: templateForm.name,
-    description: templateForm.description
+    description: templateForm.description,
   })
 
   ElMessage.success('模板添加成功')
@@ -686,7 +681,7 @@ const handleAddTemplate = () => {
   Object.assign(templateForm, {
     name: '',
     description: '',
-    steps: ''
+    steps: '',
   })
 }
 
@@ -815,7 +810,9 @@ onMounted(() => {
 }
 
 @keyframes typing {
-  0%, 80%, 100% {
+  0%,
+  80%,
+  100% {
     transform: scale(0);
   }
   40% {

@@ -48,11 +48,7 @@
             <el-icon><MagicStick /></el-icon>
             开始识别
           </el-button>
-          <el-button
-            size="large"
-            @click="handleClearFiles"
-            :disabled="recognizing"
-          >
+          <el-button size="large" @click="handleClearFiles" :disabled="recognizing">
             <el-icon><Delete /></el-icon>
             清空文件
           </el-button>
@@ -69,20 +65,13 @@
         </div>
 
         <div class="results-list">
-          <div
-            v-for="(result, index) in recognitionResults"
-            :key="result.id"
-            class="result-item"
-          >
+          <div v-for="(result, index) in recognitionResults" :key="result.id" class="result-item">
             <el-card shadow="hover" class="result-card">
               <div class="result-header">
                 <div class="file-info">
                   <h4 class="file-name">{{ result.fileName }}</h4>
                   <div class="file-meta">
-                    <el-tag
-                      :type="getStatusTagType(result.status)"
-                      size="small"
-                    >
+                    <el-tag :type="getStatusTagType(result.status)" size="small">
                       {{ getStatusText(result.status) }}
                     </el-tag>
                     <span class="file-size">{{ formatFileSize(result.fileSize) }}</span>
@@ -156,10 +145,7 @@
                         {{ result.expanded ? '收起' : '展开' }}
                       </el-button>
                     </div>
-                    <div
-                      class="text-area"
-                      :class="{ expanded: result.expanded }"
-                    >
+                    <div class="text-area" :class="{ expanded: result.expanded }">
                       <pre>{{ result.text }}</pre>
                     </div>
                   </div>
@@ -178,18 +164,12 @@
           </div>
         </div>
 
-        <div v-if="recognitionResults.some(r => r.status === 'success')" class="batch-actions">
-          <el-button
-            type="primary"
-            @click="handleBatchDownload"
-          >
+        <div v-if="recognitionResults.some((r) => r.status === 'success')" class="batch-actions">
+          <el-button type="primary" @click="handleBatchDownload">
             <el-icon><Download /></el-icon>
             批量下载所有文本
           </el-button>
-          <el-button
-            type="success"
-            @click="handleCopyAllText"
-          >
+          <el-button type="success" @click="handleCopyAllText">
             <el-icon><CopyDocument /></el-icon>
             复制所有文本
           </el-button>
@@ -198,17 +178,12 @@
     </div>
 
     <!-- 图片预览弹窗 -->
-    <el-dialog
-      v-model="previewDialogVisible"
-      title="图片预览"
-      width="70%"
-      top="5vh"
-    >
+    <el-dialog v-model="previewDialogVisible" title="图片预览" width="70%" top="5vh">
       <div v-if="currentPreview" class="image-preview">
         <img
           :src="currentPreview.previewUrl"
           :alt="currentPreview.fileName"
-          style="width: 100%; max-height: 70vh; object-fit: contain;"
+          style="width: 100%; max-height: 70vh; object-fit: contain"
         />
       </div>
     </el-dialog>
@@ -227,7 +202,7 @@ import {
   CopyDocument,
   Download,
   Refresh,
-  Picture
+  Picture,
 } from '@element-plus/icons-vue'
 import type { UploadFile } from 'element-plus'
 
@@ -257,7 +232,7 @@ const getStatusTagType = (status: string) => {
   const statusMap: Record<string, string> = {
     processing: 'warning',
     success: 'success',
-    failed: 'danger'
+    failed: 'danger',
   }
   return statusMap[status] || ''
 }
@@ -267,7 +242,7 @@ const getStatusText = (status: string) => {
   const statusMap: Record<string, string> = {
     processing: '识别中',
     success: '识别完成',
-    failed: '识别失败'
+    failed: '识别失败',
   }
   return statusMap[status] || status
 }
@@ -311,7 +286,7 @@ const handleFileRemove = (file: UploadFile) => {
   }
 
   // 从结果中移除对应的记录
-  const index = recognitionResults.value.findIndex(r => r.fileName === file.name)
+  const index = recognitionResults.value.findIndex((r) => r.fileName === file.name)
   if (index > -1) {
     recognitionResults.value.splice(index, 1)
   }
@@ -337,13 +312,13 @@ const handleStartRecognition = async () => {
 
   try {
     // 初始化识别结果
-    recognitionResults.value = fileList.value.map(file => ({
+    recognitionResults.value = fileList.value.map((file) => ({
       id: Math.random().toString(36).substr(2, 9),
       fileName: file.name!,
       fileSize: file.size!,
       status: 'processing' as const,
       progress: 0,
-      previewUrl: file.raw?.type?.startsWith('image/') ? URL.createObjectURL(file.raw) : undefined
+      previewUrl: file.raw?.type?.startsWith('image/') ? URL.createObjectURL(file.raw) : undefined,
     }))
 
     // 逐个识别文件
@@ -358,7 +333,6 @@ const handleStartRecognition = async () => {
         result.error = error instanceof Error ? error.message : '识别失败'
       }
     }
-
   } catch (error) {
     ElMessage.error('识别过程中发生错误')
   } finally {
@@ -371,7 +345,7 @@ const recognizeFile = async (result: RecognitionResult, file: File) => {
   // 模拟识别过程
   for (let progress = 0; progress <= 100; progress += 10) {
     result.progress = progress
-    await new Promise(resolve => setTimeout(resolve, 200))
+    await new Promise((resolve) => setTimeout(resolve, 200))
   }
 
   // TODO: 调用实际的OCR识别接口
@@ -386,7 +360,7 @@ const recognizeFile = async (result: RecognitionResult, file: File) => {
 
 // 重新识别
 const handleRetryRecognition = async (result: RecognitionResult) => {
-  const file = fileList.value.find(f => f.name === result.fileName)
+  const file = fileList.value.find((f) => f.name === result.fileName)
   if (!file?.raw) {
     ElMessage.error('找不到原始文件')
     return
@@ -438,15 +412,13 @@ const handleDownloadText = (result: RecognitionResult) => {
 
 // 批量下载
 const handleBatchDownload = () => {
-  const successResults = recognitionResults.value.filter(r => r.status === 'success')
+  const successResults = recognitionResults.value.filter((r) => r.status === 'success')
   if (successResults.length === 0) {
     ElMessage.warning('没有可下载的文本')
     return
   }
 
-  const allText = successResults
-    .map(r => `=== ${r.fileName} ===\n\n${r.text}\n\n`)
-    .join('')
+  const allText = successResults.map((r) => `=== ${r.fileName} ===\n\n${r.text}\n\n`).join('')
 
   const blob = new Blob([allText], { type: 'text/plain;charset=utf-8' })
   const url = URL.createObjectURL(blob)
@@ -463,15 +435,13 @@ const handleBatchDownload = () => {
 
 // 复制所有文本
 const handleCopyAllText = async () => {
-  const successResults = recognitionResults.value.filter(r => r.status === 'success')
+  const successResults = recognitionResults.value.filter((r) => r.status === 'success')
   if (successResults.length === 0) {
     ElMessage.warning('没有可复制的文本')
     return
   }
 
-  const allText = successResults
-    .map(r => `=== ${r.fileName} ===\n\n${r.text}`)
-    .join('\n\n')
+  const allText = successResults.map((r) => `=== ${r.fileName} ===\n\n${r.text}`).join('\n\n')
 
   try {
     await navigator.clipboard.writeText(allText)

@@ -1,16 +1,22 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white p-4">
+  <div
+    class="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white p-4"
+  >
     <!-- 顶部标题栏 -->
     <div class="mb-6">
       <div class="text-center mb-4">
-        <h1 class="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+        <h1
+          class="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent"
+        >
           湖北省自然资源审计数据监控大屏
         </h1>
       </div>
 
       <!-- 总体统计卡片 -->
       <div class="grid grid-cols-4 gap-4 mb-6">
-        <div class="bg-gradient-to-r from-blue-600/20 to-cyan-600/20 border border-blue-500/30 rounded-lg p-4">
+        <div
+          class="bg-gradient-to-r from-blue-600/20 to-cyan-600/20 border border-blue-500/30 rounded-lg p-4"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-blue-300 text-sm">总项目数</p>
@@ -20,7 +26,9 @@
           </div>
         </div>
 
-        <div class="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-lg p-4">
+        <div
+          class="bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 rounded-lg p-4"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-blue-300 text-sm">成果文件</p>
@@ -30,7 +38,9 @@
           </div>
         </div>
 
-        <div class="bg-gradient-to-r from-green-600/20 to-blue-600/20 border border-blue-500/30 rounded-lg p-4">
+        <div
+          class="bg-gradient-to-r from-green-600/20 to-blue-600/20 border border-blue-500/30 rounded-lg p-4"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-blue-300 text-sm">知识库</p>
@@ -40,7 +50,9 @@
           </div>
         </div>
 
-        <div class="bg-gradient-to-r from-orange-600/20 to-red-600/20 border border-blue-500/30 rounded-lg p-4">
+        <div
+          class="bg-gradient-to-r from-orange-600/20 to-red-600/20 border border-blue-500/30 rounded-lg p-4"
+        >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-blue-300 text-sm">提示词模型</p>
@@ -101,38 +113,67 @@
 
               <!-- 各个地市 -->
               <g v-for="city in hubeiCities" :key="city.id">
-                <path :d="city.path" :fill="getCityColor(city)"
+                <path
+                  :d="city.path"
+                  :fill="getCityColor(city)"
                   :stroke="selectedCity?.id === city.id ? '#00d4ff' : '#3b82f6'"
                   :stroke-width="selectedCity?.id === city.id ? '3' : '1'"
-                  class="cursor-pointer transition-all duration-300 hover:brightness-110" @click="selectCity(city)"
-                  @mouseenter="hoveredCity = city" @mouseleave="hoveredCity = null" />
+                  class="cursor-pointer transition-all duration-300 hover:brightness-110"
+                  @click="selectCity(city)"
+                  @mouseenter="hoveredCity = city"
+                  @mouseleave="hoveredCity = null"
+                />
 
                 <!-- 城市名称标签 -->
-                <text :x="city.labelX" :y="city.labelY" fill="#e2e8f0" text-anchor="middle"
-                  class="text-xs font-medium pointer-events-none">
+                <text
+                  :x="city.labelX"
+                  :y="city.labelY"
+                  fill="#e2e8f0"
+                  text-anchor="middle"
+                  class="text-xs font-medium pointer-events-none"
+                >
                   {{ city.name }}
                 </text>
 
                 <!-- 项目数量标签 -->
-                <text :x="city.labelX" :y="city.labelY + 12" fill="#00d4ff" text-anchor="middle"
-                  class="text-xs font-bold pointer-events-none">
+                <text
+                  :x="city.labelX"
+                  :y="city.labelY + 12"
+                  fill="#00d4ff"
+                  text-anchor="middle"
+                  class="text-xs font-bold pointer-events-none"
+                >
                   {{ city.projects }}个
                 </text>
               </g>
 
               <!-- 悬停提示 -->
               <g v-if="hoveredCity" class="pointer-events-none">
-                <rect :x="hoveredCity.labelX - 40" :y="hoveredCity.labelY - 35" width="80" height="25" fill="#1e3a8a"
-                  stroke="#3b82f6" rx="4" />
-                <text :x="hoveredCity.labelX" :y="hoveredCity.labelY - 20" fill="#00d4ff" text-anchor="middle"
-                  class="text-xs font-bold">
+                <rect
+                  :x="hoveredCity.labelX - 40"
+                  :y="hoveredCity.labelY - 35"
+                  width="80"
+                  height="25"
+                  fill="#1e3a8a"
+                  stroke="#3b82f6"
+                  rx="4"
+                />
+                <text
+                  :x="hoveredCity.labelX"
+                  :y="hoveredCity.labelY - 20"
+                  fill="#00d4ff"
+                  text-anchor="middle"
+                  class="text-xs font-bold"
+                >
                   {{ hoveredCity.projects }}个项目
                 </text>
               </g>
             </svg>
 
             <!-- 图例 -->
-            <div class="absolute bottom-4 left-4 bg-blue-900/50 p-3 rounded-lg border border-blue-500/30">
+            <div
+              class="absolute bottom-4 left-4 bg-blue-900/50 p-3 rounded-lg border border-blue-500/30"
+            >
               <div class="text-xs text-blue-300 mb-2">项目数量</div>
               <div class="flex items-center gap-4 text-xs">
                 <div class="flex items-center gap-1">
@@ -189,7 +230,11 @@
             <div class="bg-blue-800/20 p-3 rounded">
               <div class="text-sm text-blue-300 mb-2">审计类型分布</div>
               <div class="space-y-2">
-                <div v-for="type in selectedCity.auditTypes" :key="type.name" class="flex justify-between text-xs">
+                <div
+                  v-for="type in selectedCity.auditTypes"
+                  :key="type.name"
+                  class="flex justify-between text-xs"
+                >
                   <span class="text-blue-300">{{ type.name }}</span>
                   <span class="text-cyan-400 font-bold">{{ type.count }}</span>
                 </div>
@@ -199,8 +244,11 @@
             <div class="bg-blue-800/20 p-3 rounded">
               <div class="text-sm text-blue-300 mb-2">最新项目</div>
               <div class="space-y-2 max-h-32 overflow-y-auto">
-                <div v-for="project in selectedCity.recentProjects" :key="project.id"
-                  class="text-xs p-2 bg-blue-700/20 rounded">
+                <div
+                  v-for="project in selectedCity.recentProjects"
+                  :key="project.id"
+                  class="text-xs p-2 bg-blue-700/20 rounded"
+                >
                   <div class="text-cyan-400 font-medium">{{ project.name }}</div>
                   <div class="text-blue-300 mt-1">{{ project.date }}</div>
                 </div>
@@ -226,16 +274,26 @@
           <div class="relative h-48">
             <svg viewBox="0 0 200 200" class="w-full h-full">
               <g transform="translate(100,100)">
-                <path v-for="(segment, index) in pieSegments" :key="index" :d="segment.path" :fill="segment.color"
+                <path
+                  v-for="(segment, index) in pieSegments"
+                  :key="index"
+                  :d="segment.path"
+                  :fill="segment.color"
                   class="cursor-pointer transition-all duration-300 hover:brightness-110"
                   :transform="hoveredSegment === index ? 'scale(1.05)' : 'scale(1)'"
-                  @mouseenter="hoveredSegment = index" @mouseleave="hoveredSegment = null" />
+                  @mouseenter="hoveredSegment = index"
+                  @mouseleave="hoveredSegment = null"
+                />
               </g>
             </svg>
 
             <!-- 图例 -->
             <div class="absolute right-0 top-0 space-y-1">
-              <div v-for="(item, index) in pieData" :key="index" class="flex items-center gap-2 text-xs">
+              <div
+                v-for="(item, index) in pieData"
+                :key="index"
+                class="flex items-center gap-2 text-xs"
+              >
                 <div class="w-3 h-3 rounded" :style="{ backgroundColor: item.color }"></div>
                 <span class="text-blue-300">{{ item.name }}</span>
                 <span class="text-cyan-400 font-bold">{{ item.value }}%</span>
@@ -258,24 +316,49 @@
               <!-- 网格线 -->
       <defs>
         <pattern id="grid" width="30" height="15" patternUnits="userSpaceOnUse">
-          <path d="M 30 0 L 0 0 0 15" fill="none" stroke="#1e40af" stroke-width="0.5" opacity="0.3" />
+          <path
+            d="M 30 0 L 0 0 0 15"
+            fill="none"
+            stroke="#1e40af"
+            stroke-width="0.5"
+            opacity="0.3"
+          />
         </pattern>
       </defs>
       <rect width="300" height="150" fill="url(#grid)" />
 
       <!-- 趋势线 -->
-      <polyline :points="trendPoints" fill="none" stroke="#00d4ff" stroke-width="2" class="drop-shadow-sm" />
+      <polyline
+        :points="trendPoints"
+        fill="none"
+        stroke="#00d4ff"
+        stroke-width="2"
+        class="drop-shadow-sm"
+      />
 
       <!-- 数据点 -->
-      <circle v-for="(point, index) in trendData" :key="index" :cx="30 + index * 40" :cy="150 - point.projects * 2"
-        r="3" fill="#00d4ff" class="cursor-pointer transition-all duration-300 hover:r-5" />
+      <circle
+        v-for="(point, index) in trendData"
+        :key="index"
+        :cx="30 + index * 40"
+        :cy="150 - point.projects * 2"
+        r="3"
+        fill="#00d4ff"
+        class="cursor-pointer transition-all duration-300 hover:r-5"
+      />
 
       <!-- X轴标签 -->
-      <text v-for="(point, index) in trendData" :key="'label-' + index" :x="30 + index * 40" y="145" fill="#60a5fa"
-        text-anchor="middle" class="text-xs">
+      <text
+        v-for="(point, index) in trendData"
+        :key="'label-' + index"
+        :x="30 + index * 40"
+        y="145"
+        fill="#60a5fa"
+        text-anchor="middle"
+        class="text-xs"
+      >
         {{ point.month }}
       </text>
-
     </div>
 
     <!-- 底部项目列表 -->
@@ -284,14 +367,18 @@
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-cyan-400 font-semibold">地区项目列表</h3>
           <div class="flex gap-2">
-            <select v-model="selectedYear"
-              class="bg-blue-800/30 border border-blue-500/30 rounded px-3 py-1 text-white text-sm">
+            <select
+              v-model="selectedYear"
+              class="bg-blue-800/30 border border-blue-500/30 rounded px-3 py-1 text-white text-sm"
+            >
               <option value="2024">2024年</option>
               <option value="2023">2023年</option>
               <option value="2022">2022年</option>
             </select>
-            <select v-model="selectedRegion"
-              class="bg-blue-800/30 border border-blue-500/30 rounded px-3 py-1 text-white text-sm">
+            <select
+              v-model="selectedRegion"
+              class="bg-blue-800/30 border border-blue-500/30 rounded px-3 py-1 text-white text-sm"
+            >
               <option value="all">全部地区</option>
               <option value="wuhan">武汉市</option>
               <option value="yichang">宜昌市</option>
@@ -313,8 +400,12 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="city in hubeiCities.slice(0, 8)" :key="city.id"
-                class="border-b border-blue-500/20 hover:bg-blue-800/20 cursor-pointer" @click="selectCity(city)">
+              <tr
+                v-for="city in hubeiCities.slice(0, 8)"
+                :key="city.id"
+                class="border-b border-blue-500/20 hover:bg-blue-800/20 cursor-pointer"
+                @click="selectCity(city)"
+              >
                 <td class="p-2 text-cyan-400 font-medium">{{ city.name }}</td>
                 <td class="p-2">{{ city.projects }}</td>
                 <td class="p-2">{{ city.ongoing }}</td>
@@ -329,7 +420,6 @@
       </div>
     </div>
   </div>
-
 </template>
 
 <script setup>
@@ -342,7 +432,7 @@ import {
   TrendingUp,
   MapPin,
   PieChart,
-  Activity
+  Activity,
 } from 'lucide-vue-next'
 
 // 重命名图标以避免冲突
@@ -386,13 +476,13 @@ const hubeiCities = ref([
       { name: '土地利用审计', count: 45 },
       { name: '矿产资源审计', count: 34 },
       { name: '森林资源审计', count: 42 },
-      { name: '水资源审计', count: 35 }
+      { name: '水资源审计', count: 35 },
     ],
     recentProjects: [
       { id: 1, name: '武汉市土地利用专项审计', date: '2024-01-15' },
       { id: 2, name: '长江流域生态保护审计', date: '2024-01-10' },
-      { id: 3, name: '城市绿地资源审计', date: '2024-01-08' }
-    ]
+      { id: 3, name: '城市绿地资源审计', date: '2024-01-08' },
+    ],
   },
   {
     id: 'yichang',
@@ -408,12 +498,12 @@ const hubeiCities = ref([
       { name: '土地利用审计', count: 28 },
       { name: '矿产资源审计', count: 25 },
       { name: '森林资源审计', count: 30 },
-      { name: '水资源审计', count: 15 }
+      { name: '水资源审计', count: 15 },
     ],
     recentProjects: [
       { id: 1, name: '三峡库区生态审计', date: '2024-01-12' },
-      { id: 2, name: '矿产资源开发审计', date: '2024-01-09' }
-    ]
+      { id: 2, name: '矿产资源开发审计', date: '2024-01-09' },
+    ],
   },
   {
     id: 'xiangyang',
@@ -429,12 +519,12 @@ const hubeiCities = ref([
       { name: '土地利用审计', count: 25 },
       { name: '矿产资源审计', count: 22 },
       { name: '森林资源审计', count: 25 },
-      { name: '水资源审计', count: 15 }
+      { name: '水资源审计', count: 15 },
     ],
     recentProjects: [
       { id: 1, name: '汉江流域保护审计', date: '2024-01-14' },
-      { id: 2, name: '农田保护专项审计', date: '2024-01-11' }
-    ]
+      { id: 2, name: '农田保护专项审计', date: '2024-01-11' },
+    ],
   },
   {
     id: 'jingzhou',
@@ -450,12 +540,12 @@ const hubeiCities = ref([
       { name: '土地利用审计', count: 22 },
       { name: '矿产资源审计', count: 18 },
       { name: '森林资源审计', count: 21 },
-      { name: '水资源审计', count: 15 }
+      { name: '水资源审计', count: 15 },
     ],
     recentProjects: [
       { id: 1, name: '湿地保护审计', date: '2024-01-13' },
-      { id: 2, name: '农业用地审计', date: '2024-01-07' }
-    ]
+      { id: 2, name: '农业用地审计', date: '2024-01-07' },
+    ],
   },
   {
     id: 'huanggang',
@@ -471,12 +561,12 @@ const hubeiCities = ref([
       { name: '土地利用审计', count: 18 },
       { name: '矿产资源审计', count: 15 },
       { name: '森林资源审计', count: 20 },
-      { name: '水资源审计', count: 12 }
+      { name: '水资源审计', count: 12 },
     ],
     recentProjects: [
       { id: 1, name: '大别山生态审计', date: '2024-01-16' },
-      { id: 2, name: '红色旅游资源审计', date: '2024-01-05' }
-    ]
+      { id: 2, name: '红色旅游资源审计', date: '2024-01-05' },
+    ],
   },
   {
     id: 'xiaogan',
@@ -492,12 +582,12 @@ const hubeiCities = ref([
       { name: '土地利用审计', count: 16 },
       { name: '矿产资源审计', count: 12 },
       { name: '森林资源审计', count: 15 },
-      { name: '水资源审计', count: 11 }
+      { name: '水资源审计', count: 11 },
     ],
     recentProjects: [
       { id: 1, name: '城乡建设用地审计', date: '2024-01-18' },
-      { id: 2, name: '水库资源审计', date: '2024-01-06' }
-    ]
+      { id: 2, name: '水库资源审计', date: '2024-01-06' },
+    ],
   },
   {
     id: 'shiyan',
@@ -513,12 +603,12 @@ const hubeiCities = ref([
       { name: '土地利用审计', count: 12 },
       { name: '矿产资源审计', count: 10 },
       { name: '森林资源审计', count: 13 },
-      { name: '水资源审计', count: 8 }
+      { name: '水资源审计', count: 8 },
     ],
     recentProjects: [
       { id: 1, name: '南水北调水源地审计', date: '2024-01-17' },
-      { id: 2, name: '山区生态保护审计', date: '2024-01-04' }
-    ]
+      { id: 2, name: '山区生态保护审计', date: '2024-01-04' },
+    ],
   },
   {
     id: 'enshi',
@@ -534,13 +624,13 @@ const hubeiCities = ref([
       { name: '土地利用审计', count: 11 },
       { name: '矿产资源审计', count: 8 },
       { name: '森林资源审计', count: 12 },
-      { name: '水资源审计', count: 7 }
+      { name: '水资源审计', count: 7 },
     ],
     recentProjects: [
       { id: 1, name: '民族地区生态审计', date: '2024-01-19' },
-      { id: 2, name: '旅游资源开发审计', date: '2024-01-03' }
-    ]
-  }
+      { id: 2, name: '旅游资源开发审计', date: '2024-01-03' },
+    ],
+  },
 ])
 
 // 饼图数据
@@ -570,7 +660,7 @@ const getCityColor = (city) => {
 
 const pieSegments = computed(() => {
   let currentAngle = 0
-  return pieData.value.map(item => {
+  return pieData.value.map((item) => {
     const startAngle = currentAngle
     const endAngle = currentAngle + (item.value / 100) * 2 * Math.PI
     currentAngle = endAngle
@@ -582,16 +672,11 @@ const pieSegments = computed(() => {
 
     const largeArcFlag = endAngle - startAngle <= Math.PI ? '0' : '1'
 
-    const path = [
-      'M', 0, 0,
-      'L', x1, y1,
-      'A', 60, 60, 0, largeArcFlag, 1, x2, y2,
-      'Z'
-    ].join(' ')
+    const path = ['M', 0, 0, 'L', x1, y1, 'A', 60, 60, 0, largeArcFlag, 1, x2, y2, 'Z'].join(' ')
 
     return {
       path,
-      color: item.color
+      color: item.color,
     }
   })
 })

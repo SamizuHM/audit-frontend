@@ -7,10 +7,7 @@
         <p class="page-description">管理审计相关的法规、案例、模板和指南</p>
       </div>
       <div class="header-right">
-        <el-button
-          type="primary"
-          @click="handleCreateKnowledge"
-        >
+        <el-button type="primary" @click="handleCreateKnowledge">
           <el-icon><Plus /></el-icon>
           新建知识
         </el-button>
@@ -48,12 +45,7 @@
             </el-select>
           </el-col>
           <el-col :span="6">
-            <el-select
-              v-model="searchForm.tag"
-              placeholder="标签"
-              clearable
-              @change="handleSearch"
-            >
+            <el-select v-model="searchForm.tag" placeholder="标签" clearable @change="handleSearch">
               <el-option label="全部" value="" />
               <el-option label="土地管理" value="土地管理" />
               <el-option label="矿产资源" value="矿产资源" />
@@ -80,39 +72,23 @@
         </div>
 
         <div v-else class="knowledge-list">
-          <div
-            v-for="knowledge in paginatedKnowledge"
-            :key="knowledge.id"
-            class="knowledge-item"
-          >
+          <div v-for="knowledge in paginatedKnowledge" :key="knowledge.id" class="knowledge-item">
             <el-card shadow="hover" class="knowledge-card">
               <div class="knowledge-header">
                 <div class="knowledge-title">
                   <h3>{{ knowledge.title }}</h3>
                   <div class="knowledge-tags">
-                    <el-tag
-                      :type="getTypeTagType(knowledge.type)"
-                      size="small"
-                    >
+                    <el-tag :type="getTypeTagType(knowledge.type)" size="small">
                       {{ getTypeText(knowledge.type) }}
                     </el-tag>
-                    <el-tag
-                      v-for="tag in knowledge.tags"
-                      :key="tag"
-                      size="small"
-                      effect="plain"
-                    >
+                    <el-tag v-for="tag in knowledge.tags" :key="tag" size="small" effect="plain">
                       {{ tag }}
                     </el-tag>
                   </div>
                 </div>
                 <div class="knowledge-actions">
                   <el-dropdown @command="(command) => handleKnowledgeAction(command, knowledge)">
-                    <el-button
-                      type="text"
-                      size="small"
-                      @click.stop
-                    >
+                    <el-button type="text" size="small" @click.stop>
                       <el-icon><More /></el-icon>
                     </el-button>
                     <template #dropdown>
@@ -192,7 +168,7 @@ import {
   Calendar,
   User,
   EditPen,
-  DocumentCopy
+  DocumentCopy,
 } from '@element-plus/icons-vue'
 import { useKnowledgeStore } from '@/stores/knowledge'
 import type { KnowledgeItem } from '@/services/api'
@@ -204,7 +180,7 @@ const knowledgeStore = useKnowledgeStore()
 const searchForm = reactive({
   keyword: '',
   type: '',
-  tag: ''
+  tag: '',
 })
 
 // 分页数据
@@ -217,20 +193,21 @@ const filteredKnowledge = computed(() => {
 
   // 关键字搜索
   if (searchForm.keyword) {
-    knowledge = knowledge.filter(k =>
-      k.title.toLowerCase().includes(searchForm.keyword.toLowerCase()) ||
-      k.content.toLowerCase().includes(searchForm.keyword.toLowerCase())
+    knowledge = knowledge.filter(
+      (k) =>
+        k.title.toLowerCase().includes(searchForm.keyword.toLowerCase()) ||
+        k.content.toLowerCase().includes(searchForm.keyword.toLowerCase()),
     )
   }
 
   // 类型筛选
   if (searchForm.type) {
-    knowledge = knowledge.filter(k => k.type === searchForm.type)
+    knowledge = knowledge.filter((k) => k.type === searchForm.type)
   }
 
   // 标签筛选
   if (searchForm.tag) {
-    knowledge = knowledge.filter(k => k.tags.includes(searchForm.tag))
+    knowledge = knowledge.filter((k) => k.tags.includes(searchForm.tag))
   }
 
   return knowledge
@@ -249,7 +226,7 @@ const getTypeTagType = (type: string) => {
     regulation: 'danger',
     case: 'success',
     template: 'warning',
-    guide: 'info'
+    guide: 'info',
   }
   return typeMap[type] || ''
 }
@@ -260,7 +237,7 @@ const getTypeText = (type: string) => {
     regulation: '法规',
     case: '案例',
     template: '模板',
-    guide: '指南'
+    guide: '指南',
   }
   return typeMap[type] || type
 }
@@ -331,7 +308,7 @@ const handleKnowledgeAction = async (command: string, knowledge: KnowledgeItem) 
         await ElMessageBox.confirm('确定要删除这条知识吗？删除后无法恢复。', '警告', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          type: 'warning'
+          type: 'warning',
         })
 
         await knowledgeStore.deleteKnowledge(knowledge.id)

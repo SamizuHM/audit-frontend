@@ -124,10 +124,7 @@
 
         <el-table-column prop="type" label="备份类型" width="120">
           <template #default="{ row }">
-            <el-tag
-              :type="getBackupTypeTag(row.type)"
-              size="small"
-            >
+            <el-tag :type="getBackupTypeTag(row.type)" size="small">
               {{ getBackupTypeText(row.type) }}
             </el-tag>
           </template>
@@ -142,11 +139,7 @@
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <div class="operation-buttons">
-              <el-button
-                type="primary"
-                size="small"
-                @click="handleDownloadBackup(row)"
-              >
+              <el-button type="primary" size="small" @click="handleDownloadBackup(row)">
                 <el-icon><Download /></el-icon>
                 下载
               </el-button>
@@ -159,11 +152,7 @@
                 <el-icon><Upload /></el-icon>
                 恢复
               </el-button>
-              <el-button
-                type="danger"
-                size="small"
-                @click="handleDeleteBackup(row)"
-              >
+              <el-button type="danger" size="small" @click="handleDeleteBackup(row)">
                 <el-icon><Delete /></el-icon>
                 删除
               </el-button>
@@ -193,12 +182,7 @@
       width="500px"
       :before-close="handleCloseRestoreDialog"
     >
-      <el-form
-        ref="restoreFormRef"
-        :model="restoreForm"
-        :rules="restoreRules"
-        label-width="100px"
-      >
+      <el-form ref="restoreFormRef" :model="restoreForm" :rules="restoreRules" label-width="100px">
         <el-form-item label="恢复方式" prop="type">
           <el-radio-group v-model="restoreForm.type">
             <el-radio label="file">上传备份文件</el-radio>
@@ -220,15 +204,17 @@
               选择文件
             </el-button>
             <template #tip>
-              <div class="el-upload__tip">
-                仅支持 .sql 或 .backup 格式的备份文件
-              </div>
+              <div class="el-upload__tip">仅支持 .sql 或 .backup 格式的备份文件</div>
             </template>
           </el-upload>
         </el-form-item>
 
         <el-form-item v-if="restoreForm.type === 'backup'" label="选择备份" prop="backupId">
-          <el-select v-model="restoreForm.backupId" placeholder="请选择备份文件" style="width: 100%">
+          <el-select
+            v-model="restoreForm.backupId"
+            placeholder="请选择备份文件"
+            style="width: 100%"
+          >
             <el-option
               v-for="backup in backupHistory"
               :key="backup.id"
@@ -258,11 +244,7 @@
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="restoreDialogVisible = false">取消</el-button>
-          <el-button
-            type="danger"
-            @click="handleConfirmRestore"
-            :loading="restoreLoading"
-          >
+          <el-button type="danger" @click="handleConfirmRestore" :loading="restoreLoading">
             确认恢复
           </el-button>
         </div>
@@ -282,7 +264,7 @@ import {
   Reading,
   FolderOpened,
   Refresh,
-  Delete
+  Delete,
 } from '@element-plus/icons-vue'
 import { usePermissionStore } from '@/stores/permission'
 
@@ -322,7 +304,7 @@ const uploadRef = ref()
 const databaseInfo = ref<DatabaseInfo>({
   status: 'online',
   totalSize: 1024 * 1024 * 1024 * 100, // 100GB
-  usedSize: 1024 * 1024 * 1024 * 45   // 45GB
+  usedSize: 1024 * 1024 * 1024 * 45, // 45GB
 })
 
 // 统计数据
@@ -330,7 +312,7 @@ const statistics = ref<Statistics>({
   userCount: 156,
   projectCount: 89,
   knowledgeCount: 1247,
-  backupCount: 12
+  backupCount: 12,
 })
 
 // 备份历史
@@ -345,22 +327,16 @@ const restoreForm = reactive({
   type: 'file',
   file: null as File | null,
   backupId: '',
-  description: ''
+  description: '',
 })
 
 const fileList = ref<UploadFile[]>([])
 
 // 表单验证规则
 const restoreRules = {
-  type: [
-    { required: true, message: '请选择恢复方式', trigger: 'change' }
-  ],
-  file: [
-    { required: true, message: '请选择备份文件', trigger: 'change' }
-  ],
-  backupId: [
-    { required: true, message: '请选择备份', trigger: 'change' }
-  ]
+  type: [{ required: true, message: '请选择恢复方式', trigger: 'change' }],
+  file: [{ required: true, message: '请选择备份文件', trigger: 'change' }],
+  backupId: [{ required: true, message: '请选择备份', trigger: 'change' }],
 }
 
 // 分页后的备份列表
@@ -375,7 +351,7 @@ const getDatabaseStatusType = () => {
   const statusMap: Record<string, string> = {
     online: 'success',
     offline: 'danger',
-    maintenance: 'warning'
+    maintenance: 'warning',
   }
   return statusMap[databaseInfo.value.status] || ''
 }
@@ -385,7 +361,7 @@ const getDatabaseStatusText = () => {
   const statusMap: Record<string, string> = {
     online: '运行中',
     offline: '离线',
-    maintenance: '维护中'
+    maintenance: '维护中',
   }
   return statusMap[databaseInfo.value.status] || '未知'
 }
@@ -394,7 +370,7 @@ const getDatabaseStatusText = () => {
 const getBackupTypeTag = (type: string) => {
   const typeMap: Record<string, string> = {
     auto: 'info',
-    manual: 'success'
+    manual: 'success',
   }
   return typeMap[type] || ''
 }
@@ -403,7 +379,7 @@ const getBackupTypeTag = (type: string) => {
 const getBackupTypeText = (type: string) => {
   const typeMap: Record<string, string> = {
     auto: '自动备份',
-    manual: '手动备份'
+    manual: '手动备份',
   }
   return typeMap[type] || type
 }
@@ -448,7 +424,7 @@ const handleBackupDatabase = async () => {
     await ElMessageBox.confirm('确定要创建数据库备份吗？', '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
-      type: 'info'
+      type: 'info',
     })
 
     backupLoading.value = true
@@ -494,8 +470,8 @@ const handleConfirmRestore = async () => {
       {
         confirmButtonText: '确认恢复',
         cancelButtonText: '取消',
-        type: 'error'
-      }
+        type: 'error',
+      },
     )
 
     restoreLoading.value = true
@@ -535,8 +511,8 @@ const handleDeleteBackup = async (backup: BackupRecord) => {
       {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        type: 'warning'
-      }
+        type: 'warning',
+      },
     )
 
     // TODO: 调用删除接口
@@ -563,7 +539,7 @@ const resetRestoreForm = () => {
     type: 'file',
     file: null,
     backupId: '',
-    description: ''
+    description: '',
   })
   fileList.value = []
   if (restoreFormRef.value) {
@@ -574,14 +550,14 @@ const resetRestoreForm = () => {
 // API 方法（模拟）
 const fetchStatistics = async () => {
   // TODO: 调用实际的统计接口
-  await new Promise(resolve => setTimeout(resolve, 500))
+  await new Promise((resolve) => setTimeout(resolve, 500))
 }
 
 const fetchBackupHistory = async () => {
   historyLoading.value = true
   try {
     // TODO: 调用实际的备份历史接口
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
 
     // 模拟数据
     backupHistory.value = [
@@ -591,15 +567,15 @@ const fetchBackupHistory = async () => {
         size: 1024 * 1024 * 256,
         createTime: '2024-07-04 09:30:00',
         type: 'manual',
-        description: '系统更新前备份'
+        description: '系统更新前备份',
       },
       {
         id: '2',
         fileName: 'backup_2024_07_03_00_00_00.sql',
         size: 1024 * 1024 * 248,
         createTime: '2024-07-03 00:00:00',
-        type: 'auto'
-      }
+        type: 'auto',
+      },
     ]
   } catch (error) {
     ElMessage.error('获取备份历史失败')
@@ -610,33 +586,30 @@ const fetchBackupHistory = async () => {
 
 const createBackup = async () => {
   // TODO: 调用实际的备份接口
-  await new Promise(resolve => setTimeout(resolve, 2000))
+  await new Promise((resolve) => setTimeout(resolve, 2000))
 }
 
 const restoreDatabase = async (data: any) => {
   // TODO: 调用实际的恢复接口
   console.log('恢复数据库:', data)
-  await new Promise(resolve => setTimeout(resolve, 3000))
+  await new Promise((resolve) => setTimeout(resolve, 3000))
 }
 
 const downloadBackup = async (backupId: string) => {
   // TODO: 调用实际的下载接口
   console.log('下载备份:', backupId)
-  await new Promise(resolve => setTimeout(resolve, 1000))
+  await new Promise((resolve) => setTimeout(resolve, 1000))
 }
 
 const deleteBackup = async (backupId: string) => {
   // TODO: 调用实际的删除接口
   console.log('删除备份:', backupId)
-  await new Promise(resolve => setTimeout(resolve, 500))
+  await new Promise((resolve) => setTimeout(resolve, 500))
 }
 
 // 组件挂载时获取数据
 onMounted(async () => {
-  await Promise.all([
-    fetchStatistics(),
-    fetchBackupHistory()
-  ])
+  await Promise.all([fetchStatistics(), fetchBackupHistory()])
 })
 </script>
 
@@ -651,7 +624,7 @@ onMounted(async () => {
   border-radius: 6px;
   padding: 16px 20px;
   margin-bottom: 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -750,7 +723,7 @@ onMounted(async () => {
 .backup-history {
   background: #fff;
   border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 

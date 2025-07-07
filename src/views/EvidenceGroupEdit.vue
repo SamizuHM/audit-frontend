@@ -2,10 +2,7 @@
   <div class="evidence-group-edit-container">
     <div class="page-header">
       <div class="header-left">
-        <el-button
-          type="text"
-          @click="goBack"
-        >
+        <el-button type="text" @click="goBack">
           <el-icon><ArrowLeft /></el-icon>
           返回
         </el-button>
@@ -13,11 +10,7 @@
       </div>
       <div class="header-right">
         <el-button @click="goBack">取消</el-button>
-        <el-button
-          type="primary"
-          :loading="loading"
-          @click="handleSave"
-        >
+        <el-button type="primary" :loading="loading" @click="handleSave">
           {{ loading ? '保存中...' : '保存' }}
         </el-button>
       </div>
@@ -79,11 +72,7 @@
             <div class="evidence-files-section">
               <div class="section-header">
                 <span>证据文件管理</span>
-                <el-button
-                  type="primary"
-                  size="small"
-                  @click="handleAddFile"
-                >
+                <el-button type="primary" size="small" @click="handleAddFile">
                   <el-icon><Plus /></el-icon>
                   添加文件
                 </el-button>
@@ -94,11 +83,7 @@
               </div>
 
               <div v-else class="evidence-files-list">
-                <div
-                  v-for="(file, index) in evidenceFiles"
-                  :key="index"
-                  class="evidence-file-item"
-                >
+                <div v-for="(file, index) in evidenceFiles" :key="index" class="evidence-file-item">
                   <el-card shadow="never" class="file-card">
                     <div class="file-header">
                       <div class="file-info">
@@ -135,25 +120,13 @@
                         </div>
                       </div>
                       <div class="file-actions">
-                        <el-button
-                          type="text"
-                          size="small"
-                          @click="handlePreviewFile(file)"
-                        >
+                        <el-button type="text" size="small" @click="handlePreviewFile(file)">
                           <el-icon><View /></el-icon>
                         </el-button>
-                        <el-button
-                          type="text"
-                          size="small"
-                          @click="handleDownloadFile(file)"
-                        >
+                        <el-button type="text" size="small" @click="handleDownloadFile(file)">
                           <el-icon><Download /></el-icon>
                         </el-button>
-                        <el-button
-                          type="text"
-                          size="small"
-                          @click="handleRemoveFile(index)"
-                        >
+                        <el-button type="text" size="small" @click="handleRemoveFile(index)">
                           <el-icon><Delete /></el-icon>
                         </el-button>
                       </div>
@@ -179,11 +152,7 @@
             <div class="evidence-analysis-section">
               <div class="section-header">
                 <span>证据分析记录</span>
-                <el-button
-                  type="primary"
-                  size="small"
-                  @click="handleAddAnalysis"
-                >
+                <el-button type="primary" size="small" @click="handleAddAnalysis">
                   <el-icon><Plus /></el-icon>
                   添加分析
                 </el-button>
@@ -216,11 +185,7 @@
                         <el-option label="关联性分析" value="relevance" />
                         <el-option label="合规性分析" value="compliance" />
                       </el-select>
-                      <el-button
-                        type="text"
-                        size="small"
-                        @click="handleRemoveAnalysis(index)"
-                      >
+                      <el-button type="text" size="small" @click="handleRemoveAnalysis(index)">
                         <el-icon><Close /></el-icon>
                       </el-button>
                     </div>
@@ -237,10 +202,7 @@
                     <div class="analysis-result">
                       <div class="result-header">
                         <span>分析结论</span>
-                        <el-tag
-                          :type="getResultTagType(analysis.result)"
-                          size="small"
-                        >
+                        <el-tag :type="getResultTagType(analysis.result)" size="small">
                           {{ analysis.result }}
                         </el-tag>
                       </div>
@@ -270,15 +232,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
-import {
-  ArrowLeft,
-  Plus,
-  Close,
-  Document,
-  View,
-  Download,
-  Delete
-} from '@element-plus/icons-vue'
+import { ArrowLeft, Plus, Close, Document, View, Download, Delete } from '@element-plus/icons-vue'
 import { useProjectStore } from '@/stores/project'
 import type { EvidenceGroup, AuditProject } from '@/services/api'
 
@@ -302,48 +256,50 @@ const projectList = computed(() => projectStore.projects)
 const evidenceForm = reactive<Partial<EvidenceGroup>>({
   name: '',
   description: '',
-  projectId: undefined
+  projectId: undefined,
 })
 
 // 证据文件数据
-const evidenceFiles = ref<Array<{
-  name: string
-  type: string
-  size: string
-  description: string
-  url?: string
-}>>([])
+const evidenceFiles = ref<
+  Array<{
+    name: string
+    type: string
+    size: string
+    description: string
+    url?: string
+  }>
+>([])
 
 // 证据分析数据
-const evidenceAnalysis = ref<Array<{
-  title: string
-  type: string
-  content: string
-  result: string
-}>>([])
+const evidenceAnalysis = ref<
+  Array<{
+    title: string
+    type: string
+    content: string
+    result: string
+  }>
+>([])
 
 // 表单验证规则
 const evidenceRules = {
   name: [
     { required: true, message: '请输入证据组名称', trigger: 'blur' },
-    { min: 2, max: 100, message: '证据组名称长度应在2-100字符之间', trigger: 'blur' }
+    { min: 2, max: 100, message: '证据组名称长度应在2-100字符之间', trigger: 'blur' },
   ],
-  projectId: [
-    { required: true, message: '请选择关联项目', trigger: 'change' }
-  ],
+  projectId: [{ required: true, message: '请选择关联项目', trigger: 'change' }],
   description: [
     { required: true, message: '请输入证据组描述', trigger: 'blur' },
-    { min: 10, max: 500, message: '证据组描述长度应在10-500字符之间', trigger: 'blur' }
-  ]
+    { min: 10, max: 500, message: '证据组描述长度应在10-500字符之间', trigger: 'blur' },
+  ],
 }
 
 // 获取结果标签类型
 const getResultTagType = (result: string) => {
   const resultMap: Record<string, string> = {
-    '符合要求': 'success',
-    '存在问题': 'danger',
-    '需要补充': 'warning',
-    '无法判断': 'info'
+    符合要求: 'success',
+    存在问题: 'danger',
+    需要补充: 'warning',
+    无法判断: 'info',
   }
   return resultMap[result] || ''
 }
@@ -361,7 +317,7 @@ const handleAddFile = () => {
     name: '新文件.pdf',
     type: 'document',
     size: '1.2MB',
-    description: ''
+    description: '',
   })
 }
 
@@ -383,7 +339,7 @@ const handleRemoveFile = async (index: number) => {
     await ElMessageBox.confirm('确定要删除这个文件吗？', '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
-      type: 'warning'
+      type: 'warning',
     })
 
     evidenceFiles.value.splice(index, 1)
@@ -399,7 +355,7 @@ const handleAddAnalysis = () => {
     title: '',
     type: 'authenticity',
     content: '',
-    result: ''
+    result: '',
   })
 }
 
@@ -422,7 +378,7 @@ const handleSave = async () => {
     const saveData = {
       ...evidenceForm,
       evidenceFiles: evidenceFiles.value,
-      evidenceAnalysis: evidenceAnalysis.value
+      evidenceAnalysis: evidenceAnalysis.value,
     }
 
     // TODO: 调用真实的保存接口
@@ -433,7 +389,7 @@ const handleSave = async () => {
     // }
 
     // 模拟API调用
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     ElMessage.success(isEdit.value ? '证据组更新成功' : '证据组创建成功')
     router.push('/dashboard/audit-projects')
@@ -462,14 +418,14 @@ const loadEvidenceData = async () => {
       name: '土地出让公告.pdf',
       type: 'document',
       size: '2.5MB',
-      description: '土地出让公告原件'
+      description: '土地出让公告原件',
     },
     {
       name: '竞价记录.xlsx',
       type: 'document',
       size: '1.8MB',
-      description: '土地竞价过程记录'
-    }
+      description: '土地竞价过程记录',
+    },
   ]
 
   evidenceAnalysis.value = [
@@ -477,8 +433,8 @@ const loadEvidenceData = async () => {
       title: '公告程序合规性分析',
       type: 'compliance',
       content: '分析土地出让公告程序是否符合法律法规要求',
-      result: '符合要求'
-    }
+      result: '符合要求',
+    },
   ]
 }
 

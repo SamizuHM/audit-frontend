@@ -2,10 +2,7 @@
   <div class="project-edit-container">
     <div class="page-header">
       <div class="header-left">
-        <el-button
-          type="text"
-          @click="goBack"
-        >
+        <el-button type="text" @click="goBack">
           <el-icon><ArrowLeft /></el-icon>
           返回
         </el-button>
@@ -13,11 +10,7 @@
       </div>
       <div class="header-right">
         <el-button @click="goBack">取消</el-button>
-        <el-button
-          type="primary"
-          :loading="projectStore.loading"
-          @click="handleSave"
-        >
+        <el-button type="primary" :loading="projectStore.loading" @click="handleSave">
           {{ projectStore.loading ? '保存中...' : '保存' }}
         </el-button>
       </div>
@@ -118,11 +111,7 @@
             <div class="audit-points-section">
               <div class="section-header">
                 <span>审计要点配置</span>
-                <el-button
-                  type="primary"
-                  size="small"
-                  @click="handleAddAuditPoint"
-                >
+                <el-button type="primary" size="small" @click="handleAddAuditPoint">
                   <el-icon><Plus /></el-icon>
                   添加要点
                 </el-button>
@@ -133,11 +122,7 @@
               </div>
 
               <div v-else class="audit-points-list">
-                <div
-                  v-for="(point, index) in auditPoints"
-                  :key="index"
-                  class="audit-point-item"
-                >
+                <div v-for="(point, index) in auditPoints" :key="index" class="audit-point-item">
                   <el-card shadow="never" class="point-card">
                     <div class="point-header">
                       <el-input
@@ -145,11 +130,7 @@
                         placeholder="请输入要点标题"
                         class="point-title-input"
                       />
-                      <el-button
-                        type="text"
-                        size="small"
-                        @click="handleRemoveAuditPoint(index)"
-                      >
+                      <el-button type="text" size="small" @click="handleRemoveAuditPoint(index)">
                         <el-icon><Close /></el-icon>
                       </el-button>
                     </div>
@@ -171,11 +152,7 @@
             <div class="evidence-section">
               <div class="section-header">
                 <span>证据材料配置</span>
-                <el-button
-                  type="primary"
-                  size="small"
-                  @click="handleAddEvidence"
-                >
+                <el-button type="primary" size="small" @click="handleAddEvidence">
                   <el-icon><Plus /></el-icon>
                   添加证据
                 </el-button>
@@ -186,11 +163,7 @@
               </div>
 
               <div v-else class="evidence-list">
-                <div
-                  v-for="(evidence, index) in evidenceList"
-                  :key="index"
-                  class="evidence-item"
-                >
+                <div v-for="(evidence, index) in evidenceList" :key="index" class="evidence-item">
                   <el-card shadow="never" class="evidence-card">
                     <div class="evidence-header">
                       <el-input
@@ -208,11 +181,7 @@
                         <el-option label="视频" value="video" />
                         <el-option label="其他" value="other" />
                       </el-select>
-                      <el-button
-                        type="text"
-                        size="small"
-                        @click="handleRemoveEvidence(index)"
-                      >
+                      <el-button type="text" size="small" @click="handleRemoveEvidence(index)">
                         <el-icon><Close /></el-icon>
                       </el-button>
                     </div>
@@ -259,42 +228,42 @@ const projectForm = reactive<Partial<AuditProject>>({
   status: 'draft',
   creator: '',
   auditType: '',
-  progress: 0
+  progress: 0,
 })
 
 // 审计要点数据
-const auditPoints = ref<Array<{
-  title: string
-  content: string
-}>>([])
+const auditPoints = ref<
+  Array<{
+    title: string
+    content: string
+  }>
+>([])
 
 // 证据材料数据
-const evidenceList = ref<Array<{
-  name: string
-  type: string
-  description: string
-}>>([])
+const evidenceList = ref<
+  Array<{
+    name: string
+    type: string
+    description: string
+  }>
+>([])
 
 // 表单验证规则
 const projectRules = {
   name: [
     { required: true, message: '请输入项目名称', trigger: 'blur' },
-    { min: 2, max: 100, message: '项目名称长度应在2-100字符之间', trigger: 'blur' }
+    { min: 2, max: 100, message: '项目名称长度应在2-100字符之间', trigger: 'blur' },
   ],
-  auditType: [
-    { required: true, message: '请选择审计类型', trigger: 'change' }
-  ],
-  status: [
-    { required: true, message: '请选择项目状态', trigger: 'change' }
-  ],
+  auditType: [{ required: true, message: '请选择审计类型', trigger: 'change' }],
+  status: [{ required: true, message: '请选择项目状态', trigger: 'change' }],
   creator: [
     { required: true, message: '请输入负责人姓名', trigger: 'blur' },
-    { min: 2, max: 50, message: '负责人姓名长度应在2-50字符之间', trigger: 'blur' }
+    { min: 2, max: 50, message: '负责人姓名长度应在2-50字符之间', trigger: 'blur' },
   ],
   description: [
     { required: true, message: '请输入项目描述', trigger: 'blur' },
-    { min: 10, max: 500, message: '项目描述长度应在10-500字符之间', trigger: 'blur' }
-  ]
+    { min: 10, max: 500, message: '项目描述长度应在10-500字符之间', trigger: 'blur' },
+  ],
 }
 
 // 返回上一页
@@ -306,7 +275,7 @@ const goBack = () => {
 const handleAddAuditPoint = () => {
   auditPoints.value.push({
     title: '',
-    content: ''
+    content: '',
   })
 }
 
@@ -320,7 +289,7 @@ const handleAddEvidence = () => {
   evidenceList.value.push({
     name: '',
     type: 'document',
-    description: ''
+    description: '',
   })
 }
 
@@ -342,7 +311,7 @@ const handleSave = async () => {
       ...projectForm,
       // TODO: 这里可以添加审计要点和证据材料的保存逻辑
       auditPoints: auditPoints.value,
-      evidenceList: evidenceList.value
+      evidenceList: evidenceList.value,
     }
 
     if (isEdit.value) {
@@ -352,7 +321,9 @@ const handleSave = async () => {
       ElMessage.success('项目更新成功')
     } else {
       // 新建模式
-      await projectStore.createProject(saveData as Omit<AuditProject, 'id' | 'createTime' | 'updateTime'>)
+      await projectStore.createProject(
+        saveData as Omit<AuditProject, 'id' | 'createTime' | 'updateTime'>,
+      )
       ElMessage.success('项目创建成功')
     }
 
@@ -376,12 +347,12 @@ const loadProjectData = async () => {
     // 临时添加一些示例数据
     auditPoints.value = [
       { title: '土地利用规划符合性审计', content: '检查土地利用是否符合规划要求' },
-      { title: '土地征收程序合规性审计', content: '审查土地征收程序是否合规' }
+      { title: '土地征收程序合规性审计', content: '审查土地征收程序是否合规' },
     ]
 
     evidenceList.value = [
       { name: '土地利用规划图', type: 'document', description: '最新的土地利用规划图纸' },
-      { name: '征收批复文件', type: 'document', description: '相关征收批复文件' }
+      { name: '征收批复文件', type: 'document', description: '相关征收批复文件' },
     ]
   } else {
     ElMessage.error('项目不存在')

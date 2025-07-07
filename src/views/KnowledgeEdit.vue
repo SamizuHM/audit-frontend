@@ -2,10 +2,7 @@
   <div class="knowledge-edit-container">
     <div class="page-header">
       <div class="header-left">
-        <el-button
-          type="text"
-          @click="goBack"
-        >
+        <el-button type="text" @click="goBack">
           <el-icon><ArrowLeft /></el-icon>
           返回
         </el-button>
@@ -13,11 +10,7 @@
       </div>
       <div class="header-right">
         <el-button @click="goBack">取消</el-button>
-        <el-button
-          type="primary"
-          :loading="knowledgeStore.loading"
-          @click="handleSave"
-        >
+        <el-button type="primary" :loading="knowledgeStore.loading" @click="handleSave">
           {{ knowledgeStore.loading ? '保存中...' : '保存' }}
         </el-button>
       </div>
@@ -96,31 +89,19 @@
             <div class="content-editor">
               <div class="editor-toolbar">
                 <el-button-group>
-                  <el-button
-                    size="small"
-                    @click="insertText('**', '**')"
-                  >
+                  <el-button size="small" @click="insertText('**', '**')">
                     <el-icon><bold /></el-icon>
                     加粗
                   </el-button>
-                  <el-button
-                    size="small"
-                    @click="insertText('*', '*')"
-                  >
+                  <el-button size="small" @click="insertText('*', '*')">
                     <el-icon><italic /></el-icon>
                     斜体
                   </el-button>
-                  <el-button
-                    size="small"
-                    @click="insertText('## ', '')"
-                  >
+                  <el-button size="small" @click="insertText('## ', '')">
                     <el-icon><title /></el-icon>
                     标题
                   </el-button>
-                  <el-button
-                    size="small"
-                    @click="insertText('- ', '')"
-                  >
+                  <el-button size="small" @click="insertText('- ', '')">
                     <el-icon><list /></el-icon>
                     列表
                   </el-button>
@@ -183,26 +164,24 @@ const knowledgeForm = reactive<Partial<KnowledgeItem>>({
   content: '',
   type: 'regulation',
   creator: '',
-  tags: []
+  tags: [],
 })
 
 // 表单验证规则
 const knowledgeRules = {
   title: [
     { required: true, message: '请输入知识标题', trigger: 'blur' },
-    { min: 2, max: 100, message: '知识标题长度应在2-100字符之间', trigger: 'blur' }
+    { min: 2, max: 100, message: '知识标题长度应在2-100字符之间', trigger: 'blur' },
   ],
-  type: [
-    { required: true, message: '请选择知识类型', trigger: 'change' }
-  ],
+  type: [{ required: true, message: '请选择知识类型', trigger: 'change' }],
   creator: [
     { required: true, message: '请输入创建者姓名', trigger: 'blur' },
-    { min: 2, max: 50, message: '创建者姓名长度应在2-50字符之间', trigger: 'blur' }
+    { min: 2, max: 50, message: '创建者姓名长度应在2-50字符之间', trigger: 'blur' },
   ],
   content: [
     { required: true, message: '请输入知识内容', trigger: 'blur' },
-    { min: 10, message: '知识内容至少10个字符', trigger: 'blur' }
-  ]
+    { min: 10, message: '知识内容至少10个字符', trigger: 'blur' },
+  ],
 }
 
 // 预览内容
@@ -239,9 +218,7 @@ const insertText = (prefix: string, suffix: string) => {
 
   const newText = prefix + selectedText + suffix
   const newContent =
-    knowledgeForm.content.substring(0, start) +
-    newText +
-    knowledgeForm.content.substring(end)
+    knowledgeForm.content.substring(0, start) + newText + knowledgeForm.content.substring(end)
 
   knowledgeForm.content = newContent
 
@@ -272,7 +249,9 @@ const handleSave = async () => {
       ElMessage.success('知识更新成功')
     } else {
       // 新建模式
-      await knowledgeStore.createKnowledge(knowledgeForm as Omit<KnowledgeItem, 'id' | 'createTime' | 'updateTime'>)
+      await knowledgeStore.createKnowledge(
+        knowledgeForm as Omit<KnowledgeItem, 'id' | 'createTime' | 'updateTime'>,
+      )
       ElMessage.success('知识创建成功')
     }
 
