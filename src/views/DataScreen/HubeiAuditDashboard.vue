@@ -6,7 +6,7 @@
     <div class="mb-6">
       <div class="text-center mb-4">
         <h1
-          class="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent"
+          class="text-2xl md:text-4xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent"
         >
           湖北省自然资源审计数据监控大屏
         </h1>
@@ -66,9 +66,10 @@
 
     <!-- 主要内容区域 -->
     <div class="grid grid-cols-12 gap-4 h-[calc(100vh-280px)]">
-      <!-- 左上角 - 统计数量 -->
-      <div class="col-span-3 space-y-4">
-        <div class="bg-blue-900/30 border border-blue-500/30 rounded-lg h-full p-4">
+      <!-- 左侧 - 项目统计和审计类型分布 -->
+      <div class="col-span-3 grid grid-rows-2 gap-4">
+        <!-- 项目统计 -->
+        <div class="bg-blue-900/30 border border-blue-500/30 rounded-lg p-4">
           <div class="flex items-center gap-2 mb-4">
             <TrendingUpIcon class="h-5 w-5 text-cyan-400" />
             <h3 class="text-cyan-400 font-semibold">项目统计</h3>
@@ -89,6 +90,46 @@
             <div class="flex justify-between items-center">
               <span class="text-blue-300">待审核</span>
               <span class="text-2xl font-bold text-orange-400">67</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 审计类型分布 -->
+        <div class="bg-blue-900/30 border border-blue-500/30 rounded-lg p-4">
+          <div class="flex items-center gap-2 mb-4">
+            <PieChartIcon class="h-5 w-5 text-cyan-400" />
+            <h3 class="text-cyan-400 font-semibold">审计类型分布</h3>
+          </div>
+
+          <div class="relative h-full">
+            <svg viewBox="0 0 200 200" class="w-full h-full max-h-32">
+              <g transform="translate(100,100)">
+                <path
+                  v-for="(segment, index) in pieSegments"
+                  :key="index"
+                  :d="segment.path"
+                  :fill="segment.color"
+                  class="cursor-pointer transition-all duration-300 hover:brightness-110"
+                  :transform="hoveredSegment === index ? 'scale(1.05)' : 'scale(1)'"
+                  @mouseenter="hoveredSegment = index"
+                  @mouseleave="hoveredSegment = null"
+                />
+              </g>
+            </svg>
+
+            <!-- 图例 -->
+            <div class="mt-2 space-y-1">
+              <div
+                v-for="(item, index) in pieData"
+                :key="index"
+                class="flex items-center justify-between text-xs"
+              >
+                <div class="flex items-center gap-2">
+                  <div class="w-2 h-2 rounded" :style="{ backgroundColor: item.color }"></div>
+                  <span class="text-blue-300">{{ item.name }}</span>
+                </div>
+                <span class="text-cyan-400 font-bold">{{ item.value }}%</span>
+              </div>
             </div>
           </div>
         </div>
@@ -171,9 +212,7 @@
             </svg>
 
             <!-- 图例 -->
-            <div
-              class="absolute bottom-4 left-4 bg-blue-900/50 p-3 rounded-lg border border-blue-500/30"
-            >
+            <div class="absolute bottom-10 bg-blue-900/50 p-3 rounded-lg border border-blue-500/30">
               <div class="text-xs text-blue-300 mb-2">项目数量</div>
               <div class="flex items-center gap-4 text-xs">
                 <div class="flex items-center gap-1">
@@ -194,9 +233,10 @@
         </div>
       </div>
 
-      <!-- 右上角 - 选中城市详情 -->
-      <div class="col-span-3">
-        <div class="bg-blue-900/30 border border-blue-500/30 rounded-lg h-full p-4">
+      <!-- 右侧 - 城市详情和月度趋势 -->
+      <div class="col-span-3 grid grid-rows-3 gap-4">
+        <!-- 选中城市详情 -->
+        <div class="bg-blue-900/30 border border-blue-500/30 rounded-lg p-4 row-span-2">
           <div class="flex items-center gap-2 mb-4">
             <DatabaseIcon class="h-5 w-5 text-cyan-400" />
             <h3 class="text-cyan-400 font-semibold">
@@ -261,104 +301,62 @@
             <p>点击地图上的城市查看详情</p>
           </div>
         </div>
-      </div>
 
-      <!-- 左下角 - 饼状图 -->
-      <div class="col-span-3">
-        <div class="bg-blue-900/30 border border-blue-500/30 rounded-lg h-full p-4">
-          <div class="flex items-center gap-2 mb-4">
-            <PieChartIcon class="h-5 w-5 text-cyan-400" />
-            <h3 class="text-cyan-400 font-semibold">审计类型分布</h3>
-          </div>
-
-          <div class="relative h-48">
-            <svg viewBox="0 0 200 200" class="w-full h-full">
-              <g transform="translate(100,100)">
-                <path
-                  v-for="(segment, index) in pieSegments"
-                  :key="index"
-                  :d="segment.path"
-                  :fill="segment.color"
-                  class="cursor-pointer transition-all duration-300 hover:brightness-110"
-                  :transform="hoveredSegment === index ? 'scale(1.05)' : 'scale(1)'"
-                  @mouseenter="hoveredSegment = index"
-                  @mouseleave="hoveredSegment = null"
-                />
-              </g>
-            </svg>
-
-            <!-- 图例 -->
-            <div class="absolute right-0 top-0 space-y-1">
-              <div
-                v-for="(item, index) in pieData"
-                :key="index"
-                class="flex items-center gap-2 text-xs"
-              >
-                <div class="w-3 h-3 rounded" :style="{ backgroundColor: item.color }"></div>
-                <span class="text-blue-300">{{ item.name }}</span>
-                <span class="text-cyan-400 font-bold">{{ item.value }}%</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 右下角 - 趋势图 */}
-      <div class="col-span-3">
-        <div class="bg-blue-900/30 border border-blue-500/30 rounded-lg h-full p-4">
+        <!-- 月度趋势 -->
+        <div class="bg-blue-900/30 border border-blue-500/30 rounded-lg p-4">
           <div class="flex items-center gap-2 mb-4">
             <ActivityIcon class="h-5 w-5 text-cyan-400" />
             <h3 class="text-cyan-400 font-semibold">月度趋势</h3>
           </div>
 
-          <div class="relative h-48">
-            <svg viewBox="0 0 300 150" class="w-full h-full">
-              <!-- 网格线 -->
-      <defs>
-        <pattern id="grid" width="30" height="15" patternUnits="userSpaceOnUse">
-          <path
-            d="M 30 0 L 0 0 0 15"
-            fill="none"
-            stroke="#1e40af"
-            stroke-width="0.5"
-            opacity="0.3"
-          />
-        </pattern>
-      </defs>
-      <rect width="300" height="150" fill="url(#grid)" />
+          <div class="relative h-full">
+            <svg viewBox="0 0 300 150" class="w-full h-full max-h-32">
+              <defs>
+                <pattern id="grid" width="30" height="15" patternUnits="userSpaceOnUse">
+                  <path
+                    d="M 30 0 L 0 0 0 15"
+                    fill="none"
+                    stroke="#1e40af"
+                    stroke-width="0.5"
+                    opacity="0.3"
+                  />
+                </pattern>
+              </defs>
+              <rect width="300" height="150" fill="url(#grid)" />
 
-      <!-- 趋势线 -->
-      <polyline
-        :points="trendPoints"
-        fill="none"
-        stroke="#00d4ff"
-        stroke-width="2"
-        class="drop-shadow-sm"
-      />
+              <polyline
+                :points="trendPoints"
+                fill="none"
+                stroke="#00d4ff"
+                stroke-width="2"
+                class="drop-shadow-sm"
+              />
 
-      <!-- 数据点 -->
-      <circle
-        v-for="(point, index) in trendData"
-        :key="index"
-        :cx="30 + index * 40"
-        :cy="150 - point.projects * 2"
-        r="3"
-        fill="#00d4ff"
-        class="cursor-pointer transition-all duration-300 hover:r-5"
-      />
+              <circle
+                v-for="(point, index) in trendData"
+                :key="index"
+                :cx="30 + index * 40"
+                :cy="150 - point.projects * 2"
+                r="3"
+                fill="#00d4ff"
+                class="cursor-pointer transition-all duration-300 hover:r-5"
+              />
 
-      <!-- X轴标签 -->
-      <text
-        v-for="(point, index) in trendData"
-        :key="'label-' + index"
-        :x="30 + index * 40"
-        y="145"
-        fill="#60a5fa"
-        text-anchor="middle"
-        class="text-xs"
-      >
-        {{ point.month }}
-      </text>
+              <text
+                v-for="(point, index) in trendData"
+                :key="'label-' + index"
+                :x="30 + index * 40"
+                y="145"
+                fill="#60a5fa"
+                text-anchor="middle"
+                class="text-xs"
+              >
+                {{ point.month }}
+              </text>
+            </svg>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- 底部项目列表 -->
@@ -422,7 +420,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import {
   BarChart3,
@@ -434,6 +432,32 @@ import {
   PieChart,
   Activity,
 } from 'lucide-vue-next'
+
+// 定义类型
+interface AuditType {
+  name: string
+  count: number
+}
+
+interface RecentProject {
+  id: number
+  name: string
+  date: string
+}
+
+interface City {
+  id: string
+  name: string
+  projects: number
+  ongoing: number
+  completed: number
+  pending: number
+  labelX: number
+  labelY: number
+  path: string
+  auditTypes: AuditType[]
+  recentProjects: RecentProject[]
+}
 
 // 重命名图标以避免冲突
 const BarChart3Icon = BarChart3
@@ -448,9 +472,9 @@ const ActivityIcon = Activity
 // 响应式数据
 const selectedYear = ref('2024')
 const selectedRegion = ref('all')
-const selectedCity = ref(null)
-const hoveredCity = ref(null)
-const hoveredSegment = ref(null)
+const selectedCity = ref<City | null>(null)
+const hoveredCity = ref<City | null>(null)
+const hoveredSegment = ref<number | null>(null)
 
 // 总体统计数据
 const overallStats = ref({
@@ -652,7 +676,7 @@ const trendData = ref([
 ])
 
 // 计算属性
-const getCityColor = (city) => {
+const getCityColor = (city: City) => {
   if (city.projects > 100) return '#00d4ff'
   if (city.projects > 50) return '#0099ff'
   return '#3366ff'
@@ -688,7 +712,7 @@ const trendPoints = computed(() => {
 })
 
 // 方法
-const selectCity = (city) => {
+const selectCity = (city: City) => {
   selectedCity.value = city
 }
 </script>

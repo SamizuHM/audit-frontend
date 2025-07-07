@@ -7,8 +7,16 @@
       </div>
 
       <!-- Element Plus 菜单 -->
-      <el-menu :default-active="currentMenuIndex" class="sidebar-menu" @select="handleMenuSelect" router
-        :collapse="false" background-color="#ffffff" text-color="#666666" active-text-color="#409EFF">
+      <el-menu
+        :default-active="currentMenuIndex"
+        class="sidebar-menu"
+        @select="handleMenuSelect"
+        router
+        :collapse="false"
+        background-color="#ffffff"
+        text-color="#666666"
+        active-text-color="#409EFF"
+      >
         <el-menu-item v-for="menu in accessibleMenus" :key="menu.id" :index="menu.path!">
           <el-icon>
             <component :is="menu.icon" />
