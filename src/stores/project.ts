@@ -25,7 +25,9 @@ export const useProjectStore = defineStore('project', () => {
   }
 
   // 创建项目
-  const createProject = async (projectData: Omit<AuditProject, 'id' | 'createTime' | 'updateTime'>) => {
+  const createProject = async (
+    projectData: Omit<AuditProject, 'id' | 'createTime' | 'updateTime'>,
+  ) => {
     loading.value = true
     try {
       // TODO: 调用真实接口
@@ -46,7 +48,7 @@ export const useProjectStore = defineStore('project', () => {
     try {
       // TODO: 调用真实接口
       const updatedProject = await projectApi.updateProject(id, projectData)
-      const index = projects.value.findIndex(p => p.id === id)
+      const index = projects.value.findIndex((p) => p.id === id)
       if (index !== -1) {
         projects.value[index] = updatedProject
       }
@@ -65,7 +67,7 @@ export const useProjectStore = defineStore('project', () => {
     try {
       // TODO: 调用真实接口
       await projectApi.deleteProject(id)
-      projects.value = projects.value.filter(p => p.id !== id)
+      projects.value = projects.value.filter((p) => p.id !== id)
     } catch (error) {
       console.error('Failed to delete project:', error)
       throw error
@@ -81,7 +83,7 @@ export const useProjectStore = defineStore('project', () => {
 
   // 根据ID获取项目
   const getProjectById = (id: number): AuditProject | undefined => {
-    return projects.value.find(p => p.id === id)
+    return projects.value.find((p) => p.id === id)
   }
 
   return {
@@ -96,6 +98,6 @@ export const useProjectStore = defineStore('project', () => {
     updateProject,
     deleteProject,
     setCurrentProject,
-    getProjectById
+    getProjectById,
   }
 })

@@ -5,8 +5,8 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json'
-  }
+    'Content-Type': 'application/json',
+  },
 })
 
 // 请求拦截器
@@ -21,7 +21,7 @@ api.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error)
-  }
+  },
 )
 
 // 响应拦截器
@@ -37,7 +37,7 @@ api.interceptors.response.use(
       window.location.href = '/login'
     }
     return Promise.reject(error)
-  }
+  },
 )
 
 export default api
@@ -100,7 +100,7 @@ export const authApi = {
     // return api.post('/auth/login', data)
 
     // 模拟登录响应
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000))
     if (data.username === 'admin' && data.password === 'admin123') {
       return {
         token: 'mock-jwt-token',
@@ -108,8 +108,8 @@ export const authApi = {
           id: 1,
           username: 'admin',
           name: '管理员',
-          role: 'admin'
-        }
+          role: 'admin',
+        },
       }
     }
     throw new Error('用户名或密码错误')
@@ -121,9 +121,9 @@ export const authApi = {
     // return api.post('/auth/logout')
 
     // 模拟退出
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
     localStorage.removeItem('token')
-  }
+  },
 }
 
 export const projectApi = {
@@ -133,7 +133,7 @@ export const projectApi = {
     // return api.get('/projects')
 
     // 模拟数据
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
     return [
       {
         id: 1,
@@ -144,7 +144,7 @@ export const projectApi = {
         updateTime: '2024-01-20',
         creator: '张三',
         auditType: '土地利用审计',
-        progress: 65
+        progress: 65,
       },
       {
         id: 2,
@@ -155,23 +155,25 @@ export const projectApi = {
         updateTime: '2024-01-18',
         creator: '李四',
         auditType: '矿产资源审计',
-        progress: 30
-      }
+        progress: 30,
+      },
     ]
   },
 
   // 创建项目
-  createProject: async (data: Omit<AuditProject, 'id' | 'createTime' | 'updateTime'>): Promise<AuditProject> => {
+  createProject: async (
+    data: Omit<AuditProject, 'id' | 'createTime' | 'updateTime'>,
+  ): Promise<AuditProject> => {
     // TODO: 替换为真实接口调用
     // return api.post('/projects', data)
 
     // 模拟创建
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
     return {
       ...data,
       id: Date.now(),
       createTime: new Date().toISOString().split('T')[0],
-      updateTime: new Date().toISOString().split('T')[0]
+      updateTime: new Date().toISOString().split('T')[0],
     }
   },
 
@@ -181,11 +183,11 @@ export const projectApi = {
     // return api.put(`/projects/${id}`, data)
 
     // 模拟更新
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
     return {
       ...data,
       id,
-      updateTime: new Date().toISOString().split('T')[0]
+      updateTime: new Date().toISOString().split('T')[0],
     } as AuditProject
   },
 
@@ -195,8 +197,8 @@ export const projectApi = {
     // return api.delete(`/projects/${id}`)
 
     // 模拟删除
-    await new Promise(resolve => setTimeout(resolve, 500))
-  }
+    await new Promise((resolve) => setTimeout(resolve, 500))
+  },
 }
 
 export const knowledgeApi = {
@@ -206,7 +208,7 @@ export const knowledgeApi = {
     // return api.get('/knowledge')
 
     // 模拟数据
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
     return [
       {
         id: 1,
@@ -216,7 +218,7 @@ export const knowledgeApi = {
         tags: ['土地管理', '法规'],
         createTime: '2024-01-01',
         updateTime: '2024-01-01',
-        creator: '系统管理员'
+        creator: '系统管理员',
       },
       {
         id: 2,
@@ -226,23 +228,25 @@ export const knowledgeApi = {
         tags: ['矿产资源', '审计案例'],
         createTime: '2024-01-02',
         updateTime: '2024-01-02',
-        creator: '审计专家'
-      }
+        creator: '审计专家',
+      },
     ]
   },
 
   // 创建知识条目
-  createKnowledge: async (data: Omit<KnowledgeItem, 'id' | 'createTime' | 'updateTime'>): Promise<KnowledgeItem> => {
+  createKnowledge: async (
+    data: Omit<KnowledgeItem, 'id' | 'createTime' | 'updateTime'>,
+  ): Promise<KnowledgeItem> => {
     // TODO: 替换为真实接口调用
     // return api.post('/knowledge', data)
 
     // 模拟创建
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
     return {
       ...data,
       id: Date.now(),
       createTime: new Date().toISOString().split('T')[0],
-      updateTime: new Date().toISOString().split('T')[0]
+      updateTime: new Date().toISOString().split('T')[0],
     }
   },
 
@@ -252,11 +256,11 @@ export const knowledgeApi = {
     // return api.put(`/knowledge/${id}`, data)
 
     // 模拟更新
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
     return {
       ...data,
       id,
-      updateTime: new Date().toISOString().split('T')[0]
+      updateTime: new Date().toISOString().split('T')[0],
     } as KnowledgeItem
   },
 
@@ -266,6 +270,6 @@ export const knowledgeApi = {
     // return api.delete(`/knowledge/${id}`)
 
     // 模拟删除
-    await new Promise(resolve => setTimeout(resolve, 500))
-  }
+    await new Promise((resolve) => setTimeout(resolve, 500))
+  },
 }

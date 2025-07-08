@@ -115,7 +115,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/data-screen',
     name: 'AuditDataScreen',
-    component: () => import('../views/DataScreen/HubeiAuditDashboard.vue'),
+    component: () => import('../views/HubeiAuditDashboard.vue'),
     meta: { requiresAuth: true, permission: 'admin:dashboard:view' },
   },
   // 404页面

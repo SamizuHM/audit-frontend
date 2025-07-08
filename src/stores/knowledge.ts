@@ -25,7 +25,9 @@ export const useKnowledgeStore = defineStore('knowledge', () => {
   }
 
   // 创建知识条目
-  const createKnowledge = async (knowledgeData: Omit<KnowledgeItem, 'id' | 'createTime' | 'updateTime'>) => {
+  const createKnowledge = async (
+    knowledgeData: Omit<KnowledgeItem, 'id' | 'createTime' | 'updateTime'>,
+  ) => {
     loading.value = true
     try {
       // TODO: 调用真实接口
@@ -46,7 +48,7 @@ export const useKnowledgeStore = defineStore('knowledge', () => {
     try {
       // TODO: 调用真实接口
       const updatedKnowledge = await knowledgeApi.updateKnowledge(id, knowledgeData)
-      const index = knowledgeList.value.findIndex(k => k.id === id)
+      const index = knowledgeList.value.findIndex((k) => k.id === id)
       if (index !== -1) {
         knowledgeList.value[index] = updatedKnowledge
       }
@@ -65,7 +67,7 @@ export const useKnowledgeStore = defineStore('knowledge', () => {
     try {
       // TODO: 调用真实接口
       await knowledgeApi.deleteKnowledge(id)
-      knowledgeList.value = knowledgeList.value.filter(k => k.id !== id)
+      knowledgeList.value = knowledgeList.value.filter((k) => k.id !== id)
     } catch (error) {
       console.error('Failed to delete knowledge:', error)
       throw error
@@ -81,17 +83,17 @@ export const useKnowledgeStore = defineStore('knowledge', () => {
 
   // 根据ID获取知识条目
   const getKnowledgeById = (id: number): KnowledgeItem | undefined => {
-    return knowledgeList.value.find(k => k.id === id)
+    return knowledgeList.value.find((k) => k.id === id)
   }
 
   // 根据类型筛选知识条目
   const getKnowledgeByType = (type: KnowledgeItem['type']): KnowledgeItem[] => {
-    return knowledgeList.value.filter(k => k.type === type)
+    return knowledgeList.value.filter((k) => k.type === type)
   }
 
   // 根据标签筛选知识条目
   const getKnowledgeByTag = (tag: string): KnowledgeItem[] => {
-    return knowledgeList.value.filter(k => k.tags.includes(tag))
+    return knowledgeList.value.filter((k) => k.tags.includes(tag))
   }
 
   return {
@@ -108,6 +110,6 @@ export const useKnowledgeStore = defineStore('knowledge', () => {
     setCurrentKnowledge,
     getKnowledgeById,
     getKnowledgeByType,
-    getKnowledgeByTag
+    getKnowledgeByTag,
   }
 })
