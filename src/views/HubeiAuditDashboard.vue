@@ -1,15 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-gray-50 text-gray-800 p-4">
+  <div class="min-h-screen text-gray-800 p-4">
     <!-- 顶部标题栏 -->
     <div class="mb-6">
-      <div class="text-center mb-4">
-        <h1
-          class="text-2xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
-        >
-          湖北省自然资源审计数据监控大屏
-        </h1>
-      </div>
-
       <!-- 总体统计卡片 -->
       <div class="grid grid-cols-4 gap-4 mb-6">
         <div
@@ -18,7 +10,7 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-gray-600 text-sm">总项目数</p>
-              <p class="text-2xl font-bold text-blue-600">{{ overallStats.totalProjects }}</p>
+              <p class="text-2xl font-bold text-blue-500">{{ overallStats.totalProjects }}</p>
             </div>
             <BarChart3Icon class="h-8 w-8 text-blue-500" />
           </div>
@@ -69,8 +61,8 @@
         <!-- 项目统计 -->
         <div class="bg-white shadow-lg border border-gray-200 rounded-lg p-4">
           <div class="flex items-center gap-2 mb-4">
-            <TrendingUpIcon class="h-5 w-5 text-blue-600" />
-            <h3 class="text-blue-600 font-semibold">项目统计</h3>
+            <TrendingUpIcon class="h-5 w-5 text-blue-500" />
+            <h3 class="text-blue-500 font-semibold">项目统计</h3>
           </div>
           <div class="space-y-4">
             <div class="flex justify-between items-center">
@@ -87,8 +79,8 @@
         <!-- 审计类型分布 -->
         <div class="bg-white shadow-lg border border-gray-200 rounded-lg p-4">
           <div class="flex items-center gap-2 mb-4">
-            <PieChartIcon class="h-5 w-5 text-blue-600" />
-            <h3 class="text-blue-600 font-semibold">审计类型分布</h3>
+            <PieChartIcon class="h-5 w-5 text-blue-500" />
+            <h3 class="text-blue-500 font-semibold">审计类型分布</h3>
           </div>
 
           <div class="relative h-full">
@@ -129,8 +121,8 @@
       <div class="col-span-6">
         <div class="bg-white shadow-lg border border-gray-200 rounded-lg h-full p-4">
           <div class="flex items-center gap-2 mb-4">
-            <MapPinIcon class="h-5 w-5 text-blue-600" />
-            <h3 class="text-blue-600 font-semibold">湖北省项目分布</h3>
+            <MapPinIcon class="h-5 w-5 text-blue-500" />
+            <h3 class="text-blue-500 font-semibold">湖北省项目分布</h3>
             <span v-if="selectedCity" class="ml-auto text-sm text-gray-600">
               当前选中: {{ selectedCity.name }}
             </span>
@@ -230,8 +222,8 @@
         <!-- 选中城市详情 -->
         <div class="bg-white shadow-lg border border-gray-200 rounded-lg p-4 row-span-2">
           <div class="flex items-center gap-2 mb-4">
-            <DatabaseIcon class="h-5 w-5 text-blue-600" />
-            <h3 class="text-blue-600 font-semibold">
+            <DatabaseIcon class="h-5 w-5 text-blue-500" />
+            <h3 class="text-blue-500 font-semibold">
               {{ selectedCity ? selectedCity.name + '详情' : '城市详情' }}
             </h3>
           </div>
@@ -242,7 +234,7 @@
               <div class="grid grid-cols-2 gap-2 text-xs">
                 <div>
                   <span class="text-gray-600">总项目:</span>
-                  <span class="text-blue-600 font-bold ml-1">{{ selectedCity.projects }}</span>
+                  <span class="text-blue-500 font-bold ml-1">{{ selectedCity.projects }}</span>
                 </div>
                 <div>
                   <span class="text-gray-600">进行中:</span>
@@ -281,7 +273,7 @@
                   :key="project.id"
                   class="text-xs p-2 bg-white rounded border"
                 >
-                  <div class="text-blue-600 font-medium">{{ project.name }}</div>
+                  <div class="text-blue-500 font-medium">{{ project.name }}</div>
                   <div class="text-gray-500 mt-1">{{ project.date }}</div>
                 </div>
               </div>
@@ -297,8 +289,8 @@
         <!-- 月度趋势 -->
         <div class="bg-white shadow-lg border border-gray-200 rounded-lg p-4">
           <div class="flex items-center gap-2 mb-4">
-            <ActivityIcon class="h-5 w-5 text-blue-600" />
-            <h3 class="text-blue-600 font-semibold">月度趋势</h3>
+            <ActivityIcon class="h-5 w-5 text-blue-500" />
+            <h3 class="text-blue-500 font-semibold">月度趋势</h3>
           </div>
 
           <div class="relative h-full">
@@ -355,7 +347,7 @@
     <div class="mt-6">
       <div class="bg-white shadow-lg border border-gray-200 rounded-lg p-4">
         <div class="flex justify-between items-center mb-4">
-          <h3 class="text-blue-600 font-semibold">地区项目列表</h3>
+          <h3 class="text-blue-500 font-semibold">地区项目列表</h3>
           <div class="flex gap-2">
             <select
               v-model="selectedYear"
@@ -396,7 +388,7 @@
                 class="border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition-colors"
                 @click="selectCity(city)"
               >
-                <td class="p-3 text-blue-600 font-medium">{{ city.name }}</td>
+                <td class="p-3 text-blue-500 font-medium">{{ city.name }}</td>
                 <td class="p-3 text-gray-700">{{ city.projects }}</td>
                 <td class="p-3 text-gray-700">{{ city.ongoing }}</td>
                 <td class="p-3 text-gray-700">{{ city.completed }}</td>

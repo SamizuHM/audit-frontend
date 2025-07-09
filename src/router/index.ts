@@ -22,7 +22,13 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: '',
-        redirect: '/dashboard/projects',
+        redirect: '/dashboard/home',
+      },
+      {
+        path: 'home',
+        name: '首页',
+        component: () => import('../views/HubeiAuditDashboard.vue'),
+        meta: { requiresAuth: true, permission: 'user:home:dashboard' },
       },
       {
         path: 'projects',
@@ -53,12 +59,6 @@ const routes: Array<RouteRecordRaw> = [
         name: 'KnowledgeManagement',
         component: () => import('../views/KnowledgeManagement.vue'),
         meta: { requiresAuth: true, permission: 'user:knowledge:list' },
-      },
-      {
-        path: 'ocr-recognition',
-        name: 'OcrRecognition',
-        component: () => import('../views/OcrRecognition.vue'),
-        meta: { requiresAuth: true, permission: 'user:ocr:recognition' },
       },
       {
         path: 'project-edit/:id?',
@@ -142,5 +142,51 @@ router.beforeEach(async (to, from, next) => {
   // 对于其他页面，暂时也直接放行，避免循环依赖
   next()
 })
+
+// TODO: 路由守卫
+// router.beforeEach(async (to, from, next) => {
+//   const authStore = useAuthStore()
+//   const permissionStore = usePermissionStore()
+
+//   // 初始化认证状态
+//   if (!authStore.isAuthenticated) {
+//     authStore.initAuth()
+//   }
+
+//   // 如果是登录页面，且已经登录，则重定向到对应的首页
+//   if (to.path === '/login' && authStore.isAuthenticated) {
+//     if (permissionStore.userRole === 'admin') {
+//       next('/admin/user-management')
+//     } else {
+//       next('/dashboard/projects')
+//     }
+//     return
+//   }
+
+//   // 检查是否需要认证
+//   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+//     next('/login')
+//     return
+//   }
+
+//   // 检查角色权限
+//   if (to.meta.role && to.meta.role !== permissionStore.userRole) {
+//     next('/login')
+//     return
+//   }
+
+//   // 检查具体权限
+//   if (to.meta.permission && !permissionStore.hasButtonPermission(to.meta.permission as string)) {
+//     // 权限不足，重定向到首页
+//     if (permissionStore.userRole === 'admin') {
+//       next('/admin/user-management')
+//     } else {
+//       next('/dashboard/projects')
+//     }
+//     return
+//   }
+
+//   next()
+// })
 
 export default router

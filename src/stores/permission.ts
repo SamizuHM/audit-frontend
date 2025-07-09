@@ -98,6 +98,15 @@ export const usePermissionStore = defineStore('permission', () => {
           menus: [
             // 用户端菜单
             {
+              id: '0',
+              name: '首页',
+              code: 'user:dashboard',
+              type: 'menu',
+              path: '/dashboard/home',
+              icon: 'House',
+              sort: 0,
+            },
+            {
               id: '1',
               name: '我的项目',
               code: 'user:project:list',
@@ -142,15 +151,6 @@ export const usePermissionStore = defineStore('permission', () => {
               icon: 'Reading',
               sort: 5,
             },
-            {
-              id: '6',
-              name: 'OCR识别',
-              code: 'user:ocr:recognition',
-              type: 'menu',
-              path: '/dashboard/ocr-recognition',
-              icon: 'Rank',
-              sort: 6,
-            },
           ],
           buttons: [
             'user:project:add',
@@ -161,7 +161,7 @@ export const usePermissionStore = defineStore('permission', () => {
             'user:knowledge:edit',
             'user:evidence:edit',
           ],
-          apis: ['user:project:*', 'user:audit:*', 'user:knowledge:*', 'user:ocr:*'],
+          apis: ['user:project:*', 'user:audit:*', 'user:knowledge:*'],
         }
       }
     } catch (error) {

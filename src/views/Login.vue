@@ -47,7 +47,6 @@
           >
             <el-option label="用户端" value="user" />
             <el-option label="管理端" value="admin" />
-            <el-option label="领导大屏" value="leader" />
           </el-select>
         </el-form-item>
 
@@ -126,9 +125,7 @@ const handleLogin = async () => {
     if (loginForm.role === 'admin') {
       router.push('/admin/user-management')
     } else if (loginForm.role === 'user') {
-      router.push('/dashboard/projects')
-    } else if (loginForm.role === 'leader') {
-      router.push('/data-screen')
+      router.push('/dashboard/home')
     }
   } catch (error) {
     ElMessage.error(error instanceof Error ? error.message : '登录失败')
