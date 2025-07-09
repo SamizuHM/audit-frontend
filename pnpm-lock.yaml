@@ -29,6 +29,9 @@ importers:
       lucide-vue-next:
         specifier: ^0.525.0
         version: 0.525.0(vue@3.5.17(typescript@5.8.3))
+      mockjs:
+        specifier: ^1.1.0
+        version: 1.1.0
       pinia:
         specifier: ^3.0.3
         version: 3.0.3(typescript@5.8.3)(vue@3.5.17(typescript@5.8.3))
@@ -48,6 +51,9 @@ importers:
       '@tsconfig/node22':
         specifier: ^22.0.2
         version: 22.0.2
+      '@types/mockjs':
+        specifier: ^1.0.10
+        version: 1.0.10
       '@types/node':
         specifier: ^22.16.0
         version: 22.16.0
@@ -754,6 +760,9 @@ packages:
   '@types/lodash@4.17.20':
     resolution: {integrity: sha512-H3MHACvFUEiujabxhaI/ImO6gUrd8oOurg7LQtS7mbwIXA/cUqWrvBsaeJ23aZEPk1TAYkurjfMbSELfoCXlGA==}
 
+  '@types/mockjs@1.0.10':
+    resolution: {integrity: sha512-SXgrhajHG7boLv6oU93CcmdDm0HYRiceuz6b+7z+/2lCJPTWDv0V5YiwFHT2ejE4bQqgSXQiVPQYPWv7LGsK1g==}
+
   '@types/node@22.16.0':
     resolution: {integrity: sha512-B2egV9wALML1JCpv3VQoQ+yesQKAmNMBIAY7OteVrikcOcAkWm+dGL6qpeCktPjAv6N1JLnhbNiqS35UpFyBsQ==}
 
@@ -1067,6 +1076,10 @@ packages:
   combined-stream@1.0.8:
     resolution: {integrity: sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==}
     engines: {node: '>= 0.8'}
+
+  commander@14.0.0:
+    resolution: {integrity: sha512-2uM9rYjPvyq39NwLRqaiLtWHyDC1FvryJDa2ATTVims5YAS4PupsEQsDvP14FqhFr0P49CYDugi59xaxJlTXRA==}
+    engines: {node: '>=20'}
 
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
@@ -1661,6 +1674,10 @@ packages:
   mkdirp@3.0.1:
     resolution: {integrity: sha512-+NsyUUAZDmo6YVHzL/stxSu3t9YS1iljliy3BSDrXJ/dkn1KYdmtZODGGjLcc9XLgVVpH4KshHB8XmZgMhaBXg==}
     engines: {node: '>=10'}
+    hasBin: true
+
+  mockjs@1.1.0:
+    resolution: {integrity: sha512-eQsKcWzIaZzEZ07NuEyO4Nw65g0hdWAyurVol1IPl1gahRwY+svqzfgfey8U8dahLwG44d6/RwEzuK52rSa/JQ==}
     hasBin: true
 
   mrmime@2.0.1:
@@ -2687,6 +2704,8 @@ snapshots:
 
   '@types/lodash@4.17.20': {}
 
+  '@types/mockjs@1.0.10': {}
+
   '@types/node@22.16.0':
     dependencies:
       undici-types: 6.21.0
@@ -3119,6 +3138,8 @@ snapshots:
   combined-stream@1.0.8:
     dependencies:
       delayed-stream: 1.0.0
+
+  commander@14.0.0: {}
 
   concat-map@0.0.1: {}
 
@@ -3678,6 +3699,10 @@ snapshots:
   mitt@3.0.1: {}
 
   mkdirp@3.0.1: {}
+
+  mockjs@1.1.0:
+    dependencies:
+      commander: 14.0.0
 
   mrmime@2.0.1: {}
 
