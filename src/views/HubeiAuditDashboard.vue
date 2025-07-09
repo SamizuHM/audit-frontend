@@ -55,7 +55,7 @@
     </div>
 
     <!-- 主要内容区域 -->
-    <div class="grid grid-cols-12 gap-4 h-[calc(100vh-280px)]">
+    <div class="grid grid-cols-12 gap-4 min-h-[600px]">
       <!-- 左侧 - 年度趋势和审计类型分布 -->
       <div class="col-span-3 grid grid-rows-2 gap-4">
         <!-- 年度趋势 -->
@@ -156,7 +156,7 @@
 
       <!-- 中间 - 湖北省地图 -->
       <div class="col-span-6">
-        <div class="bg-white shadow-lg border border-gray-200 rounded-lg h-full p-4">
+        <div class="bg-white shadow-lg border border-gray-200 rounded-lg p-4 flex flex-col">
           <div class="flex items-center gap-2 mb-4">
             <MapPinIcon class="h-5 w-5 text-blue-500" />
             <h3 class="text-blue-500 font-semibold">湖北省项目分布</h3>
@@ -165,91 +165,9 @@
             </span>
           </div>
 
-          <div class="relative h-full">
-            <!-- 湖北省SVG地图 -->
-            <svg viewBox="0 0 800 600" class="w-full h-5/6">
-              <!-- 地图背景 -->
-              <rect width="800" height="600" fill="transparent" />
-
-              <!-- 各个地市 -->
-              <g v-for="city in hubeiCities" :key="city.id">
-                <path
-                  :d="city.path"
-                  :fill="getCityColor(city)"
-                  :stroke="selectedCity?.id === city.id ? '#1e40af' : '#6b7280'"
-                  :stroke-width="selectedCity?.id === city.id ? '3' : '1'"
-                  class="cursor-pointer transition-all duration-300 hover:brightness-110"
-                  @click="selectCity(city)"
-                  @mouseenter="hoveredCity = city"
-                  @mouseleave="hoveredCity = null"
-                />
-
-                <!-- 城市名称标签 -->
-                <text
-                  :x="city.labelX"
-                  :y="city.labelY"
-                  fill="#374151"
-                  text-anchor="middle"
-                  class="text-xs font-medium pointer-events-none"
-                >
-                  {{ city.name }}
-                </text>
-
-                <!-- 项目数量标签 -->
-                <text
-                  :x="city.labelX"
-                  :y="city.labelY + 12"
-                  fill="#1e40af"
-                  text-anchor="middle"
-                  class="text-xs font-bold pointer-events-none"
-                >
-                  {{ city.projects }}个
-                </text>
-              </g>
-
-              <!-- 悬停提示 -->
-              <g v-if="hoveredCity" class="pointer-events-none">
-                <rect
-                  :x="hoveredCity.labelX - 40"
-                  :y="hoveredCity.labelY - 35"
-                  width="80"
-                  height="25"
-                  fill="#f3f4f6"
-                  stroke="#6b7280"
-                  rx="4"
-                />
-                <text
-                  :x="hoveredCity.labelX"
-                  :y="hoveredCity.labelY - 20"
-                  fill="#1e40af"
-                  text-anchor="middle"
-                  class="text-xs font-bold"
-                >
-                  {{ hoveredCity.projects }}个项目
-                </text>
-              </g>
-            </svg>
-
-            <!-- 图例 -->
-            <div
-              class="absolute bottom-10 bg-white/90 p-3 rounded-lg border border-gray-300 shadow-md"
-            >
-              <div class="text-xs text-gray-600 mb-2">项目数量</div>
-              <div class="flex items-center gap-4 text-xs">
-                <div class="flex items-center gap-1">
-                  <div class="w-3 h-3 bg-blue-400 rounded"></div>
-                  <span class="text-gray-600">0-50</span>
-                </div>
-                <div class="flex items-center gap-1">
-                  <div class="w-3 h-3 bg-blue-600 rounded"></div>
-                  <span class="text-gray-600">51-100</span>
-                </div>
-                <div class="flex items-center gap-1">
-                  <div class="w-3 h-3 bg-blue-800 rounded"></div>
-                  <span class="text-gray-600">100+</span>
-                </div>
-              </div>
-            </div>
+          <div class="flex-1 min-h-[500px]">
+            <!-- Echarts 湖北省地图 -->
+            <div ref="mapChart" class="w-full h-full min-h-[500px]"></div>
           </div>
         </div>
       </div>
@@ -299,8 +217,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { BarChart3, FileText, Database, Zap, MapPin, PieChart, Activity } from 'lucide-vue-next'
+import * as echarts from 'echarts'
+import type { ECElementEvent } from 'echarts'
 
 // 定义类型
 interface AuditType {
@@ -338,11 +258,10 @@ const PieChartIcon = PieChart
 const ActivityIcon = Activity
 
 // 响应式数据
-const selectedYear = ref('2024')
-const selectedRegion = ref('all')
 const selectedCity = ref<City | null>(null)
-const hoveredCity = ref<City | null>(null)
 const hoveredSegment = ref<number | null>(null)
+const mapChart = ref<HTMLElement>()
+let chartInstance: echarts.ECharts | null = null
 
 // 总体统计数据
 const overallStats = ref({
@@ -388,177 +307,25 @@ const yearlyTrendData = ref([
   { year: '2024', projects: 1248 },
 ])
 
-// 湖北省各地市数据（简化的SVG路径）
-const hubeiCities = ref([
-  {
-    id: 'wuhan',
-    name: '武汉市',
-    projects: 156,
-    ongoing: 45,
-    completed: 89,
-    pending: 22,
-    labelX: 400,
-    labelY: 300,
-    path: 'M380,280 L420,280 L420,320 L380,320 Z',
-    auditTypes: [
-      { name: '土地利用审计', count: 45 },
-      { name: '矿产资源审计', count: 34 },
-      { name: '森林资源审计', count: 42 },
-      { name: '水资源审计', count: 35 },
-    ],
-    recentProjects: [
-      { id: 1, name: '武汉市土地利用专项审计', date: '2024-01-15' },
-      { id: 2, name: '长江流域生态保护审计', date: '2024-01-10' },
-      { id: 3, name: '城市绿地资源审计', date: '2024-01-08' },
-    ],
-  },
-  {
-    id: 'yichang',
-    name: '宜昌市',
-    projects: 98,
-    ongoing: 28,
-    completed: 56,
-    pending: 14,
-    labelX: 320,
-    labelY: 350,
-    path: 'M300,330 L340,330 L340,370 L300,370 Z',
-    auditTypes: [
-      { name: '土地利用审计', count: 28 },
-      { name: '矿产资源审计', count: 25 },
-      { name: '森林资源审计', count: 30 },
-      { name: '水资源审计', count: 15 },
-    ],
-    recentProjects: [
-      { id: 1, name: '三峡库区生态审计', date: '2024-01-12' },
-      { id: 2, name: '矿产资源开发审计', date: '2024-01-09' },
-    ],
-  },
-  {
-    id: 'xiangyang',
-    name: '襄阳市',
-    projects: 87,
-    ongoing: 25,
-    completed: 48,
-    pending: 14,
-    labelX: 350,
-    labelY: 220,
-    path: 'M330,200 L370,200 L370,240 L330,240 Z',
-    auditTypes: [
-      { name: '土地利用审计', count: 25 },
-      { name: '矿产资源审计', count: 22 },
-      { name: '森林资源审计', count: 25 },
-      { name: '水资源审计', count: 15 },
-    ],
-    recentProjects: [
-      { id: 1, name: '汉江流域保护审计', date: '2024-01-14' },
-      { id: 2, name: '农田保护专项审计', date: '2024-01-11' },
-    ],
-  },
-  {
-    id: 'jingzhou',
-    name: '荆州市',
-    projects: 76,
-    ongoing: 22,
-    completed: 42,
-    pending: 12,
-    labelX: 360,
-    labelY: 380,
-    path: 'M340,360 L380,360 L380,400 L340,400 Z',
-    auditTypes: [
-      { name: '土地利用审计', count: 22 },
-      { name: '矿产资源审计', count: 18 },
-      { name: '森林资源审计', count: 21 },
-      { name: '水资源审计', count: 15 },
-    ],
-    recentProjects: [
-      { id: 1, name: '湿地保护审计', date: '2024-01-13' },
-      { id: 2, name: '农业用地审计', date: '2024-01-07' },
-    ],
-  },
-  {
-    id: 'huanggang',
-    name: '黄冈市',
-    projects: 65,
-    ongoing: 18,
-    completed: 35,
-    pending: 12,
-    labelX: 450,
-    labelY: 280,
-    path: 'M430,260 L470,260 L470,300 L430,300 Z',
-    auditTypes: [
-      { name: '土地利用审计', count: 18 },
-      { name: '矿产资源审计', count: 15 },
-      { name: '森林资源审计', count: 20 },
-      { name: '水资源审计', count: 12 },
-    ],
-    recentProjects: [
-      { id: 1, name: '大别山生态审计', date: '2024-01-16' },
-      { id: 2, name: '红色旅游资源审计', date: '2024-01-05' },
-    ],
-  },
-  {
-    id: 'xiaogan',
-    name: '孝感市',
-    projects: 54,
-    ongoing: 16,
-    completed: 28,
-    pending: 10,
-    labelX: 380,
-    labelY: 250,
-    path: 'M360,230 L400,230 L400,270 L360,270 Z',
-    auditTypes: [
-      { name: '土地利用审计', count: 16 },
-      { name: '矿产资源审计', count: 12 },
-      { name: '森林资源审计', count: 15 },
-      { name: '水资源审计', count: 11 },
-    ],
-    recentProjects: [
-      { id: 1, name: '城乡建设用地审计', date: '2024-01-18' },
-      { id: 2, name: '水库资源审计', date: '2024-01-06' },
-    ],
-  },
-  {
-    id: 'shiyan',
-    name: '十堰市',
-    projects: 43,
-    ongoing: 12,
-    completed: 23,
-    pending: 8,
-    labelX: 280,
-    labelY: 200,
-    path: 'M260,180 L300,180 L300,220 L260,220 Z',
-    auditTypes: [
-      { name: '土地利用审计', count: 12 },
-      { name: '矿产资源审计', count: 10 },
-      { name: '森林资源审计', count: 13 },
-      { name: '水资源审计', count: 8 },
-    ],
-    recentProjects: [
-      { id: 1, name: '南水北调水源地审计', date: '2024-01-17' },
-      { id: 2, name: '山区生态保护审计', date: '2024-01-04' },
-    ],
-  },
-  {
-    id: 'enshi',
-    name: '恩施州',
-    projects: 38,
-    ongoing: 11,
-    completed: 20,
-    pending: 7,
-    labelX: 250,
-    labelY: 400,
-    path: 'M230,380 L270,380 L270,420 L230,420 Z',
-    auditTypes: [
-      { name: '土地利用审计', count: 11 },
-      { name: '矿产资源审计', count: 8 },
-      { name: '森林资源审计', count: 12 },
-      { name: '水资源审计', count: 7 },
-    ],
-    recentProjects: [
-      { id: 1, name: '民族地区生态审计', date: '2024-01-19' },
-      { id: 2, name: '旅游资源开发审计', date: '2024-01-03' },
-    ],
-  },
+// 湖北省各地市数据（更新为市级数据，用于ECharts地图）
+const hubeiCitiesData = ref([
+  { name: '武汉市', value: 156, ongoing: 45, completed: 89, pending: 22 },
+  { name: '黄石市', value: 98, ongoing: 28, completed: 56, pending: 14 },
+  { name: '十堰市', value: 87, ongoing: 25, completed: 48, pending: 14 },
+  { name: '宜昌市', value: 76, ongoing: 22, completed: 42, pending: 12 },
+  { name: '襄阳市', value: 65, ongoing: 18, completed: 35, pending: 12 },
+  { name: '鄂州市', value: 54, ongoing: 16, completed: 28, pending: 10 },
+  { name: '荆门市', value: 43, ongoing: 12, completed: 23, pending: 8 },
+  { name: '孝感市', value: 38, ongoing: 11, completed: 20, pending: 7 },
+  { name: '荆州市', value: 42, ongoing: 13, completed: 21, pending: 8 },
+  { name: '黄冈市', value: 51, ongoing: 15, completed: 26, pending: 10 },
+  { name: '咸宁市', value: 35, ongoing: 10, completed: 18, pending: 7 },
+  { name: '随州市', value: 28, ongoing: 8, completed: 15, pending: 5 },
+  { name: '恩施土家族苗族自治州', value: 33, ongoing: 9, completed: 17, pending: 7 },
+  { name: '仙桃市', value: 25, ongoing: 7, completed: 12, pending: 6 },
+  { name: '潜江市', value: 22, ongoing: 6, completed: 11, pending: 5 },
+  { name: '天门市', value: 19, ongoing: 5, completed: 10, pending: 4 },
+  { name: '神农架林区', value: 12, ongoing: 3, completed: 6, pending: 3 },
 ])
 
 // 饼图数据
@@ -570,12 +337,6 @@ const pieData = ref([
 ])
 
 // 计算属性
-const getCityColor = (city: City) => {
-  if (city.projects > 100) return '#1e40af' // 深蓝色
-  if (city.projects > 50) return '#2563eb' // 中蓝色
-  return '#60a5fa' // 浅蓝色
-}
-
 const pieSegments = computed(() => {
   let currentAngle = 0
   return pieData.value.map((item) => {
@@ -605,10 +366,198 @@ const yearlyTrendPoints = computed(() => {
     .join(' ')
 })
 
-// 方法
-const selectCity = (city: City) => {
-  selectedCity.value = city
+// ECharts地图初始化
+const initMap = async () => {
+  if (!mapChart.value) return
+
+  try {
+    // 加载湖北省地图数据，使用URL编码处理中文文件名
+    const response = await fetch(`${import.meta.env.BASE_URL}map/Hubei_DataV.json`)
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    const hubeiGeoJson = await response.json()
+
+    // 注册地图
+    echarts.registerMap('hubei', hubeiGeoJson)
+
+    // 创建图表实例
+    chartInstance = echarts.init(mapChart.value)
+
+    // 配置选项
+    const option = {
+      tooltip: {
+        trigger: 'item',
+        formatter: (params: ECElementEvent) => {
+          if (params.data) {
+            const data = hubeiCitiesData.value.find((item) => item.name === params.name)
+            if (data) {
+              return `
+                <div class="bg-white p-2 rounded shadow-lg border">
+                  <div class="font-bold text-gray-800 mb-1">${params.name}</div>
+                  <div class="text-sm text-gray-600">
+                    <div>总项目数: <span class="font-semibold text-blue-600">${data.value}</span></div>
+                    <div>进行中: <span class="font-semibold text-amber-600">${data.ongoing}</span></div>
+                    <div>已完成: <span class="font-semibold text-green-600">${data.completed}</span></div>
+                  </div>
+                </div>
+              `
+            }
+          }
+          return params.name || ''
+        },
+        backgroundColor: 'transparent',
+        borderWidth: 0,
+      },
+      visualMap: {
+        min: 0,
+        max: Math.max(...hubeiCitiesData.value.map((item) => item.value)),
+        left: 'left',
+        top: 'bottom',
+        text: ['高', '低'],
+        textStyle: {
+          color: '#374151',
+        },
+        inRange: {
+          color: ['#dbeafe', '#3b82f6', '#1e40af'],
+        },
+        calculable: true,
+      },
+      geo: {
+        map: 'hubei',
+        roam: true,
+        scaleLimit: {
+          min: 0.8,
+          max: 3,
+        },
+        zoom: 1.1,
+        center: [112, 31.2],
+        itemStyle: {
+          areaColor: '#f3f4f6',
+          borderColor: '#e5e7eb',
+          borderWidth: 1,
+        },
+        emphasis: {
+          itemStyle: {
+            areaColor: '#3b82f6',
+            borderColor: '#1e40af',
+            borderWidth: 2,
+          },
+          label: {
+            show: true,
+            color: '#ffffff',
+            fontSize: 12,
+          },
+        },
+        select: {
+          itemStyle: {
+            areaColor: '#1e40af',
+            borderColor: '#1e3a8a',
+            borderWidth: 2,
+          },
+          label: {
+            show: true,
+            color: '#ffffff',
+            fontSize: 12,
+          },
+        },
+      },
+      series: [
+        {
+          name: '项目分布',
+          type: 'map',
+          geoIndex: 0,
+          data: hubeiCitiesData.value.map((item) => ({
+            name: item.name,
+            value: item.value,
+            ongoing: item.ongoing,
+            completed: item.completed,
+            pending: item.pending,
+          })),
+          animationDuration: 1000,
+          animationEasing: 'cubicOut',
+        },
+      ],
+    }
+
+    // 设置配置
+    chartInstance.setOption(option)
+
+    // 添加点击事件
+    chartInstance.on('click', (params: ECElementEvent) => {
+      if (params.data) {
+        const cityData = hubeiCitiesData.value.find((item) => item.name === params.name)
+        if (cityData) {
+          selectedCity.value = {
+            id: params.name || '',
+            name: params.name || '',
+            projects: cityData.value,
+            ongoing: cityData.ongoing,
+            completed: cityData.completed,
+            pending: cityData.pending,
+            labelX: 0,
+            labelY: 0,
+            path: '',
+            auditTypes: [],
+            recentProjects: [],
+          }
+
+          // 触发选中动画
+          chartInstance?.dispatchAction({
+            type: 'mapSelect',
+            name: params.name,
+          })
+
+          console.log('Selected city:', selectedCity.value)
+        }
+      }
+    })
+
+    // 添加悬停事件
+    chartInstance.on('mouseover', (params: ECElementEvent) => {
+      if (params.componentType === 'series') {
+        chartInstance?.dispatchAction({
+          type: 'highlight',
+          name: params.name,
+        })
+      }
+    })
+
+    chartInstance.on('mouseout', (params: ECElementEvent) => {
+      if (params.componentType === 'series') {
+        chartInstance?.dispatchAction({
+          type: 'downplay',
+          name: params.name,
+        })
+      }
+    })
+
+    // 响应式处理
+    const resizeHandler = () => {
+      chartInstance?.resize()
+    }
+
+    window.addEventListener('resize', resizeHandler)
+
+    // 组件销毁时清理
+    const cleanup = () => {
+      window.removeEventListener('resize', resizeHandler)
+      chartInstance?.dispose()
+      chartInstance = null
+    }
+
+    // 返回清理函数
+    return cleanup
+  } catch (error) {
+    console.error('Failed to load map data:', error)
+  }
 }
+
+// 组件挂载后初始化地图
+onMounted(async () => {
+  await nextTick()
+  await initMap()
+})
 </script>
 
 <style scoped>
