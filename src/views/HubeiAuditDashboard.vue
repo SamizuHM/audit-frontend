@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen text-gray-800 p-4">
+  <div class="text-gray-800 p-4">
     <!-- 顶部标题栏 -->
     <div class="mb-6">
       <!-- 总体统计卡片 -->
@@ -29,26 +29,26 @@
         </div>
 
         <div
-          class="bg-white shadow-lg border border-green-200 rounded-lg p-4 hover:shadow-xl transition-shadow"
+          class="bg-white shadow-lg border border-amber-200 rounded-lg p-4 hover:shadow-xl transition-shadow"
         >
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-gray-600 text-sm">知识库</p>
-              <p class="text-2xl font-bold text-green-600">{{ overallStats.knowledgeBase }}</p>
+              <p class="text-gray-600 text-sm">进行中</p>
+              <p class="text-2xl font-bold text-amber-600">{{ projectStats.ongoing }}</p>
             </div>
-            <DatabaseIcon class="h-8 w-8 text-green-500" />
+            <ActivityIcon class="h-8 w-8 text-amber-500" />
           </div>
         </div>
 
         <div
-          class="bg-white shadow-lg border border-orange-200 rounded-lg p-4 hover:shadow-xl transition-shadow"
+          class="bg-white shadow-lg border border-green-200 rounded-lg p-4 hover:shadow-xl transition-shadow"
         >
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-gray-600 text-sm">提示词模型</p>
-              <p class="text-2xl font-bold text-orange-600">{{ overallStats.promptModels }}</p>
+              <p class="text-gray-600 text-sm">已完成</p>
+              <p class="text-2xl font-bold text-green-600">{{ projectStats.completed }}</p>
             </div>
-            <ZapIcon class="h-8 w-8 text-orange-500" />
+            <DatabaseIcon class="h-8 w-8 text-green-500" />
           </div>
         </div>
       </div>
@@ -56,23 +56,60 @@
 
     <!-- 主要内容区域 -->
     <div class="grid grid-cols-12 gap-4 h-[calc(100vh-280px)]">
-      <!-- 左侧 - 项目统计和审计类型分布 -->
+      <!-- 左侧 - 年度趋势和审计类型分布 -->
       <div class="col-span-3 grid grid-rows-2 gap-4">
-        <!-- 项目统计 -->
+        <!-- 年度趋势 -->
         <div class="bg-white shadow-lg border border-gray-200 rounded-lg p-4">
           <div class="flex items-center gap-2 mb-4">
-            <TrendingUpIcon class="h-5 w-5 text-blue-500" />
-            <h3 class="text-blue-500 font-semibold">项目统计</h3>
+            <ActivityIcon class="h-5 w-5 text-blue-500" />
+            <h3 class="text-blue-500 font-semibold">年度趋势</h3>
           </div>
-          <div class="space-y-4">
-            <div class="flex justify-between items-center">
-              <span class="text-gray-600">进行中</span>
-              <span class="text-2xl font-bold text-amber-600">234</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-gray-600">已完成</span>
-              <span class="text-2xl font-bold text-green-600">947</span>
-            </div>
+
+          <div class="relative h-full">
+            <svg viewBox="0 0 400 120" class="w-full h-full max-h-24">
+              <defs>
+                <pattern id="grid" width="50" height="12" patternUnits="userSpaceOnUse">
+                  <path
+                    d="M 50 0 L 0 0 0 12"
+                    fill="none"
+                    stroke="#e5e7eb"
+                    stroke-width="0.5"
+                    opacity="0.5"
+                  />
+                </pattern>
+              </defs>
+              <rect width="400" height="120" fill="url(#grid)" />
+
+              <polyline
+                :points="yearlyTrendPoints"
+                fill="none"
+                stroke="#2563eb"
+                stroke-width="2"
+                class="drop-shadow-sm"
+              />
+
+              <circle
+                v-for="(point, index) in yearlyTrendData"
+                :key="index"
+                :cx="40 + index * 50"
+                :cy="120 - point.projects * 0.08"
+                r="3"
+                fill="#2563eb"
+                class="cursor-pointer transition-all duration-300 hover:r-5"
+              />
+
+              <text
+                v-for="(point, index) in yearlyTrendData"
+                :key="'label-' + index"
+                :x="40 + index * 50"
+                y="115"
+                fill="#6b7280"
+                text-anchor="middle"
+                class="text-xs"
+              >
+                {{ point.year }}
+              </text>
+            </svg>
           </div>
         </div>
 
@@ -217,187 +254,44 @@
         </div>
       </div>
 
-      <!-- 右侧 - 城市详情和月度趋势 -->
-      <div class="col-span-3 grid grid-rows-3 gap-4">
-        <!-- 选中城市详情 -->
-        <div class="bg-white shadow-lg border border-gray-200 rounded-lg p-4 row-span-2">
-          <div class="flex items-center gap-2 mb-4">
-            <DatabaseIcon class="h-5 w-5 text-blue-500" />
-            <h3 class="text-blue-500 font-semibold">
-              {{ selectedCity ? selectedCity.name + '详情' : '城市详情' }}
-            </h3>
-          </div>
-
-          <div v-if="selectedCity" class="space-y-4">
-            <div class="bg-gray-50 p-3 rounded border">
-              <div class="text-sm text-gray-600 mb-2">项目概况</div>
-              <div class="grid grid-cols-2 gap-2 text-xs">
-                <div>
-                  <span class="text-gray-600">总项目:</span>
-                  <span class="text-blue-500 font-bold ml-1">{{ selectedCity.projects }}</span>
-                </div>
-                <div>
-                  <span class="text-gray-600">进行中:</span>
-                  <span class="text-amber-600 font-bold ml-1">{{ selectedCity.ongoing }}</span>
-                </div>
-                <div>
-                  <span class="text-gray-600">已完成:</span>
-                  <span class="text-green-600 font-bold ml-1">{{ selectedCity.completed }}</span>
-                </div>
-                <div>
-                  <span class="text-gray-600">待审核:</span>
-                  <span class="text-orange-600 font-bold ml-1">{{ selectedCity.pending }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-gray-50 p-3 rounded border">
-              <div class="text-sm text-gray-600 mb-2">审计类型分布</div>
-              <div class="space-y-2">
-                <div
-                  v-for="type in selectedCity.auditTypes"
-                  :key="type.name"
-                  class="flex justify-between text-xs"
-                >
-                  <span class="text-gray-600">{{ type.name }}</span>
-                  <span class="text-gray-800 font-bold">{{ type.count }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-gray-50 p-3 rounded border">
-              <div class="text-sm text-gray-600 mb-2">最新项目</div>
-              <div class="space-y-2 max-h-32 overflow-y-auto">
-                <div
-                  v-for="project in selectedCity.recentProjects"
-                  :key="project.id"
-                  class="text-xs p-2 bg-white rounded border"
-                >
-                  <div class="text-blue-500 font-medium">{{ project.name }}</div>
-                  <div class="text-gray-500 mt-1">{{ project.date }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div v-else class="text-center text-gray-500 mt-8">
-            <MapPinIcon class="h-12 w-12 mx-auto mb-2 opacity-50" />
-            <p>点击地图上的城市查看详情</p>
-          </div>
-        </div>
-
-        <!-- 月度趋势 -->
+      <!-- 右侧 - 知识库和提示词模型 -->
+      <div class="col-span-3 grid grid-rows-2 gap-4">
+        <!-- 知识库 -->
         <div class="bg-white shadow-lg border border-gray-200 rounded-lg p-4">
           <div class="flex items-center gap-2 mb-4">
-            <ActivityIcon class="h-5 w-5 text-blue-500" />
-            <h3 class="text-blue-500 font-semibold">月度趋势</h3>
+            <DatabaseIcon class="h-5 w-5 text-green-500" />
+            <h3 class="text-green-500 font-semibold">知识库</h3>
           </div>
 
-          <div class="relative h-full">
-            <svg viewBox="0 0 300 150" class="w-full h-full max-h-32">
-              <defs>
-                <pattern id="grid" width="30" height="15" patternUnits="userSpaceOnUse">
-                  <path
-                    d="M 30 0 L 0 0 0 15"
-                    fill="none"
-                    stroke="#e5e7eb"
-                    stroke-width="0.5"
-                    opacity="0.5"
-                  />
-                </pattern>
-              </defs>
-              <rect width="300" height="150" fill="url(#grid)" />
-
-              <polyline
-                :points="trendPoints"
-                fill="none"
-                stroke="#2563eb"
-                stroke-width="2"
-                class="drop-shadow-sm"
-              />
-
-              <circle
-                v-for="(point, index) in trendData"
-                :key="index"
-                :cx="30 + index * 40"
-                :cy="150 - point.projects * 2"
-                r="3"
-                fill="#2563eb"
-                class="cursor-pointer transition-all duration-300 hover:r-5"
-              />
-
-              <text
-                v-for="(point, index) in trendData"
-                :key="'label-' + index"
-                :x="30 + index * 40"
-                y="145"
-                fill="#6b7280"
-                text-anchor="middle"
-                class="text-xs"
-              >
-                {{ point.month }}
-              </text>
-            </svg>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 底部项目列表 -->
-    <div class="mt-6">
-      <div class="bg-white shadow-lg border border-gray-200 rounded-lg p-4">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-blue-500 font-semibold">地区项目列表</h3>
-          <div class="flex gap-2">
-            <select
-              v-model="selectedYear"
-              class="bg-white border border-gray-300 rounded px-3 py-1 text-gray-700 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          <div class="space-y-2 max-h-32 overflow-y-auto">
+            <div
+              v-for="kb in knowledgeBases"
+              :key="kb.name"
+              class="flex justify-between items-center p-2 bg-gray-50 rounded border"
             >
-              <option value="2024">2024年</option>
-              <option value="2023">2023年</option>
-              <option value="2022">2022年</option>
-            </select>
-            <select
-              v-model="selectedRegion"
-              class="bg-white border border-gray-300 rounded px-3 py-1 text-gray-700 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="all">全部地区</option>
-              <option value="wuhan">武汉市</option>
-              <option value="yichang">宜昌市</option>
-            </select>
+              <span class="text-sm text-gray-700">{{ kb.name }}</span>
+              <span class="text-sm font-bold text-green-600">{{ kb.docCount }}篇</span>
+            </div>
           </div>
         </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="border-b border-gray-200 bg-gray-50">
-                <th class="text-left p-3 text-gray-700 font-medium">地区</th>
-                <th class="text-left p-3 text-gray-700 font-medium">总项目数</th>
-                <th class="text-left p-3 text-gray-700 font-medium">进行中</th>
-                <th class="text-left p-3 text-gray-700 font-medium">已完成</th>
-                <th class="text-left p-3 text-gray-700 font-medium">土地利用</th>
-                <th class="text-left p-3 text-gray-700 font-medium">矿产资源</th>
-                <th class="text-left p-3 text-gray-700 font-medium">森林资源</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="city in hubeiCities.slice(0, 8)"
-                :key="city.id"
-                class="border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition-colors"
-                @click="selectCity(city)"
-              >
-                <td class="p-3 text-blue-500 font-medium">{{ city.name }}</td>
-                <td class="p-3 text-gray-700">{{ city.projects }}</td>
-                <td class="p-3 text-gray-700">{{ city.ongoing }}</td>
-                <td class="p-3 text-gray-700">{{ city.completed }}</td>
-                <td class="p-3 text-gray-700">{{ city.auditTypes[0]?.count || 0 }}</td>
-                <td class="p-3 text-gray-700">{{ city.auditTypes[1]?.count || 0 }}</td>
-                <td class="p-3 text-gray-700">{{ city.auditTypes[2]?.count || 0 }}</td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- 提示词模型 -->
+        <div class="bg-white shadow-lg border border-gray-200 rounded-lg p-4">
+          <div class="flex items-center gap-2 mb-4">
+            <ZapIcon class="h-5 w-5 text-orange-500" />
+            <h3 class="text-orange-500 font-semibold">提示词模型</h3>
+          </div>
+
+          <div class="space-y-2 max-h-32 overflow-y-auto">
+            <div
+              v-for="model in promptModels"
+              :key="model.category"
+              class="flex justify-between items-center p-2 bg-gray-50 rounded border"
+            >
+              <span class="text-sm text-gray-700">{{ model.category }}</span>
+              <span class="text-sm font-bold text-orange-600">{{ model.count }}个</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -406,16 +300,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import {
-  BarChart3,
-  FileText,
-  Database,
-  Zap,
-  TrendingUp,
-  MapPin,
-  PieChart,
-  Activity,
-} from 'lucide-vue-next'
+import { BarChart3, FileText, Database, Zap, MapPin, PieChart, Activity } from 'lucide-vue-next'
 
 // 定义类型
 interface AuditType {
@@ -448,7 +333,6 @@ const BarChart3Icon = BarChart3
 const FileTextIcon = FileText
 const DatabaseIcon = Database
 const ZapIcon = Zap
-const TrendingUpIcon = TrendingUp
 const MapPinIcon = MapPin
 const PieChartIcon = PieChart
 const ActivityIcon = Activity
@@ -464,9 +348,45 @@ const hoveredSegment = ref<number | null>(null)
 const overallStats = ref({
   totalProjects: 1248,
   totalFiles: 8956,
-  knowledgeBase: 342,
-  promptModels: 156,
 })
+
+// 项目统计数据
+const projectStats = ref({
+  ongoing: 234,
+  completed: 947,
+})
+
+// 知识库数据
+const knowledgeBases = ref([
+  { name: '土地资源审计知识库', docCount: 156 },
+  { name: '水资源审计知识库', docCount: 98 },
+  { name: '矿产资源审计知识库', docCount: 134 },
+  { name: '林业资源审计知识库', docCount: 87 },
+  { name: '生态资源审计知识库', docCount: 76 },
+  { name: '城市建设审计知识库', docCount: 112 },
+  { name: '农业生产审计知识库', docCount: 89 },
+])
+
+// 提示词模型数据
+const promptModels = ref([
+  { category: '土地资源', count: 25 },
+  { category: '水资源', count: 18 },
+  { category: '矿产资源', count: 22 },
+  { category: '林业资源', count: 15 },
+  { category: '生态资源', count: 19 },
+  { category: '城市建设', count: 28 },
+  { category: '农业生产', count: 16 },
+])
+
+// 年度趋势数据
+const yearlyTrendData = ref([
+  { year: '2019', projects: 680 },
+  { year: '2020', projects: 720 },
+  { year: '2021', projects: 850 },
+  { year: '2022', projects: 920 },
+  { year: '2023', projects: 1050 },
+  { year: '2024', projects: 1248 },
+])
 
 // 湖北省各地市数据（简化的SVG路径）
 const hubeiCities = ref([
@@ -649,16 +569,6 @@ const pieData = ref([
   { name: '水资源审计', value: 15, color: '#dc2626' }, // 红色
 ])
 
-// 趋势数据
-const trendData = ref([
-  { month: '1月', projects: 45 },
-  { month: '2月', projects: 52 },
-  { month: '3月', projects: 48 },
-  { month: '4月', projects: 61 },
-  { month: '5月', projects: 55 },
-  { month: '6月', projects: 67 },
-])
-
 // 计算属性
 const getCityColor = (city: City) => {
   if (city.projects > 100) return '#1e40af' // 深蓝色
@@ -689,9 +599,9 @@ const pieSegments = computed(() => {
   })
 })
 
-const trendPoints = computed(() => {
-  return trendData.value
-    .map((point, index) => `${30 + index * 40},${150 - point.projects * 2}`)
+const yearlyTrendPoints = computed(() => {
+  return yearlyTrendData.value
+    .map((point, index) => `${40 + index * 50},${120 - point.projects * 0.08}`)
     .join(' ')
 })
 
