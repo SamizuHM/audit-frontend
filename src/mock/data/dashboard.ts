@@ -28,7 +28,7 @@ export interface Project {
   startDate: string
   endDate: string
   auditor: string
-  status: '进行中' | '已完成' | '待开始'
+  status: '进行中' | '已完成'
   documents: Document[]
   type: ProjectType // 新增类型字段
 }
@@ -546,7 +546,7 @@ export const generateMockProjectData = () => {
         startDate: '@date("yyyy-MM-dd")',
         endDate: '@date("yyyy-MM-dd")',
         auditor: '@cname',
-        status: '@pick(["进行中", "已完成", "待开始"])',
+        status: '@pick(["进行中", "已完成"])',
         'documents|1-5': [
           {
             'id|+1': 1,

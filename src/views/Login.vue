@@ -121,23 +121,24 @@ const handleLogin = async () => {
 
     ElMessage.success('登录成功')
 
-    // 根据角色跳转到不同的页面
-    if (loginForm.role === 'admin') {
-      router.push('/admin/user-management')
-    } else if (loginForm.role === 'user') {
-      router.push('/dashboard/home')
-    }
+    redirectLogin()
   } catch (error) {
     ElMessage.error(error instanceof Error ? error.message : '登录失败')
   }
 }
 
+const redirectLogin = () => {
+  if (authStore.isAuthenticated) {
+    if (authStore.userRole === 'admin') {
+      router.push('/admin/user-management')
+    } else {
+      router.push('/dashboard/home')
+    }
+  }
+}
 // 组件挂载时初始化
 onMounted(() => {
-  // 如果已登录，直接跳转到仪表盘
-  if (authStore.isAuthenticated) {
-    router.push('/dashboard')
-  }
+  redirectLogin()
 })
 </script>
 

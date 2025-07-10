@@ -106,9 +106,9 @@ export const authApi = {
         token: 'mock-jwt-token',
         user: {
           id: 1,
-          username: 'admin',
-          name: '管理员',
-          role: 'admin',
+          username: data.username,
+          name: data.role === 'admin' ? '管理员' : '普通用户',
+          role: data.role,
         },
       }
     }
