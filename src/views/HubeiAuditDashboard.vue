@@ -605,6 +605,8 @@ const initPieChart = async () => {
 const initMap = async () => {
   if (!mapChart.value) return
 
+  let echartsClickFlag = false // 标志变量
+
   try {
     // 加载湖北省地图数据，使用URL编码处理中文文件名
     const response = await fetch(`${import.meta.env.BASE_URL}map/Hubei_DataV.json`)
@@ -716,6 +718,7 @@ const initMap = async () => {
 
     // 添加点击事件
     chartInstance.on('click', (params: ECElementEvent) => {
+      echartsClickFlag = true // 标记本次为echarts点击
       if (params.data) {
         const cityData = hubeiCitiesData.value.find((item) => item.name === params.name)
         if (cityData) {
@@ -732,16 +735,27 @@ const initMap = async () => {
             auditTypes: [],
             recentProjects: [],
           }
-
-          // 触发选中动画
           chartInstance?.dispatchAction({
             type: 'mapSelect',
             name: params.name,
           })
-
           console.log('Selected city:', selectedCity.value)
         }
       }
+    })
+
+    // 地图容器原生点击事件
+    mapChart.value.addEventListener('click', () => {
+      // 如果不是echarts触发的点击，则视为空白区域点击
+      if (!echartsClickFlag && selectedCity.value) {
+        chartInstance?.dispatchAction({
+          type: 'mapUnSelect',
+          name: selectedCity.value.name,
+        })
+        selectedCity.value = null
+        console.log('Cleared city selection by container click')
+      }
+      echartsClickFlag = false // 重置标志
     })
 
     // 添加悬停事件
