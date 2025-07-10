@@ -55,43 +55,55 @@
     </div>
 
     <!-- 主要内容区域 -->
-    <div class="grid grid-cols-12 gap-4 min-h-[600px]">
+    <div class="grid grid-cols-12 gap-4">
       <!-- 左侧 - 年度趋势和审计类型分布 -->
-      <div class="col-span-3 grid grid-rows-2 gap-4">
+      <div class="col-span-3 grid grid-rows-[260px_260px] gap-4">
         <!-- 年度趋势 -->
-        <div class="bg-white shadow-lg border border-gray-200 rounded-lg p-4">
+        <div
+          class="bg-white shadow-lg border border-gray-200 rounded-lg p-4 h-[260px] grid grid-rows-[auto_1fr]"
+        >
           <div class="flex items-center gap-2 mb-4">
             <ActivityIcon class="h-5 w-5 text-blue-500" />
             <h3 class="text-blue-500 font-semibold">年度项目数量（柱状图）</h3>
           </div>
 
-          <div class="flex-1 min-h-[250px]">
-            <div ref="barChart" class="w-full h-full min-h-[250px]"></div>
+          <div class="min-h-0">
+            <div ref="barChart" class="w-full h-full"></div>
           </div>
         </div>
         <!-- 审计类型分布 -->
-        <div class="bg-white shadow-lg border border-gray-200 rounded-lg p-4">
+        <div
+          class="bg-white shadow-lg border border-gray-200 rounded-lg p-4 h-[260px] grid grid-rows-[auto_1fr]"
+        >
           <div class="flex items-center gap-2 mb-4">
             <PieChartIcon class="h-5 w-5 text-blue-500" />
             <h3 class="text-blue-500 font-semibold">审计类型分布</h3>
           </div>
 
-          <div class="flex-1 min-h-[200px]">
-            <div ref="pieChart" class="w-full h-full min-h-[200px]"></div>
-          </div>
+          <div class="grid grid-cols-2 gap-4 min-h-0">
+            <!-- 饼图 -->
+            <div class="min-h-0">
+              <div ref="pieChart" class="w-full h-full"></div>
+            </div>
 
-          <!-- 图例 -->
-          <div class="mt-2 space-y-1">
-            <div
-              v-for="(item, index) in pieData"
-              :key="index"
-              class="flex items-center justify-between text-xs"
-            >
-              <div class="flex items-center gap-2">
-                <div class="w-2 h-2 rounded" :style="{ backgroundColor: item.color }"></div>
-                <span class="text-gray-600">{{ item.name }}</span>
+            <!-- 图例 -->
+            <div class="overflow-y-auto min-h-0">
+              <div class="flex flex-col justify-center h-full space-y-2">
+                <div
+                  v-for="(item, index) in pieData"
+                  :key="index"
+                  class="flex items-center justify-between text-xs"
+                >
+                  <div class="flex items-center gap-2">
+                    <div
+                      class="w-2 h-2 rounded flex-shrink-0"
+                      :style="{ backgroundColor: item.color }"
+                    ></div>
+                    <span class="text-gray-600">{{ item.name }}</span>
+                  </div>
+                  <span class="text-gray-800 font-bold">{{ item.value }}%</span>
+                </div>
               </div>
-              <span class="text-gray-800 font-bold">{{ item.value }}%</span>
             </div>
           </div>
         </div>
@@ -99,7 +111,9 @@
 
       <!-- 中间 - 湖北省地图 -->
       <div class="col-span-6">
-        <div class="bg-white shadow-lg border border-gray-200 rounded-lg p-4 flex flex-col">
+        <div
+          class="bg-white shadow-lg border border-gray-200 rounded-lg p-4 h-full grid grid-rows-[auto_1fr]"
+        >
           <div class="flex items-center gap-2 mb-4">
             <MapPinIcon class="h-5 w-5 text-blue-500" />
             <h3 class="text-blue-500 font-semibold">湖北省项目分布</h3>
@@ -108,23 +122,25 @@
             </span>
           </div>
 
-          <div class="flex-1 min-h-[500px]">
+          <div class="min-h-0">
             <!-- Echarts 湖北省地图 -->
-            <div ref="mapChart" class="w-full h-full min-h-[500px]"></div>
+            <div ref="mapChart" class="w-full h-full"></div>
           </div>
         </div>
       </div>
 
       <!-- 右侧 - 知识库和提示词模型 -->
-      <div class="col-span-3 grid grid-rows-2 gap-4">
+      <div class="col-span-3 grid grid-rows-[260px_260px] gap-4">
         <!-- 知识库 -->
-        <div class="bg-white shadow-lg border border-gray-200 rounded-lg p-4">
+        <div
+          class="bg-white shadow-lg border border-gray-200 rounded-lg p-4 h-[260px] grid grid-rows-[auto_1fr]"
+        >
           <div class="flex items-center gap-2 mb-4">
             <DatabaseIcon class="h-5 w-5 text-green-500" />
             <h3 class="text-green-500 font-semibold">知识库</h3>
           </div>
 
-          <div class="space-y-2 overflow-y-auto">
+          <div class="space-y-2 overflow-y-auto min-h-0">
             <div
               v-for="kb in knowledgeBases"
               :key="kb.name"
@@ -137,13 +153,15 @@
         </div>
 
         <!-- 提示词模型 -->
-        <div class="bg-white shadow-lg border border-gray-200 rounded-lg p-4">
+        <div
+          class="bg-white shadow-lg border border-gray-200 rounded-lg p-4 h-[260px] grid grid-rows-[auto_1fr]"
+        >
           <div class="flex items-center gap-2 mb-4">
             <ZapIcon class="h-5 w-5 text-orange-500" />
             <h3 class="text-orange-500 font-semibold">提示词模型</h3>
           </div>
 
-          <div class="space-y-2 overflow-y-auto">
+          <div class="space-y-2 overflow-y-auto min-h-0">
             <div
               v-for="model in promptModels"
               :key="model.category"
