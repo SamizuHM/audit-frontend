@@ -12,7 +12,6 @@
         class="sidebar-menu"
         @select="handleMenuSelect"
         router
-        :collapse="false"
         background-color="#ffffff"
         text-color="#666666"
         active-text-color="#409EFF"
@@ -23,16 +22,14 @@
           </el-icon>
           <span>{{ menu.name }}</span>
         </el-menu-item>
-
         <div class="menu-divider"></div>
-
         <!-- 退出登录 -->
-        <el-menu-item index="logout" @click="handleLogout">
+        <div class="logout-btn" @click="handleLogout">
           <el-icon>
             <SwitchButton />
           </el-icon>
           <span>退出登录</span>
-        </el-menu-item>
+        </div>
       </el-menu>
     </el-aside>
 
@@ -93,22 +90,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import {
-  Document,
-  Edit,
-  Histogram,
-  ChatLineSquare,
-  Reading,
-  Rank,
-  User,
-  Coin,
-  SwitchButton,
-  ArrowDown,
-  Setting,
-} from '@element-plus/icons-vue'
+import { User, SwitchButton, ArrowDown, Setting } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { usePermissionStore } from '@/stores/permission'
 
@@ -126,7 +111,7 @@ const systemTitle = computed(() => {
 
 // 可访问的菜单
 const accessibleMenus = computed(() => {
-  return permissionStore.accessibleMenus.sort((a, b) => (a.sort || 0) - (b.sort || 0))
+  return [...permissionStore.accessibleMenus].sort((a, b) => (a.sort || 0) - (b.sort || 0))
 })
 
 // 当前激活的菜单索引
@@ -225,6 +210,28 @@ const handleLogout = async () => {
   height: 1px;
   background-color: #e4e7ed;
   margin: 8px 16px;
+}
+
+/* 新增退出登录按钮样式 */
+.logout-btn {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 10px 24px;
+  color: #666;
+  font-size: 15px;
+  border-radius: 6px;
+  margin: 8px;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.logout-btn:hover {
+  background: #ecf5ff;
+  color: #409eff;
+}
+.logout-btn .el-icon {
+  margin-right: 8px;
 }
 
 /* 主内容区域 */
