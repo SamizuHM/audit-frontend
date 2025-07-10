@@ -64,7 +64,7 @@
         >
           <div class="flex items-center gap-2 mb-4">
             <ActivityIcon class="h-5 w-5 text-blue-500" />
-            <h3 class="text-blue-500 font-semibold">年度项目数量（柱状图）</h3>
+            <h3 class="text-blue-500 font-semibold">年度项目数量</h3>
           </div>
 
           <div class="min-h-0">
@@ -80,31 +80,8 @@
             <h3 class="text-blue-500 font-semibold">审计类型分布</h3>
           </div>
 
-          <div class="grid grid-cols-2 gap-4 min-h-0">
-            <!-- 饼图 -->
-            <div class="min-h-0">
-              <div ref="pieChart" class="w-full h-full"></div>
-            </div>
-
-            <!-- 图例 -->
-            <div class="overflow-y-auto min-h-0">
-              <div class="flex flex-col justify-center h-full space-y-2">
-                <div
-                  v-for="(item, index) in pieData"
-                  :key="index"
-                  class="flex items-center justify-between text-xs"
-                >
-                  <div class="flex items-center gap-2">
-                    <div
-                      class="w-2 h-2 rounded flex-shrink-0"
-                      :style="{ backgroundColor: item.color }"
-                    ></div>
-                    <span class="text-gray-600">{{ item.name }}</span>
-                  </div>
-                  <span class="text-gray-800 font-bold">{{ item.value }}%</span>
-                </div>
-              </div>
-            </div>
+          <div class="min-h-0">
+            <div ref="pieChart" class="w-full h-full"></div>
           </div>
         </div>
       </div>
@@ -573,9 +550,6 @@ const initPieChart = async () => {
         trigger: 'item',
         formatter: '{a} <br/>{b}: {c} ({d}%)',
       },
-      legend: {
-        show: false,
-      },
       series: [
         {
           name: '审计类型',
@@ -591,10 +565,20 @@ const initPieChart = async () => {
             },
           },
           label: {
-            show: false,
+            show: true,
+            position: 'outside',
+            formatter: '{b}: {d}%',
+            fontSize: 10,
+            color: '#374151',
           },
           labelLine: {
-            show: false,
+            show: true,
+            length: 15,
+            length2: 8,
+            lineStyle: {
+              color: '#9ca3af',
+              width: 1,
+            },
           },
         },
       ],
@@ -676,11 +660,7 @@ const initMap = async () => {
       },
       geo: {
         map: 'hubei',
-        roam: true,
-        scaleLimit: {
-          min: 0.8,
-          max: 3,
-        },
+        roam: false,
         zoom: 1.1,
         center: [112, 31.2],
         itemStyle: {
