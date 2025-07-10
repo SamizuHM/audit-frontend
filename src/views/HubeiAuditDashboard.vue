@@ -21,10 +21,10 @@
         >
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-gray-600 text-sm">成果文件</p>
+              <p class="text-gray-600 text-sm">AI生成工作方案</p>
               <p class="text-2xl font-bold text-purple-600">{{ overallStats.totalFiles }}</p>
             </div>
-            <FileTextIcon class="h-8 w-8 text-purple-500" />
+            <ClipboardListIcon class="h-8 w-8 text-purple-500" />
           </div>
         </div>
 
@@ -33,10 +33,10 @@
         >
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-gray-600 text-sm">进行中</p>
+              <p class="text-gray-600 text-sm">AI生成实施方案</p>
               <p class="text-2xl font-bold text-amber-600">{{ projectStats.ongoing }}</p>
             </div>
-            <ActivityIcon class="h-8 w-8 text-amber-500" />
+            <HammerIcon class="h-8 w-8 text-amber-500" />
           </div>
         </div>
 
@@ -45,10 +45,10 @@
         >
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-gray-600 text-sm">已完成</p>
+              <p class="text-gray-600 text-sm">AI生成审计报告</p>
               <p class="text-2xl font-bold text-green-600">{{ projectStats.completed }}</p>
             </div>
-            <DatabaseIcon class="h-8 w-8 text-green-500" />
+            <FileBarChartIcon class="h-8 w-8 text-green-500" />
           </div>
         </div>
       </div>
@@ -62,57 +62,13 @@
         <div class="bg-white shadow-lg border border-gray-200 rounded-lg p-4">
           <div class="flex items-center gap-2 mb-4">
             <ActivityIcon class="h-5 w-5 text-blue-500" />
-            <h3 class="text-blue-500 font-semibold">年度趋势</h3>
+            <h3 class="text-blue-500 font-semibold">年度项目数量（柱状图）</h3>
           </div>
 
-          <div class="relative h-full">
-            <svg viewBox="0 0 400 120" class="w-full h-full max-h-24">
-              <defs>
-                <pattern id="grid" width="50" height="12" patternUnits="userSpaceOnUse">
-                  <path
-                    d="M 50 0 L 0 0 0 12"
-                    fill="none"
-                    stroke="#e5e7eb"
-                    stroke-width="0.5"
-                    opacity="0.5"
-                  />
-                </pattern>
-              </defs>
-              <rect width="400" height="120" fill="url(#grid)" />
-
-              <polyline
-                :points="yearlyTrendPoints"
-                fill="none"
-                stroke="#2563eb"
-                stroke-width="2"
-                class="drop-shadow-sm"
-              />
-
-              <circle
-                v-for="(point, index) in yearlyTrendData"
-                :key="index"
-                :cx="40 + index * 50"
-                :cy="120 - point.projects * 0.08"
-                r="3"
-                fill="#2563eb"
-                class="cursor-pointer transition-all duration-300 hover:r-5"
-              />
-
-              <text
-                v-for="(point, index) in yearlyTrendData"
-                :key="'label-' + index"
-                :x="40 + index * 50"
-                y="115"
-                fill="#6b7280"
-                text-anchor="middle"
-                class="text-xs"
-              >
-                {{ point.year }}
-              </text>
-            </svg>
+          <div class="flex-1 min-h-[250px]">
+            <div ref="barChart" class="w-full h-full min-h-[250px]"></div>
           </div>
         </div>
-
         <!-- 审计类型分布 -->
         <div class="bg-white shadow-lg border border-gray-200 rounded-lg p-4">
           <div class="flex items-center gap-2 mb-4">
@@ -120,35 +76,22 @@
             <h3 class="text-blue-500 font-semibold">审计类型分布</h3>
           </div>
 
-          <div class="relative h-full">
-            <svg viewBox="0 0 200 200" class="w-full h-full max-h-32">
-              <g transform="translate(100,100)">
-                <path
-                  v-for="(segment, index) in pieSegments"
-                  :key="index"
-                  :d="segment.path"
-                  :fill="segment.color"
-                  class="cursor-pointer transition-all duration-300 hover:brightness-110"
-                  :transform="hoveredSegment === index ? 'scale(1.05)' : 'scale(1)'"
-                  @mouseenter="hoveredSegment = index"
-                  @mouseleave="hoveredSegment = null"
-                />
-              </g>
-            </svg>
+          <div class="flex-1 min-h-[200px]">
+            <div ref="pieChart" class="w-full h-full min-h-[200px]"></div>
+          </div>
 
-            <!-- 图例 -->
-            <div class="mt-2 space-y-1">
-              <div
-                v-for="(item, index) in pieData"
-                :key="index"
-                class="flex items-center justify-between text-xs"
-              >
-                <div class="flex items-center gap-2">
-                  <div class="w-2 h-2 rounded" :style="{ backgroundColor: item.color }"></div>
-                  <span class="text-gray-600">{{ item.name }}</span>
-                </div>
-                <span class="text-gray-800 font-bold">{{ item.value }}%</span>
+          <!-- 图例 -->
+          <div class="mt-2 space-y-1">
+            <div
+              v-for="(item, index) in pieData"
+              :key="index"
+              class="flex items-center justify-between text-xs"
+            >
+              <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded" :style="{ backgroundColor: item.color }"></div>
+                <span class="text-gray-600">{{ item.name }}</span>
               </div>
+              <span class="text-gray-800 font-bold">{{ item.value }}%</span>
             </div>
           </div>
         </div>
@@ -181,11 +124,11 @@
             <h3 class="text-green-500 font-semibold">知识库</h3>
           </div>
 
-          <div class="space-y-2 max-h-32 overflow-y-auto">
+          <div class="space-y-2 overflow-y-auto">
             <div
               v-for="kb in knowledgeBases"
               :key="kb.name"
-              class="flex justify-between items-center p-2 bg-gray-50 rounded border"
+              class="flex justify-between items-center p-2 bg-gray-50 rounded border border-gray-300"
             >
               <span class="text-sm text-gray-700">{{ kb.name }}</span>
               <span class="text-sm font-bold text-green-600">{{ kb.docCount }}篇</span>
@@ -200,11 +143,11 @@
             <h3 class="text-orange-500 font-semibold">提示词模型</h3>
           </div>
 
-          <div class="space-y-2 max-h-32 overflow-y-auto">
+          <div class="space-y-2 overflow-y-auto">
             <div
               v-for="model in promptModels"
               :key="model.category"
-              class="flex justify-between items-center p-2 bg-gray-50 rounded border"
+              class="flex justify-between items-center p-2 bg-gray-50 rounded border border-gray-300"
             >
               <span class="text-sm text-gray-700">{{ model.category }}</span>
               <span class="text-sm font-bold text-orange-600">{{ model.count }}个</span>
@@ -233,6 +176,7 @@
               <tr class="bg-gray-50">
                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">序号</th>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">项目名称</th>
+                <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">项目类型</th>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">地区</th>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">开始时间</th>
                 <th class="px-4 py-3 text-left text-sm font-semibold text-gray-600">结束时间</th>
@@ -249,6 +193,7 @@
               >
                 <td class="px-4 py-3 text-sm text-gray-800">{{ index + 1 }}</td>
                 <td class="px-4 py-3 text-sm text-gray-800 font-medium">{{ project.name }}</td>
+                <td class="px-4 py-3 text-sm text-gray-600">{{ project.type }}</td>
                 <td class="px-4 py-3 text-sm text-gray-600">{{ project.region }}</td>
                 <td class="px-4 py-3 text-sm text-gray-600">{{ project.startDate }}</td>
                 <td class="px-4 py-3 text-sm text-gray-600">{{ project.endDate }}</td>
@@ -279,7 +224,7 @@
     <!-- 项目详情Modal -->
     <div
       v-if="selectedProject"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
       @click.self="closeProjectDetails"
     >
       <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
@@ -364,7 +309,18 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue'
-import { BarChart3, FileText, Database, Zap, MapPin, PieChart, Activity } from 'lucide-vue-next'
+import {
+  BarChart3,
+  FileText,
+  Database,
+  Zap,
+  MapPin,
+  PieChart,
+  Activity,
+  ClipboardList,
+  Hammer,
+  FileBarChart,
+} from 'lucide-vue-next'
 import * as echarts from 'echarts'
 import type { ECElementEvent } from 'echarts'
 // 导入 mock 数据和类型
@@ -384,6 +340,9 @@ import {
 
 // 重命名图标以避免冲突
 const BarChart3Icon = BarChart3
+const ClipboardListIcon = ClipboardList
+const HammerIcon = Hammer
+const FileBarChartIcon = FileBarChart
 const FileTextIcon = FileText
 const DatabaseIcon = Database
 const ZapIcon = Zap
@@ -394,9 +353,12 @@ const ActivityIcon = Activity
 // 响应式数据
 const selectedCity = ref<City | null>(null)
 const selectedProject = ref<Project | null>(null)
-const hoveredSegment = ref<number | null>(null)
 const mapChart = ref<HTMLElement>()
+const barChart = ref<HTMLElement>()
+const pieChart = ref<HTMLElement>()
 let chartInstance: echarts.ECharts | null = null
+let barChartInstance: echarts.ECharts | null = null
+let pieChartInstance: echarts.ECharts | null = null
 
 // 使用 mock 数据初始化响应式数据
 const overallStats = ref(mockOverallStats)
@@ -416,35 +378,6 @@ const selectedCityProjects = computed(() => {
   }
   // 选择了城市时，只显示该城市的项目
   return projectsData.value.filter((project) => project.region === selectedCity.value?.name)
-})
-
-const pieSegments = computed(() => {
-  let currentAngle = 0
-  return pieData.value.map((item) => {
-    const startAngle = currentAngle
-    const endAngle = currentAngle + (item.value / 100) * 2 * Math.PI
-    currentAngle = endAngle
-
-    const x1 = Math.cos(startAngle) * 60
-    const y1 = Math.sin(startAngle) * 60
-    const x2 = Math.cos(endAngle) * 60
-    const y2 = Math.sin(endAngle) * 60
-
-    const largeArcFlag = endAngle - startAngle <= Math.PI ? '0' : '1'
-
-    const path = ['M', 0, 0, 'L', x1, y1, 'A', 60, 60, 0, largeArcFlag, 1, x2, y2, 'Z'].join(' ')
-
-    return {
-      path,
-      color: item.color,
-    }
-  })
-})
-
-const yearlyTrendPoints = computed(() => {
-  return yearlyTrendData.value
-    .map((point, index) => `${40 + index * 50},${120 - point.projects * 0.08}`)
-    .join(' ')
 })
 
 // 方法
@@ -486,6 +419,184 @@ const downloadDocument = (doc: Document) => {
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
+}
+
+// ECharts柱状图初始化
+const initBarChart = async () => {
+  if (!barChart.value) return
+
+  try {
+    barChartInstance = echarts.init(barChart.value)
+
+    const totalYears = yearlyTrendData.value.length
+    const displayYears = 6 // 默认显示最近6年
+    const startPercent = Math.max(0, ((totalYears - displayYears) / totalYears) * 100)
+
+    const option = {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow',
+        },
+      },
+      grid: {
+        left: '10%',
+        right: '10%',
+        bottom: '25%',
+        top: '10%',
+      },
+      dataZoom: [
+        {
+          type: 'slider',
+          show: true,
+          xAxisIndex: [0],
+          start: startPercent,
+          end: 100,
+          height: 20,
+          bottom: '5%',
+          handleIcon:
+            'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23.1h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+          handleSize: '80%',
+          handleStyle: {
+            color: '#3b82f6',
+            shadowBlur: 3,
+            shadowColor: 'rgba(0, 0, 0, 0.3)',
+            shadowOffsetX: 2,
+            shadowOffsetY: 2,
+          },
+          textStyle: {
+            color: '#6b7280',
+          },
+          borderColor: '#e5e7eb',
+          backgroundColor: '#f9fafb',
+          dataBackground: {
+            lineStyle: {
+              color: '#3b82f6',
+            },
+            areaStyle: {
+              color: '#dbeafe',
+            },
+          },
+        },
+      ],
+      xAxis: {
+        type: 'category',
+        data: yearlyTrendData.value.map((item) => item.year),
+        axisLine: {
+          lineStyle: {
+            color: '#e5e7eb',
+          },
+        },
+        axisLabel: {
+          color: '#6b7280',
+          fontSize: 10,
+          rotate: 45,
+        },
+      },
+      yAxis: {
+        type: 'value',
+        axisLine: {
+          show: false,
+        },
+        axisTick: {
+          show: false,
+        },
+        axisLabel: {
+          color: '#6b7280',
+          fontSize: 10,
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#f3f4f6',
+          },
+        },
+      },
+      series: [
+        {
+          data: yearlyTrendData.value.map((item) => item.projects),
+          type: 'bar',
+          itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#3b82f6' },
+              { offset: 1, color: '#1d4ed8' },
+            ]),
+          },
+          barWidth: '60%',
+        },
+      ],
+    }
+
+    barChartInstance.setOption(option)
+
+    const resizeHandler = () => {
+      barChartInstance?.resize()
+    }
+    window.addEventListener('resize', resizeHandler)
+
+    return () => {
+      window.removeEventListener('resize', resizeHandler)
+      barChartInstance?.dispose()
+      barChartInstance = null
+    }
+  } catch (error) {
+    console.error('Failed to init bar chart:', error)
+  }
+}
+
+// ECharts饼状图初始化
+const initPieChart = async () => {
+  if (!pieChart.value) return
+
+  try {
+    pieChartInstance = echarts.init(pieChart.value)
+
+    const option = {
+      tooltip: {
+        trigger: 'item',
+        formatter: '{a} <br/>{b}: {c} ({d}%)',
+      },
+      legend: {
+        show: false,
+      },
+      series: [
+        {
+          name: '审计类型',
+          type: 'pie',
+          radius: ['40%', '70%'],
+          center: ['50%', '50%'],
+          data: pieData.value,
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: 'rgba(0, 0, 0, 0.5)',
+            },
+          },
+          label: {
+            show: false,
+          },
+          labelLine: {
+            show: false,
+          },
+        },
+      ],
+    }
+
+    pieChartInstance.setOption(option)
+
+    const resizeHandler = () => {
+      pieChartInstance?.resize()
+    }
+    window.addEventListener('resize', resizeHandler)
+
+    return () => {
+      window.removeEventListener('resize', resizeHandler)
+      pieChartInstance?.dispose()
+      pieChartInstance = null
+    }
+  } catch (error) {
+    console.error('Failed to init pie chart:', error)
+  }
 }
 
 // ECharts地图初始化
@@ -675,10 +786,12 @@ const initMap = async () => {
   }
 }
 
-// 组件挂载后初始化地图
+// 组件挂载后初始化图表
 onMounted(async () => {
   await nextTick()
   await initMap()
+  await initBarChart()
+  await initPieChart()
 })
 </script>
 

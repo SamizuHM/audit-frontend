@@ -30,6 +30,7 @@ export interface Project {
   auditor: string
   status: '进行中' | '已完成' | '待开始'
   documents: Document[]
+  type: ProjectType // 新增类型字段
 }
 
 export interface City {
@@ -44,6 +45,17 @@ export interface City {
   path: string
   auditTypes: AuditType[]
   recentProjects: RecentProject[]
+}
+
+// 项目类型枚举
+export enum ProjectType {
+  土地资源 = '土地资源',
+  水资源 = '水资源',
+  矿产资源 = '矿产资源',
+  林业资源 = '林业资源',
+  生态环境 = '生态环境',
+  城市建设 = '城市建设',
+  农业生产 = '农业生产',
 }
 
 // 总体统计数据
@@ -82,6 +94,20 @@ export const promptModels = [
 
 // 年度趋势数据
 export const yearlyTrendData = [
+  { year: '2005', projects: 180 },
+  { year: '2006', projects: 210 },
+  { year: '2007', projects: 250 },
+  { year: '2008', projects: 320 },
+  { year: '2009', projects: 290 },
+  { year: '2010', projects: 380 },
+  { year: '2011', projects: 420 },
+  { year: '2012', projects: 460 },
+  { year: '2013', projects: 510 },
+  { year: '2014', projects: 580 },
+  { year: '2015', projects: 620 },
+  { year: '2016', projects: 580 },
+  { year: '2017', projects: 650 },
+  { year: '2018', projects: 690 },
   { year: '2019', projects: 680 },
   { year: '2020', projects: 720 },
   { year: '2021', projects: 850 },
@@ -130,6 +156,7 @@ export const projectsData: Project[] = [
     endDate: '2024-06-30',
     auditor: '张明',
     status: '已完成',
+    type: ProjectType.土地资源,
     documents: [
       {
         id: 1,
@@ -165,6 +192,7 @@ export const projectsData: Project[] = [
     endDate: '2024-08-15',
     auditor: '李华',
     status: '进行中',
+    type: ProjectType.矿产资源,
     documents: [
       {
         id: 4,
@@ -193,6 +221,7 @@ export const projectsData: Project[] = [
     endDate: '2024-07-20',
     auditor: '王强',
     status: '进行中',
+    type: ProjectType.林业资源,
     documents: [
       {
         id: 6,
@@ -220,6 +249,7 @@ export const projectsData: Project[] = [
     endDate: '2024-04-30',
     auditor: '陈丽',
     status: '已完成',
+    type: ProjectType.水资源,
     documents: [
       {
         id: 8,
@@ -256,6 +286,7 @@ export const projectsData: Project[] = [
     endDate: '2024-10-31',
     auditor: '刘斌',
     status: '进行中',
+    type: ProjectType.生态环境,
     documents: [
       {
         id: 11,
@@ -275,6 +306,7 @@ export const projectsData: Project[] = [
     endDate: '2024-05-30',
     auditor: '赵军',
     status: '已完成',
+    type: ProjectType.城市建设,
     documents: [
       {
         id: 12,
@@ -303,6 +335,7 @@ export const projectsData: Project[] = [
     endDate: '2024-09-30',
     auditor: '孙薇',
     status: '进行中',
+    type: ProjectType.生态环境,
     documents: [
       {
         id: 14,
@@ -330,6 +363,7 @@ export const projectsData: Project[] = [
     endDate: '2024-03-31',
     auditor: '周琳',
     status: '已完成',
+    type: ProjectType.城市建设,
     documents: [
       {
         id: 16,
@@ -350,6 +384,7 @@ export const projectsData: Project[] = [
     endDate: '2024-08-31',
     auditor: '马超',
     status: '进行中',
+    type: ProjectType.农业生产,
     documents: [
       {
         id: 17,
@@ -377,6 +412,7 @@ export const projectsData: Project[] = [
     endDate: '2024-06-30',
     auditor: '李雪',
     status: '已完成',
+    type: ProjectType.城市建设,
     documents: [
       {
         id: 19,
@@ -405,6 +441,7 @@ export const projectsData: Project[] = [
     endDate: '2024-10-31',
     auditor: '田浩',
     status: '进行中',
+    type: ProjectType.城市建设,
     documents: [
       {
         id: 21,
@@ -424,6 +461,7 @@ export const projectsData: Project[] = [
     endDate: '2024-09-30',
     auditor: '吴凯',
     status: '进行中',
+    type: ProjectType.城市建设,
     documents: [
       {
         id: 22,
@@ -443,6 +481,7 @@ export const projectsData: Project[] = [
     endDate: '2024-08-15',
     auditor: '宋娜',
     status: '进行中',
+    type: ProjectType.城市建设,
     documents: [
       {
         id: 23,
@@ -462,6 +501,7 @@ export const projectsData: Project[] = [
     endDate: '2024-07-20',
     auditor: '梁伟',
     status: '已完成',
+    type: ProjectType.城市建设,
     documents: [
       {
         id: 24,
@@ -481,6 +521,7 @@ export const projectsData: Project[] = [
     endDate: '2024-11-10',
     auditor: '谭敏',
     status: '进行中',
+    type: ProjectType.生态环境,
     documents: [
       {
         id: 25,
