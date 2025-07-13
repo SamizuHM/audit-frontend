@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { usePermissionStore } from '@/stores/permission'
+// import { useAuthStore } from '@/stores/auth'
+// import { usePermissionStore } from '@/stores/permission'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -13,110 +13,177 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Login',
     component: () => import('../views/Login.vue'),
   },
-  // 用户端路由
+  // 主应用路由 - 统一布局
   {
-    path: '/dashboard',
-    name: 'Dashboard',
+    path: '/app',
+    name: 'App',
     component: () => import('../views/LayoutNew.vue'),
-    meta: { requiresAuth: true, role: 'user' },
+    meta: { requiresAuth: true },
+    redirect: '/app/home',
     children: [
-      {
-        path: '',
-        redirect: '/dashboard/home',
-      },
+      // 首页
       {
         path: 'home',
-        name: '首页',
+        name: 'Home',
         component: () => import('../views/HubeiAuditDashboard.vue'),
-        meta: { requiresAuth: true, permission: 'user:home:dashboard' },
+        meta: {
+          requiresAuth: true,
+          permission: 'user:home:dashboard',
+          title: '首页',
+          icon: 'House',
+          sort: 1,
+        },
       },
+      // 用户功能模块
       {
         path: 'projects',
-        name: 'AuditProjects',
+        name: 'Projects',
         component: () => import('../views/AuditProjects.vue'),
-        meta: { requiresAuth: true, permission: 'user:project:list' },
+        meta: {
+          requiresAuth: true,
+          permission: 'user:project:list',
+          title: '我的项目',
+          icon: 'Document',
+          sort: 2,
+        },
       },
       {
         path: 'audit-text',
         name: 'AuditText',
         component: () => import('../views/AuditText.vue'),
-        meta: { requiresAuth: true, permission: 'user:audit:text' },
+        meta: {
+          requiresAuth: true,
+          permission: 'user:audit:text',
+          title: '审计文书生成',
+          icon: 'Edit',
+          sort: 3,
+        },
       },
       {
         path: 'data-analysis',
         name: 'DataAnalysis',
         component: () => import('../views/DataAnalysis.vue'),
-        meta: { requiresAuth: true, permission: 'user:data:analysis' },
+        meta: {
+          requiresAuth: true,
+          permission: 'user:data:analysis',
+          title: '数据分析',
+          icon: 'Histogram',
+          sort: 4,
+        },
       },
       {
         path: 'audit-assistant',
         name: 'AuditAssistant',
         component: () => import('../views/AuditAssistant.vue'),
-        meta: { requiresAuth: true, permission: 'user:audit:assistant' },
+        meta: {
+          requiresAuth: true,
+          permission: 'user:audit:assistant',
+          title: '法律法规查询',
+          icon: 'ChatLineSquare',
+          sort: 5,
+        },
       },
       {
         path: 'knowledge-management',
         name: 'KnowledgeManagement',
         component: () => import('../views/KnowledgeManagement.vue'),
-        meta: { requiresAuth: true, permission: 'user:knowledge:list' },
+        meta: {
+          requiresAuth: true,
+          permission: 'user:knowledge:list',
+          title: '知识库',
+          icon: 'Reading',
+          sort: 6,
+        },
       },
-      {
-        path: 'project-edit/:id?',
-        name: 'ProjectEdit',
-        component: () => import('../views/ProjectEdit.vue'),
-        meta: { requiresAuth: true, permission: 'user:project:edit' },
-      },
-      {
-        path: 'knowledge-edit/:id?',
-        name: 'KnowledgeEdit',
-        component: () => import('../views/KnowledgeEdit.vue'),
-        meta: { requiresAuth: true, permission: 'user:knowledge:edit' },
-      },
-      {
-        path: 'evidence-group-edit/:id?',
-        name: 'EvidenceGroupEdit',
-        component: () => import('../views/EvidenceGroupEdit.vue'),
-        meta: { requiresAuth: true, permission: 'user:evidence:edit' },
-      },
-    ],
-  },
-  // 管理端路由
-  {
-    path: '/admin',
-    name: 'Admin',
-    component: () => import('../views/LayoutNew.vue'),
-    meta: { requiresAuth: true, role: 'admin' },
-    children: [
-      {
-        path: '',
-        redirect: '/admin/user-management',
-      },
+      // 管理功能模块
       {
         path: 'user-management',
         name: 'UserManagement',
         component: () => import('../views/admin/UserManagement.vue'),
-        meta: { requiresAuth: true, permission: 'admin:user:list' },
+        meta: {
+          requiresAuth: true,
+          permission: 'admin:user:list',
+          title: '用户管理',
+          icon: 'User',
+          sort: 10,
+        },
       },
       {
-        path: 'knowledge-management',
+        path: 'admin-knowledge-management',
         name: 'AdminKnowledgeManagement',
         component: () => import('../views/admin/KnowledgeManagement.vue'),
-        meta: { requiresAuth: true, permission: 'admin:knowledge:list' },
+        meta: {
+          requiresAuth: true,
+          permission: 'admin:knowledge:list',
+          title: '知识库管理',
+          icon: 'Reading',
+          sort: 11,
+        },
       },
       {
         path: 'database-management',
         name: 'DatabaseManagement',
         component: () => import('../views/admin/DatabaseManagement.vue'),
-        meta: { requiresAuth: true, permission: 'admin:database:list' },
+        meta: {
+          requiresAuth: true,
+          permission: 'admin:database:list',
+          title: '数据库管理',
+          icon: 'Coin',
+          sort: 12,
+        },
+      },
+      // 编辑页面 - 隐藏在菜单中
+      {
+        path: 'project-edit/:id?',
+        name: 'ProjectEdit',
+        component: () => import('../views/ProjectEdit.vue'),
+        meta: {
+          requiresAuth: true,
+          permission: 'user:project:edit',
+          hideInMenu: true,
+        },
+      },
+      {
+        path: 'knowledge-edit/:id?',
+        name: 'KnowledgeEdit',
+        component: () => import('../views/KnowledgeEdit.vue'),
+        meta: {
+          requiresAuth: true,
+          permission: 'user:knowledge:edit',
+          hideInMenu: true,
+        },
+      },
+      {
+        path: 'evidence-group-edit/:id?',
+        name: 'EvidenceGroupEdit',
+        component: () => import('../views/EvidenceGroupEdit.vue'),
+        meta: {
+          requiresAuth: true,
+          permission: 'user:evidence:edit',
+          hideInMenu: true,
+        },
       },
     ],
   },
-  // 数据屏路由
+  // 数据屏路由 - 独立页面
   {
     path: '/data-screen',
-    name: 'AuditDataScreen',
+    name: 'DataScreen',
     component: () => import('../views/HubeiAuditDashboard.vue'),
-    meta: { requiresAuth: true, permission: 'admin:dashboard:view' },
+    meta: {
+      requiresAuth: true,
+      permission: 'admin:dashboard:view',
+      hideInMenu: true,
+    },
+  },
+  // 兼容旧路由的重定向
+  {
+    path: '/dashboard/:pathMatch(.*)*',
+    redirect: (to) => `/app/${to.params.pathMatch}`,
+  },
+  {
+    path: '/admin/:pathMatch(.*)*',
+    redirect: (to) => `/app/${to.params.pathMatch}`,
   },
   // 404页面
   {
@@ -153,13 +220,9 @@ router.beforeEach(async (to, from, next) => {
 //     authStore.initAuth()
 //   }
 
-//   // 如果是登录页面，且已经登录，则重定向到对应的首页
+//   // 如果是登录页面，且已经登录，则重定向到首页
 //   if (to.path === '/login' && authStore.isAuthenticated) {
-//     if (permissionStore.userRole === 'admin') {
-//       next('/admin/user-management')
-//     } else {
-//       next('/dashboard/projects')
-//     }
+//     next('/app/home')
 //     return
 //   }
 
@@ -169,20 +232,10 @@ router.beforeEach(async (to, from, next) => {
 //     return
 //   }
 
-//   // 检查角色权限
-//   if (to.meta.role && to.meta.role !== permissionStore.userRole) {
-//     next('/login')
-//     return
-//   }
-
 //   // 检查具体权限
 //   if (to.meta.permission && !permissionStore.hasButtonPermission(to.meta.permission as string)) {
 //     // 权限不足，重定向到首页
-//     if (permissionStore.userRole === 'admin') {
-//       next('/admin/user-management')
-//     } else {
-//       next('/dashboard/projects')
-//     }
+//     next('/app/home')
 //     return
 //   }
 
