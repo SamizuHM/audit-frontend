@@ -68,7 +68,10 @@ export const usePermissionStore = defineStore(
     // 根据角色获取权限列表
     const getUserPermissionsByRole = (role: UserRole): string[] => {
       if (role === 'admin') {
-        return [...defaultMenuConfig.user.permissions, ...defaultMenuConfig.admin.permissions]
+        return [
+          // ...defaultMenuConfig.user.permissions,
+          ...defaultMenuConfig.admin.permissions,
+        ]
       }
       return defaultMenuConfig.user.permissions
     }
@@ -90,26 +93,24 @@ export const usePermissionStore = defineStore(
               'admin:user:add',
               'admin:user:edit',
               'admin:user:delete',
+              'admin:log:view',
+              'admin:log:export',
+              'admin:project:add',
+              'admin:project:edit',
+              'admin:project:delete',
+              'admin:datasource:add',
+              'admin:datasource:edit',
+              'admin:datasource:delete',
               'admin:knowledge:add',
               'admin:knowledge:edit',
               'admin:knowledge:delete',
-              'admin:database:backup',
-              'admin:database:restore',
-              'user:project:add',
-              'user:project:edit',
-              'user:project:view',
-              'user:audit:generate',
-              'user:knowledge:view',
-              'user:knowledge:edit',
-              'user:evidence:edit',
             ],
             apis: [
               'admin:user:*',
+              'admin:log:*',
+              'admin:project:*',
+              'admin:datasource:*',
               'admin:knowledge:*',
-              'admin:database:*',
-              'user:project:*',
-              'user:audit:*',
-              'user:knowledge:*',
             ],
           }
         } else {
