@@ -96,6 +96,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       // 管理功能模块
+      // 系统管理分组下的页面
       {
         path: 'user-management',
         name: 'UserManagement',
@@ -106,8 +107,51 @@ const routes: Array<RouteRecordRaw> = [
           title: '用户管理',
           icon: 'User',
           sort: 10,
+          group: '系统管理',
+          groupIcon: 'Setting',
         },
       },
+      {
+        path: 'operation-log',
+        name: 'OperationLog',
+        component: () => import('../views/admin/OperationLog.vue'),
+        meta: {
+          requiresAuth: true,
+          permission: 'admin:log:list',
+          title: '操作日志',
+          icon: 'Document',
+          sort: 11,
+          group: '系统管理',
+          groupIcon: 'Setting',
+        },
+      },
+      // 项目管理
+      {
+        path: 'project-management',
+        name: 'ProjectManagement',
+        component: () => import('../views/AuditProjects.vue'),
+        meta: {
+          requiresAuth: true,
+          permission: 'admin:project:list',
+          title: '项目管理',
+          icon: 'Document',
+          sort: 12,
+        },
+      },
+      // 数据源管理
+      {
+        path: 'datasource-management',
+        name: 'DatasourceManagement',
+        component: () => import('../views/admin/DatabaseManagement.vue'),
+        meta: {
+          requiresAuth: true,
+          permission: 'admin:datasource:list',
+          title: '数据源管理',
+          icon: 'Coin',
+          sort: 13,
+        },
+      },
+      // 知识库管理
       {
         path: 'admin-knowledge-management',
         name: 'AdminKnowledgeManagement',
@@ -117,19 +161,7 @@ const routes: Array<RouteRecordRaw> = [
           permission: 'admin:knowledge:list',
           title: '知识库管理',
           icon: 'Reading',
-          sort: 11,
-        },
-      },
-      {
-        path: 'database-management',
-        name: 'DatabaseManagement',
-        component: () => import('../views/admin/DatabaseManagement.vue'),
-        meta: {
-          requiresAuth: true,
-          permission: 'admin:database:list',
-          title: '数据库管理',
-          icon: 'Coin',
-          sort: 12,
+          sort: 14,
         },
       },
       // 编辑页面 - 隐藏在菜单中
