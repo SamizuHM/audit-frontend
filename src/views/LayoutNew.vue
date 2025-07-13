@@ -15,13 +15,38 @@
         background-color="#ffffff"
         text-color="#666666"
         active-text-color="#409EFF"
+        :unique-opened="true"
       >
-        <el-menu-item v-for="menu in accessibleMenus" :key="menu.id" :index="menu.path!">
-          <el-icon>
-            <component :is="menu.icon" />
-          </el-icon>
-          <span>{{ menu.name }}</span>
-        </el-menu-item>
+        <template v-for="menu in accessibleMenus" :key="menu.id">
+          <!-- 有子菜单的项 -->
+          <el-sub-menu v-if="menu.children && menu.children.length > 0" :index="menu.path">
+            <template #title>
+              <el-icon v-if="menu.icon">
+                <component :is="menu.icon" />
+              </el-icon>
+              <span>{{ menu.name }}</span>
+            </template>
+            <el-menu-item 
+              v-for="child in menu.children" 
+              :key="child.id" 
+              :index="child.path"
+            >
+              <el-icon v-if="child.icon">
+                <component :is="child.icon" />
+              </el-icon>
+              <span>{{ child.name }}</span>
+            </el-menu-item>
+          </el-sub-menu>
+          
+          <!-- 无子菜单的项 -->
+          <el-menu-item v-else :index="menu.path">
+            <el-icon v-if="menu.icon">
+              <component :is="menu.icon" />
+            </el-icon>
+            <span>{{ menu.name }}</span>
+          </el-menu-item>
+        </template>
+        
         <div class="menu-divider"></div>
         <!-- 退出登录 -->
         <div class="logout-btn" @click="handleLogout">
@@ -90,12 +115,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { User, SwitchButton, ArrowDown, Setting } from '@element-plus/icons-vue'
 import { useAuthStore } from '@/stores/auth'
 import { usePermissionStore } from '@/stores/permission'
+import type { MenuItem } from '@/utils/menuGenerator'
 
 const route = useRoute()
 const router = useRouter()
@@ -121,7 +147,20 @@ const currentMenuIndex = computed(() => {
 
 // 页面标题
 const pageTitle = computed(() => {
-  const currentMenu = accessibleMenus.value.find((menu) => menu.path === route.path)
+  const findMenuByPath = (menus: MenuItem[], path: string): MenuItem | null => {
+    for (const menu of menus) {
+      if (menu.path === path) {
+        return menu
+      }
+      if (menu.children) {
+        const found = findMenuByPath(menu.children, path)
+        if (found) return found
+      }
+    }
+    return null
+  }
+  
+  const currentMenu = findMenuByPath(accessibleMenus.value, route.path)
   return currentMenu?.name || '首页'
 })
 
@@ -317,6 +356,37 @@ const handleLogout = async () => {
 
 :deep(.el-menu-item.is-active .el-icon) {
   color: #ffffff !important;
+}
+
+/* 子菜单样式 */
+:deep(.el-sub-menu) {
+  margin: 4px 8px;
+}
+
+:deep(.el-sub-menu__title) {
+  height: 45px;
+  border-radius: 6px;
+  margin: 0;
+}
+
+:deep(.el-sub-menu__title:hover) {
+  background-color: #ecf5ff !important;
+  color: #409eff !important;
+}
+
+:deep(.el-sub-menu.is-active .el-sub-menu__title) {
+  background-color: #409eff !important;
+  color: #ffffff !important;
+}
+
+:deep(.el-sub-menu.is-active .el-sub-menu__title .el-icon) {
+  color: #ffffff !important;
+}
+
+/* 子菜单项缩进 */
+:deep(.el-sub-menu .el-menu-item) {
+  padding-left: 50px !important;
+  margin: 2px 0;
 }
 
 /* Element Plus Breadcrumb 自定义样式 */

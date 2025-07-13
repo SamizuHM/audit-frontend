@@ -1,20 +1,15 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-
-export interface Permission {
-  id: string
-  name: string
-  code: string
-  type: 'menu' | 'button' | 'api'
-  parentId?: string
-  path?: string
-  component?: string
-  icon?: string
-  sort?: number
-}
+import {
+  generateMenuFromRouter,
+  filterMenusByPermissions,
+  defaultMenuConfig,
+} from '@/utils/menuGenerator'
+import type { MenuItem, UserRole } from '@/utils/menuGenerator'
+import router from '@/router'
 
 export interface UserPermissions {
-  menus: Permission[]
+  menus: MenuItem[]
   buttons: string[]
   apis: string[]
 }
@@ -28,18 +23,55 @@ export const usePermissionStore = defineStore(
       apis: [],
     })
 
-    const userRole = ref<'admin' | 'user' | ''>('')
+    const userRole = ref<UserRole | ''>('')
     const loading = ref(false)
 
     // 计算属性：可访问的菜单
     const accessibleMenus = computed(() => {
-      return permissions.value.menus.filter((menu) => menu.type === 'menu')
+      return permissions.value.menus
     })
 
     // 计算属性：可访问的路由
     const accessibleRoutes = computed(() => {
-      return permissions.value.menus.filter((menu) => menu.path).map((menu) => menu.path!)
+      const flattenRoutes = (menus: MenuItem[]): string[] => {
+        const routes: string[] = []
+        for (const menu of menus) {
+          if (menu.path) {
+            routes.push(menu.path)
+          }
+          if (menu.children) {
+            routes.push(...flattenRoutes(menu.children))
+          }
+        }
+        return routes
+      }
+      return flattenRoutes(permissions.value.menus)
     })
+
+    // 从路由配置生成菜单
+    const generateMenusFromRouter = () => {
+      if (!userRole.value) return []
+
+      const userPermissions = getUserPermissionsByRole(userRole.value)
+
+      // 获取主应用路由的子路由
+      const appRoute = router.options.routes.find((route) => route.path === '/app')
+      if (!appRoute || !appRoute.children) return []
+
+      // 生成菜单
+      const allMenus = generateMenuFromRouter(appRoute.children, userRole.value, userPermissions)
+
+      // 根据权限过滤菜单
+      return filterMenusByPermissions(allMenus, userPermissions)
+    }
+
+    // 根据角色获取权限列表
+    const getUserPermissionsByRole = (role: UserRole): string[] => {
+      if (role === 'admin') {
+        return [...defaultMenuConfig.user.permissions, ...defaultMenuConfig.admin.permissions]
+      }
+      return defaultMenuConfig.user.permissions
+    }
 
     // 获取用户权限信息
     const fetchUserPermissions = async () => {
@@ -53,36 +85,7 @@ export const usePermissionStore = defineStore(
 
         if (userRole.value === 'admin') {
           permissions.value = {
-            menus: [
-              // 管理端菜单
-              {
-                id: '1',
-                name: '用户管理',
-                code: 'admin:user:list',
-                type: 'menu',
-                path: '/admin/user-management',
-                icon: 'User',
-                sort: 1,
-              },
-              {
-                id: '2',
-                name: '知识库管理',
-                code: 'admin:knowledge:list',
-                type: 'menu',
-                path: '/admin/knowledge-management',
-                icon: 'Reading',
-                sort: 2,
-              },
-              {
-                id: '3',
-                name: '数据库管理',
-                code: 'admin:database:list',
-                type: 'menu',
-                path: '/admin/database-management',
-                icon: 'Coin',
-                sort: 3,
-              },
-            ],
+            menus: generateMenusFromRouter(),
             buttons: [
               'admin:user:add',
               'admin:user:edit',
@@ -92,68 +95,26 @@ export const usePermissionStore = defineStore(
               'admin:knowledge:delete',
               'admin:database:backup',
               'admin:database:restore',
+              'user:project:add',
+              'user:project:edit',
+              'user:project:view',
+              'user:audit:generate',
+              'user:knowledge:view',
+              'user:knowledge:edit',
+              'user:evidence:edit',
             ],
-            apis: ['admin:user:*', 'admin:knowledge:*', 'admin:database:*'],
+            apis: [
+              'admin:user:*',
+              'admin:knowledge:*',
+              'admin:database:*',
+              'user:project:*',
+              'user:audit:*',
+              'user:knowledge:*',
+            ],
           }
         } else {
           permissions.value = {
-            menus: [
-              // 用户端菜单
-              {
-                id: '0',
-                name: '首页',
-                code: 'user:dashboard',
-                type: 'menu',
-                path: '/dashboard/home',
-                icon: 'House',
-                sort: 0,
-              },
-              {
-                id: '1',
-                name: '我的项目',
-                code: 'user:project:list',
-                type: 'menu',
-                path: '/dashboard/projects',
-                icon: 'Document',
-                sort: 1,
-              },
-              {
-                id: '2',
-                name: '审计文书生成',
-                code: 'user:audit:text',
-                type: 'menu',
-                path: '/dashboard/audit-text',
-                icon: 'Edit',
-                sort: 2,
-              },
-              {
-                id: '3',
-                name: '数据分析',
-                code: 'user:data:analysis',
-                type: 'menu',
-                path: '/dashboard/data-analysis',
-                icon: 'Histogram',
-                sort: 3,
-              },
-              {
-                id: '4',
-                name: '法律法规查询',
-                code: 'user:audit:assistant',
-                type: 'menu',
-                path: '/dashboard/audit-assistant',
-                icon: 'ChatLineSquare',
-                sort: 4,
-              },
-              {
-                id: '5',
-                name: '知识库',
-                code: 'user:knowledge:list',
-                type: 'menu',
-                path: '/dashboard/knowledge-management',
-                icon: 'Reading',
-                sort: 5,
-              },
-            ],
+            menus: generateMenusFromRouter(),
             buttons: [
               'user:project:add',
               'user:project:edit',
@@ -174,7 +135,7 @@ export const usePermissionStore = defineStore(
     }
 
     // 设置用户角色
-    const setUserRole = (role: 'admin' | 'user') => {
+    const setUserRole = (role: UserRole) => {
       userRole.value = role
     }
 
