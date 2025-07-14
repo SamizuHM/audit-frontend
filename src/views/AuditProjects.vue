@@ -6,33 +6,45 @@
         <el-form-item label="项目名称">
           <el-input
             v-model="searchForm.keyword"
-            placeholder="请输入项目名称"
+            placeholder="请输入项目名称或被审单位"
             style="width: 200px"
             clearable
             @input="handleSearch"
             :prefix-icon="Search"
           />
         </el-form-item>
+        <el-form-item label="状态">
+          <el-select
+            v-model="searchForm.status"
+            placeholder="请选择状态"
+            style="width: 120px"
+            clearable
+          >
+            <el-option label="进行中" value="ongoing" />
+            <el-option label="已结束" value="completed" />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" :icon="Search" @click="handleSearch"> 搜索 </el-button>
-          <el-button @click="searchForm.keyword = ''"> 重置 </el-button>
+          <el-button @click="resetSearch"> 重置 </el-button>
+          <el-button type="success" :icon="Plus" @click="handleAddProject"> 新建项目 </el-button>
         </el-form-item>
       </el-form>
     </el-card>
 
-    <!-- 我主审的项目 -->
-    <el-card class="project-category" shadow="never">
+    <!-- 项目列表 -->
+    <el-card class="project-list" shadow="never">
       <template #header>
-        <div class="category-header">
-          <el-icon><UserFilled /></el-icon>
-          <span>我主审的项目</span>
-          <el-badge :value="leaderProjects.length" class="badge-count" />
+        <div class="list-header">
+          <el-icon><Document /></el-icon>
+          <span>项目列表</span>
+          <el-badge :value="filteredProjects.length" class="badge-count" />
         </div>
       </template>
 
       <el-table
         v-loading="loading"
-        :data="leaderProjects"
+        :data="filteredProjects"
         style="width: 100%"
         row-key="id"
         stripe
@@ -40,32 +52,44 @@
       >
         <el-table-column type="index" label="序号" width="80" />
 
-        <el-table-column prop="name" label="审计项目" min-width="200">
+        <el-table-column prop="name" label="项目名称" min-width="180">
           <template #default="{ row }">
             <span class="project-name">{{ row.name }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column prop="content" label="审计内容" min-width="300">
+        <el-table-column prop="auditedUnit" label="被审单位" min-width="150">
           <template #default="{ row }">
-            <div class="project-content">{{ row.content }}</div>
+            <span>{{ row.auditedUnit }}</span>
           </template>
         </el-table-column>
 
-        <el-table-column prop="auditDate" label="审计日期" width="120">
+        <el-table-column prop="startDate" label="起始日期" width="120">
           <template #default="{ row }">
-            {{ formatDate(row.auditDate) }}
+            {{ formatDate(row.startDate) }}
           </template>
         </el-table-column>
 
-        <el-table-column prop="participants" label="参与人" width="120">
+        <el-table-column prop="endDate" label="截止日期" width="120">
+          <template #default="{ row }">
+            {{ formatDate(row.endDate) }}
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="manager" label="主审" width="100">
+          <template #default="{ row }">
+            <el-tag type="primary" size="small">{{ row.manager }}</el-tag>
+          </template>
+        </el-table-column>
+
+        <el-table-column prop="participants" label="参与人" min-width="120">
           <template #default="{ row }">
             <el-tag
               v-for="participant in row.participants"
               :key="participant"
               size="small"
               type="info"
-              style="margin-right: 4px"
+              style="margin-right: 4px; margin-bottom: 2px"
             >
               {{ participant }}
             </el-tag>
@@ -81,14 +105,11 @@
           </template>
         </el-table-column>
 
-        <el-table-column label="操作" width="220" fixed="right">
+        <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
-            <el-button-group class="operation-buttons">
+            <div class="operation-buttons">
               <el-button type="primary" size="small" :icon="Edit" @click="handleEditProject(row)">
                 编辑
-              </el-button>
-              <el-button type="success" size="small" :icon="View" @click="handleViewProject(row)">
-                查看
               </el-button>
               <el-popconfirm
                 title="确定要删除这个项目吗？"
@@ -100,72 +121,14 @@
                   <el-button type="danger" size="small" :icon="Delete"> 删除 </el-button>
                 </template>
               </el-popconfirm>
-            </el-button-group>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
-
-    <!-- 我参与的项目 -->
-    <el-card class="project-category" shadow="never">
-      <template #header>
-        <div class="category-header participant">
-          <el-icon><User /></el-icon>
-          <span>我参与的项目</span>
-          <el-badge :value="participantProjects.length" class="badge-count" />
-        </div>
-      </template>
-
-      <el-table
-        v-loading="loading"
-        :data="participantProjects"
-        style="width: 100%"
-        row-key="id"
-        stripe
-        :header-cell-style="{ background: '#fafafa' }"
-      >
-        <el-table-column type="index" label="序号" width="80" />
-
-        <el-table-column prop="name" label="审计项目" min-width="200">
-          <template #default="{ row }">
-            <span class="project-name">{{ row.name }}</span>
-          </template>
-        </el-table-column>
-
-        <el-table-column prop="content" label="审计内容" min-width="300">
-          <template #default="{ row }">
-            <div class="project-content">{{ row.content }}</div>
-          </template>
-        </el-table-column>
-
-        <el-table-column prop="auditDate" label="审计日期" width="120">
-          <template #default="{ row }">
-            {{ formatDate(row.auditDate) }}
-          </template>
-        </el-table-column>
-
-        <el-table-column prop="manager" label="负责人" width="120">
-          <template #default="{ row }">
-            {{ row.manager }}
-          </template>
-        </el-table-column>
-
-        <el-table-column prop="status" label="状态" width="100">
-          <template #default="{ row }">
-            <span class="status-badge" :class="getStatusClass(row.status)">
-              {{ getStatusText(row.status) }}
-            </span>
-          </template>
-        </el-table-column>
-
-        <el-table-column label="操作" width="150" fixed="right">
-          <template #default="{ row }">
-            <div class="operation-buttons">
-              <el-button type="success" size="small" @click="handleViewProject(row)">
-                查看
-              </el-button>
-              <el-button type="primary" size="small" @click="handleParticipateProject(row)">
-                参与
+              <el-button
+                v-if="row.status === 'completed'"
+                type="warning"
+                size="small"
+                :icon="FolderOpened"
+                @click="handleArchiveProject(row)"
+              >
+                归档
               </el-button>
             </div>
           </template>
@@ -179,21 +142,19 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, UserFilled, User, Edit, View, Delete } from '@element-plus/icons-vue'
-import { useProjectStore } from '@/stores/project'
+import { Search, Document, Edit, Delete, Plus, FolderOpened } from '@element-plus/icons-vue'
 
 const router = useRouter()
-const projectStore = useProjectStore()
 
 interface ProjectData {
   id: string
   name: string
-  content: string
-  auditDate: string
+  auditedUnit: string
+  startDate: string
+  endDate: string
   manager: string
   participants: string[]
   status: 'ongoing' | 'completed'
-  role: 'leader' | 'participant'
 }
 
 // 响应式数据
@@ -203,50 +164,35 @@ const projects = ref<ProjectData[]>([])
 // 搜索表单
 const searchForm = reactive({
   keyword: '',
+  status: '',
 })
 
-// 过滤后的主审项目
-const leaderProjects = computed(() => {
-  let result = projects.value.filter((p) => p.role === 'leader')
+// 过滤后的项目列表
+const filteredProjects = computed(() => {
+  let result = projects.value
 
   if (searchForm.keyword) {
     const keyword = searchForm.keyword.toLowerCase()
     result = result.filter(
-      (p) => p.name.toLowerCase().includes(keyword) || p.content.toLowerCase().includes(keyword),
+      (p) =>
+        p.name.toLowerCase().includes(keyword) ||
+        p.auditedUnit.toLowerCase().includes(keyword) ||
+        p.manager.toLowerCase().includes(keyword),
     )
+  }
+
+  if (searchForm.status) {
+    result = result.filter((p) => p.status === searchForm.status)
   }
 
   return result
 })
-
-// 过滤后的参与项目
-const participantProjects = computed(() => {
-  let result = projects.value.filter((p) => p.role === 'participant')
-
-  if (searchForm.keyword) {
-    const keyword = searchForm.keyword.toLowerCase()
-    result = result.filter(
-      (p) => p.name.toLowerCase().includes(keyword) || p.content.toLowerCase().includes(keyword),
-    )
-  }
-
-  return result
-})
-
-// 获取状态样式类
-const getStatusClass = (status: string) => {
-  const statusMap: Record<string, string> = {
-    ongoing: 'status-ongoing',
-    completed: 'status-completed',
-  }
-  return statusMap[status] || ''
-}
 
 // 获取状态文本
 const getStatusText = (status: string) => {
   const statusMap: Record<string, string> = {
     ongoing: '进行中',
-    completed: '已完成',
+    completed: '已结束',
   }
   return statusMap[status] || status
 }
@@ -255,6 +201,7 @@ const getStatusText = (status: string) => {
 const formatDate = (dateString: string) => {
   const date = new Date(dateString)
   return date.toLocaleDateString('zh-CN', {
+    year: 'numeric',
     month: '2-digit',
     day: '2-digit',
   })
@@ -265,15 +212,21 @@ const handleSearch = () => {
   // 搜索逻辑已在计算属性中实现
 }
 
-// 编辑项目
-const handleEditProject = (project: ProjectData) => {
-  router.push(`/dashboard/project-edit/${project.id}`)
+// 重置搜索
+const resetSearch = () => {
+  searchForm.keyword = ''
+  searchForm.status = ''
 }
 
-// 查看项目
-const handleViewProject = (project: ProjectData) => {
-  // TODO: 实现查看项目详情
-  ElMessage.info('查看项目详情功能正在开发中')
+// 新建项目
+const handleAddProject = () => {
+  router.push('/app/project-edit/new')
+}
+
+// 编辑项目
+const handleEditProject = (project: ProjectData) => {
+  console.log(project.id)
+  router.push(`/app/project-edit/${project.id}`)
 }
 
 // 删除项目
@@ -296,10 +249,24 @@ const handleDeleteProject = async (project: ProjectData) => {
   }
 }
 
-// 参与项目
-const handleParticipateProject = (project: ProjectData) => {
-  // TODO: 实现参与项目功能
-  ElMessage.info('参与项目功能正在开发中')
+// 归档项目
+const handleArchiveProject = async (project: ProjectData) => {
+  try {
+    await ElMessageBox.confirm(`确定要归档项目"${project.name}"吗？`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'info',
+    })
+
+    // TODO: 调用归档接口
+    await archiveProject(project.id)
+    ElMessage.success('项目已归档')
+    await fetchProjects()
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('归档失败')
+    }
+  }
 }
 
 // API 方法（模拟）
@@ -315,49 +282,55 @@ const fetchProjects = async () => {
       {
         id: '1',
         name: '2024年度森林资源审计项目',
-        content:
-          '针对全市森林资源保护和利用情况进行专项审计，重点关注森林覆盖率变化、林地使用合规性、森林防火措施执行情况等关键指标。',
-        auditDate: '2024-05-16',
+        auditedUnit: '市林业局',
+        startDate: '2024-05-01',
+        endDate: '2024-08-31',
         manager: '张三',
-        participants: ['李四'],
+        participants: ['李四', '王五'],
         status: 'ongoing',
-        role: 'leader',
       },
       {
         id: '2',
         name: '矿产资源开发利用审计',
-        content:
-          '对全市矿产资源开发许可、环境保护措施执行情况进行审计，确保资源合理开发利用，检查开采许可证办理流程。',
-        auditDate: '2024-05-21',
+        auditedUnit: '市自然资源局',
+        startDate: '2024-05-15',
+        endDate: '2024-07-30',
         manager: '张三',
         participants: ['孙七'],
         status: 'ongoing',
-        role: 'leader',
       },
       {
         id: '3',
         name: '水资源保护专项审计',
-        content:
-          '审查水资源保护政策执行情况，水质监测数据真实性，以及水污染治理项目实施效果，重点关注饮用水源地保护。',
-        auditDate: '2024-06-01',
+        auditedUnit: '市水务局',
+        startDate: '2024-06-01',
+        endDate: '2024-09-30',
         manager: '李四',
-        participants: [],
+        participants: ['张三', '赵六'],
         status: 'ongoing',
-        role: 'participant',
       },
       {
         id: '4',
         name: '土地利用变更审计',
-        content:
-          '对农用地转为建设用地的审批程序、用地指标使用情况、土地收益分配等进行审计，确保土地利用的合法性和合理性。',
-        auditDate: '2024-04-12',
+        auditedUnit: '市国土资源局',
+        startDate: '2024-03-01',
+        endDate: '2024-05-31',
         manager: '王五',
-        participants: [],
+        participants: ['张三'],
         status: 'completed',
-        role: 'participant',
+      },
+      {
+        id: '5',
+        name: '环保资金使用审计',
+        auditedUnit: '市环保局',
+        startDate: '2024-02-01',
+        endDate: '2024-04-30',
+        manager: '赵六',
+        participants: ['李四', '孙七'],
+        status: 'completed',
       },
     ]
-  } catch (error) {
+  } catch {
     ElMessage.error('获取项目数据失败')
   } finally {
     loading.value = false
@@ -367,6 +340,12 @@ const fetchProjects = async () => {
 const deleteProject = async (projectId: string) => {
   // TODO: 调用实际的删除接口
   console.log('删除项目:', projectId)
+  await new Promise((resolve) => setTimeout(resolve, 500))
+}
+
+const archiveProject = async (projectId: string) => {
+  // TODO: 调用实际的归档接口
+  console.log('归档项目:', projectId)
   await new Promise((resolve) => setTimeout(resolve, 500))
 }
 
@@ -390,22 +369,18 @@ onMounted(async () => {
   margin-bottom: 20px;
 }
 
-/* 项目分类样式 */
-.project-category {
+/* 项目列表样式 */
+.project-list {
   margin-bottom: 24px;
 }
 
-.category-header {
+.list-header {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 16px;
   font-weight: 600;
   color: #333;
-}
-
-.category-header.participant {
-  color: #67c23a;
 }
 
 .badge-count {
@@ -418,21 +393,10 @@ onMounted(async () => {
   color: #333;
 }
 
-.project-content {
-  color: #666;
-  line-height: 1.5;
-  max-width: 300px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  line-clamp: 2;
-}
-
 .operation-buttons {
   display: flex;
   gap: 4px;
+  flex-wrap: wrap;
 }
 
 .text-muted {
@@ -440,15 +404,56 @@ onMounted(async () => {
   font-size: 12px;
 }
 
+/* 状态标签样式 */
+:deep(.el-tag) {
+  border-radius: 4px;
+}
+
 /* 响应式设计 */
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
   .operation-buttons {
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
   }
 
-  .project-content {
-    max-width: 200px;
+  .operation-buttons .el-button {
+    min-width: 60px;
   }
+}
+
+@media (max-width: 768px) {
+  :deep(.el-form--inline .el-form-item) {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .search-section :deep(.el-form--inline) {
+    display: block;
+  }
+
+  .operation-buttons {
+    flex-direction: column;
+    gap: 2px;
+  }
+}
+
+/* 表格行样式 */
+:deep(.el-table__row) {
+  cursor: pointer;
+}
+
+:deep(.el-table__row:hover) {
+  background-color: #f5f7fa;
+}
+
+/* 按钮组样式 */
+.operation-buttons .el-button + .el-button {
+  margin-left: 4px;
+}
+
+/* 表格内标签换行样式 */
+:deep(.el-table-column) .el-tag {
+  margin-bottom: 2px;
+  display: inline-block;
 }
 </style>

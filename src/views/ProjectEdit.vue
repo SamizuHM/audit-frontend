@@ -268,7 +268,7 @@ const projectRules = {
 
 // 返回上一页
 const goBack = () => {
-  router.push('/dashboard/audit-projects')
+  router.push('/app/projects')
 }
 
 // 添加审计要点
@@ -327,7 +327,7 @@ const handleSave = async () => {
       ElMessage.success('项目创建成功')
     }
 
-    router.push('/dashboard/audit-projects')
+    router.push('/app/projects')
   } catch (error) {
     ElMessage.error(error instanceof Error ? error.message : '保存失败')
   }
@@ -356,7 +356,7 @@ const loadProjectData = async () => {
     ]
   } else {
     ElMessage.error('项目不存在')
-    router.push('/dashboard/audit-projects')
+    router.push('/app/projects')
   }
 }
 

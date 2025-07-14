@@ -1,494 +1,712 @@
 <template>
-  <div class="knowledge-management-container">
-    <!-- 页面标题和操作按钮 -->
-    <div class="page-header">
-      <div class="header-left">
-        <h2 class="page-title">知识库管理</h2>
-        <p class="page-description">管理审计相关的法规、案例、模板和指南</p>
-      </div>
-      <div class="header-right">
-        <el-button type="primary" @click="handleCreateKnowledge">
-          <el-icon><Plus /></el-icon>
-          新建知识
-        </el-button>
-      </div>
+  <!-- 知识库分类 -->
+  <div class="knowledge-section">
+    <div class="section-header">
+      <h3 class="section-title">
+        <el-icon class="section-icon"><Coin /></el-icon>
+        知识库
+      </h3>
     </div>
 
-    <!-- 搜索和筛选区域 -->
-    <div class="search-section">
-      <el-card shadow="never">
-        <el-row :gutter="16">
-          <el-col :span="8">
-            <el-input
-              v-model="searchForm.keyword"
-              placeholder="搜索知识标题或内容"
-              clearable
-              @input="handleSearch"
-            >
-              <template #prefix>
-                <el-icon><Search /></el-icon>
-              </template>
-            </el-input>
-          </el-col>
-          <el-col :span="6">
-            <el-select
-              v-model="searchForm.type"
-              placeholder="知识类型"
-              clearable
-              @change="handleSearch"
-            >
-              <el-option label="全部" value="" />
-              <el-option label="法规" value="regulation" />
-              <el-option label="案例" value="case" />
-              <el-option label="模板" value="template" />
-              <el-option label="指南" value="guide" />
-            </el-select>
-          </el-col>
-          <el-col :span="6">
-            <el-select v-model="searchForm.tag" placeholder="标签" clearable @change="handleSearch">
-              <el-option label="全部" value="" />
-              <el-option label="土地管理" value="土地管理" />
-              <el-option label="矿产资源" value="矿产资源" />
-              <el-option label="环境保护" value="环境保护" />
-              <el-option label="审计案例" value="审计案例" />
-            </el-select>
-          </el-col>
-          <el-col :span="4">
-            <el-button @click="handleReset">重置</el-button>
-          </el-col>
-        </el-row>
-      </el-card>
-    </div>
-
-    <!-- 知识列表 -->
-    <div class="knowledge-section">
-      <el-card shadow="never">
-        <div v-if="knowledgeStore.loading" class="loading-container">
-          <el-skeleton :rows="5" animated />
-        </div>
-
-        <div v-else-if="filteredKnowledge.length === 0" class="empty-container">
-          <el-empty description="暂无知识数据" />
-        </div>
-
-        <div v-else class="knowledge-list">
-          <div v-for="knowledge in paginatedKnowledge" :key="knowledge.id" class="knowledge-item">
-            <el-card shadow="hover" class="knowledge-card">
-              <div class="knowledge-header">
-                <div class="knowledge-title">
-                  <h3>{{ knowledge.title }}</h3>
-                  <div class="knowledge-tags">
-                    <el-tag :type="getTypeTagType(knowledge.type)" size="small">
-                      {{ getTypeText(knowledge.type) }}
-                    </el-tag>
-                    <el-tag v-for="tag in knowledge.tags" :key="tag" size="small" effect="plain">
-                      {{ tag }}
-                    </el-tag>
-                  </div>
-                </div>
-                <div class="knowledge-actions">
-                  <el-dropdown @command="(command) => handleKnowledgeAction(command, knowledge)">
-                    <el-button type="text" size="small" @click.stop>
-                      <el-icon><More /></el-icon>
-                    </el-button>
-                    <template #dropdown>
-                      <el-dropdown-menu>
-                        <el-dropdown-item command="edit">
-                          <el-icon><Edit /></el-icon>
-                          编辑
-                        </el-dropdown-item>
-                        <el-dropdown-item command="view">
-                          <el-icon><View /></el-icon>
-                          查看详情
-                        </el-dropdown-item>
-                        <el-dropdown-item command="copy">
-                          <el-icon><DocumentCopy /></el-icon>
-                          复制内容
-                        </el-dropdown-item>
-                        <el-dropdown-item command="delete" divided>
-                          <el-icon><Delete /></el-icon>
-                          删除
-                        </el-dropdown-item>
-                      </el-dropdown-menu>
-                    </template>
-                  </el-dropdown>
-                </div>
-              </div>
-
-              <div class="knowledge-content">
-                <p class="knowledge-excerpt">{{ getExcerpt(knowledge.content) }}</p>
-
-                <div class="knowledge-meta">
-                  <div class="meta-item">
-                    <el-icon><Calendar /></el-icon>
-                    <span>创建时间：{{ formatDate(knowledge.createTime) }}</span>
-                  </div>
-                  <div class="meta-item">
-                    <el-icon><User /></el-icon>
-                    <span>创建者：{{ knowledge.creator }}</span>
-                  </div>
-                  <div class="meta-item">
-                    <el-icon><EditPen /></el-icon>
-                    <span>最后更新：{{ formatDate(knowledge.updateTime) }}</span>
-                  </div>
-                </div>
-              </div>
-            </el-card>
+    <div class="knowledge-grid">
+      <div
+        v-for="category in knowledgeCategories"
+        :key="category.id"
+        class="knowledge-card"
+        @click="handleCategoryClick(category)"
+      >
+        <div class="card-header">
+          <div class="card-icon" :style="{ background: category.color }">
+            <el-icon :size="20">
+              <component :is="category.icon" />
+            </el-icon>
           </div>
+          <div class="card-title">{{ category.title }}</div>
         </div>
-
-        <!-- 分页 -->
-        <div v-if="filteredKnowledge.length > 0" class="pagination-container">
-          <el-pagination
-            v-model:current-page="currentPage"
-            v-model:page-size="pageSize"
-            :page-sizes="[10, 20, 30, 50]"
-            :total="filteredKnowledge.length"
-            layout="total, sizes, prev, pager, next, jumper"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-          />
+        <div class="card-description">
+          {{ category.description }}
         </div>
-      </el-card>
+        <div class="card-stats">
+          <span>文件数量: {{ category.fileCount }}</span>
+          <span>最后更新: {{ category.lastUpdate }}</span>
+        </div>
+        <div class="card-actions">
+          <el-button size="small" @click.stop="handleViewDetails(category)">
+            <el-icon><View /></el-icon>
+            查看详情
+          </el-button>
+          <el-button size="small" type="primary" @click.stop="handleEditCategory(category)">
+            <el-icon><Edit /></el-icon>
+            编辑
+          </el-button>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- 知识库详情模态框 -->
+  <el-dialog
+    v-model="detailDialogVisible"
+    :title="selectedCategory?.title"
+    width="800px"
+    class="knowledge-detail-dialog"
+  >
+    <div v-if="selectedCategory" class="category-detail">
+      <div class="detail-header">
+        <div class="detail-icon" :style="{ background: selectedCategory.color }">
+          <el-icon :size="24">
+            <component :is="selectedCategory.icon" />
+          </el-icon>
+        </div>
+        <div class="detail-info">
+          <h3>{{ selectedCategory.title }}</h3>
+          <p>{{ selectedCategory.description }}</p>
+        </div>
+      </div>
+
+      <div class="detail-stats">
+        <div class="stat-item">
+          <el-icon><Document /></el-icon>
+          <span>文件数量：{{ selectedCategory.fileCount }}</span>
+        </div>
+        <div class="stat-item">
+          <el-icon><Calendar /></el-icon>
+          <span>最后更新：{{ selectedCategory.lastUpdate }}</span>
+        </div>
+        <div class="stat-item">
+          <el-icon><User /></el-icon>
+          <span>维护人员：{{ selectedCategory.maintainer }}</span>
+        </div>
+      </div>
+
+      <div class="file-list">
+        <h4>最近文件</h4>
+        <div class="file-items">
+          <div v-for="file in selectedCategory.recentFiles" :key="file.id" class="file-item">
+            <div class="file-info">
+              <el-icon size="20" :color="getFileTypeColor(file.type)">
+                <component :is="getFileTypeIcon(file.type)" />
+              </el-icon>
+              <div class="file-details">
+                <div class="file-name">{{ file.name }}</div>
+                <div class="file-meta">
+                  <el-tag size="small" :type="getFileTypeTagType(file.type)">
+                    {{ file.type }}
+                  </el-tag>
+                  <span class="file-date">{{ file.updateTime }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="file-actions">
+              <el-button size="small" text @click="handleViewFile(file)">
+                <el-icon><View /></el-icon>
+              </el-button>
+              <el-button size="small" text @click="handleDownloadFile(file)">
+                <el-icon><Download /></el-icon>
+              </el-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="detailDialogVisible = false">关闭</el-button>
+        <el-button type="primary" @click="handleManageCategory(selectedCategory)">
+          管理此类别
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import {
-  Plus,
-  Search,
-  Edit,
+  Coin,
+  Operation,
+  DocumentChecked,
+  List,
+  CircleCheck,
+  EditPen,
+  TrendCharts,
   View,
-  More,
-  Delete,
+  Edit,
+  Document,
   Calendar,
   User,
-  EditPen,
-  DocumentCopy,
+  Download,
+  Files,
+  Memo,
+  Tickets,
 } from '@element-plus/icons-vue'
-import { useKnowledgeStore } from '@/stores/knowledge'
-import type { KnowledgeItem } from '@/services/api'
 
 const router = useRouter()
-const knowledgeStore = useKnowledgeStore()
 
-// 搜索表单
-const searchForm = reactive({
-  keyword: '',
-  type: '',
-  tag: '',
-})
+// 知识库分类数据
+const knowledgeCategories = ref([
+  {
+    id: 'law-regulations',
+    title: '法律法规库',
+    description: '收录自然资源相关的法律法规、政策文件、规范标准等，为审计工作提供法律依据。',
+    icon: Operation,
+    color: '#1890ff',
+    fileCount: 156,
+    lastUpdate: '2024-06-15',
+    maintainer: '法规部门',
+    recentFiles: [
+      {
+        id: '1',
+        name: '自然资源资产审计实施办法',
+        type: '法规文件',
+        updateTime: '2024-06-15',
+      },
+      {
+        id: '2',
+        name: '土地资源管理条例',
+        type: '法规文件',
+        updateTime: '2024-06-14',
+      },
+      {
+        id: '3',
+        name: '矿产资源开发利用规范',
+        type: '技术标准',
+        updateTime: '2024-06-13',
+      },
+    ],
+  },
+  {
+    id: 'work-plans',
+    title: '工作方案库',
+    description: '存储各类审计工作方案模板、实施计划、工作流程等，提高审计工作规范性。',
+    icon: DocumentChecked,
+    color: '#52c41a',
+    fileCount: 89,
+    lastUpdate: '2024-06-14',
+    maintainer: '审计部门',
+    recentFiles: [
+      {
+        id: '4',
+        name: '森林资源审计工作方案模板',
+        type: '工作方案',
+        updateTime: '2024-06-14',
+      },
+      {
+        id: '5',
+        name: '水资源审计工作方案模板',
+        type: '工作方案',
+        updateTime: '2024-06-13',
+      },
+      {
+        id: '6',
+        name: '矿产资源审计工作方案模板',
+        type: '工作方案',
+        updateTime: '2024-06-12',
+      },
+    ],
+  },
+  {
+    id: 'implementation-plans',
+    title: '实施方案库',
+    description: '汇集审计实施方案、执行程序、操作指南等，确保审计工作有序开展。',
+    icon: List,
+    color: '#722ed1',
+    fileCount: 67,
+    lastUpdate: '2024-06-13',
+    maintainer: '实施部门',
+    recentFiles: [
+      {
+        id: '7',
+        name: '自然资源审计实施方案',
+        type: '实施方案',
+        updateTime: '2024-06-13',
+      },
+      {
+        id: '8',
+        name: '生态环境保护审计程序',
+        type: '操作指南',
+        updateTime: '2024-06-12',
+      },
+      {
+        id: '9',
+        name: '土地利用审计实施细则',
+        type: '实施方案',
+        updateTime: '2024-06-11',
+      },
+    ],
+  },
+  {
+    id: 'evidence-collection',
+    title: '取证单库',
+    description: '收录各类取证单模板、填写规范、取证要求等，规范审计取证工作。',
+    icon: CircleCheck,
+    color: '#fa8c16',
+    fileCount: 45,
+    lastUpdate: '2024-06-12',
+    maintainer: '取证组',
+    recentFiles: [
+      {
+        id: '10',
+        name: '森林资源审计取证单模板',
+        type: '取证单',
+        updateTime: '2024-06-12',
+      },
+      {
+        id: '11',
+        name: '水资源审计取证规范',
+        type: '规范文件',
+        updateTime: '2024-06-11',
+      },
+      {
+        id: '12',
+        name: '矿产资源取证要求说明',
+        type: '指导文件',
+        updateTime: '2024-06-10',
+      },
+    ],
+  },
+  {
+    id: 'working-papers',
+    title: '底稿库',
+    description: '存储审计底稿模板、编写规范、质量标准等，提升审计底稿质量。',
+    icon: EditPen,
+    color: '#eb2f96',
+    fileCount: 78,
+    lastUpdate: '2024-06-11',
+    maintainer: '质控部门',
+    recentFiles: [
+      {
+        id: '13',
+        name: '审计底稿编写规范',
+        type: '规范文件',
+        updateTime: '2024-06-11',
+      },
+      {
+        id: '14',
+        name: '森林资源审计底稿模板',
+        type: '底稿模板',
+        updateTime: '2024-06-10',
+      },
+      {
+        id: '15',
+        name: '审计底稿质量标准',
+        type: '质量标准',
+        updateTime: '2024-06-09',
+      },
+    ],
+  },
+  {
+    id: 'audit-reports',
+    title: '审计报告库',
+    description: '收录各类审计报告模板、撰写规范、质量标准等，提升审计报告质量和规范性。',
+    icon: TrendCharts,
+    color: '#13c2c2',
+    fileCount: 52,
+    lastUpdate: '2024-06-10',
+    maintainer: '报告组',
+    recentFiles: [
+      {
+        id: '16',
+        name: '综合审计报告模板',
+        type: '报告模板',
+        updateTime: '2024-06-10',
+      },
+      {
+        id: '17',
+        name: '专项审计报告格式',
+        type: '格式规范',
+        updateTime: '2024-06-09',
+      },
+      {
+        id: '18',
+        name: '审计报告质量评估标准',
+        type: '质量标准',
+        updateTime: '2024-06-08',
+      },
+    ],
+  },
+])
 
-// 分页数据
-const currentPage = ref(1)
-const pageSize = ref(10)
+// 模态框状态
+const detailDialogVisible = ref(false)
+const selectedCategory = ref<any>(null)
 
-// 过滤后的知识列表
-const filteredKnowledge = computed(() => {
-  let knowledge = knowledgeStore.knowledgeList
+// 处理分类点击
+const handleCategoryClick = (category: any) => {
+  selectedCategory.value = category
+  detailDialogVisible.value = true
+}
 
-  // 关键字搜索
-  if (searchForm.keyword) {
-    knowledge = knowledge.filter(
-      (k) =>
-        k.title.toLowerCase().includes(searchForm.keyword.toLowerCase()) ||
-        k.content.toLowerCase().includes(searchForm.keyword.toLowerCase()),
-    )
+// 查看详情
+const handleViewDetails = (category: any) => {
+  selectedCategory.value = category
+  detailDialogVisible.value = true
+}
+
+// 编辑分类
+const handleEditCategory = (category: any) => {
+  router.push(`/app/knowledge-edit?category=${category.id}`)
+}
+
+// 管理分类
+const handleManageCategory = (category: any) => {
+  router.push(`/app/knowledge-edit?category=${category.id}`)
+}
+
+// 查看文件
+const handleViewFile = (file: any) => {
+  ElMessage.info(`查看文件：${file.name}`)
+}
+
+// 下载文件
+const handleDownloadFile = (file: any) => {
+  ElMessage.success(`开始下载：${file.name}`)
+}
+
+// 获取文件类型图标
+const getFileTypeIcon = (type: string) => {
+  const iconMap: Record<string, any> = {
+    法规文件: Operation,
+    工作方案: Files,
+    实施方案: List,
+    取证单: Tickets,
+    底稿模板: Memo,
+    报告模板: TrendCharts,
+    技术标准: Document,
+    规范文件: Document,
+    操作指南: Document,
+    指导文件: Document,
+    质量标准: Document,
+    格式规范: Document,
   }
+  return iconMap[type] || Document
+}
 
-  // 类型筛选
-  if (searchForm.type) {
-    knowledge = knowledge.filter((k) => k.type === searchForm.type)
+// 获取文件类型颜色
+const getFileTypeColor = (type: string) => {
+  const colorMap: Record<string, string> = {
+    法规文件: '#1890ff',
+    工作方案: '#52c41a',
+    实施方案: '#722ed1',
+    取证单: '#fa8c16',
+    底稿模板: '#eb2f96',
+    报告模板: '#13c2c2',
+    技术标准: '#666666',
+    规范文件: '#666666',
+    操作指南: '#666666',
+    指导文件: '#666666',
+    质量标准: '#666666',
+    格式规范: '#666666',
   }
+  return colorMap[type] || '#666666'
+}
 
-  // 标签筛选
-  if (searchForm.tag) {
-    knowledge = knowledge.filter((k) => k.tags.includes(searchForm.tag))
+// 获取文件类型标签类型
+const getFileTypeTagType = (type: string) => {
+  const tagMap: Record<string, string> = {
+    法规文件: 'primary',
+    工作方案: 'success',
+    实施方案: 'warning',
+    取证单: 'danger',
+    底稿模板: 'info',
+    报告模板: 'default',
   }
-
-  return knowledge
-})
-
-// 分页后的知识列表
-const paginatedKnowledge = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value
-  const end = start + pageSize.value
-  return filteredKnowledge.value.slice(start, end)
-})
-
-// 获取类型标签类型
-const getTypeTagType = (type: string) => {
-  const typeMap: Record<string, string> = {
-    regulation: 'danger',
-    case: 'success',
-    template: 'warning',
-    guide: 'info',
-  }
-  return typeMap[type] || ''
+  return tagMap[type] || 'default'
 }
-
-// 获取类型文本
-const getTypeText = (type: string) => {
-  const typeMap: Record<string, string> = {
-    regulation: '法规',
-    case: '案例',
-    template: '模板',
-    guide: '指南',
-  }
-  return typeMap[type] || type
-}
-
-// 获取内容摘要
-const getExcerpt = (content: string) => {
-  return content.length > 150 ? content.substring(0, 150) + '...' : content
-}
-
-// 格式化日期
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN')
-}
-
-// 处理搜索
-const handleSearch = () => {
-  currentPage.value = 1
-}
-
-// 重置搜索
-const handleReset = () => {
-  searchForm.keyword = ''
-  searchForm.type = ''
-  searchForm.tag = ''
-  currentPage.value = 1
-}
-
-// 处理分页大小变化
-const handleSizeChange = (size: number) => {
-  pageSize.value = size
-  currentPage.value = 1
-}
-
-// 处理当前页变化
-const handleCurrentChange = (page: number) => {
-  currentPage.value = page
-}
-
-// 创建新知识
-const handleCreateKnowledge = () => {
-  router.push('/dashboard/knowledge-edit')
-}
-
-// 处理知识操作
-const handleKnowledgeAction = async (command: string, knowledge: KnowledgeItem) => {
-  switch (command) {
-    case 'edit':
-      router.push(`/dashboard/knowledge-edit/${knowledge.id}`)
-      break
-
-    case 'view':
-      // TODO: 实现查看知识详情
-      ElMessage.info('查看知识详情功能正在开发中')
-      break
-
-    case 'copy':
-      try {
-        await navigator.clipboard.writeText(knowledge.content)
-        ElMessage.success('内容已复制到剪贴板')
-      } catch (error) {
-        ElMessage.error('复制失败')
-      }
-      break
-
-    case 'delete':
-      try {
-        await ElMessageBox.confirm('确定要删除这条知识吗？删除后无法恢复。', '警告', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
-        })
-
-        await knowledgeStore.deleteKnowledge(knowledge.id)
-        ElMessage.success('知识已删除')
-      } catch (error) {
-        if (error !== 'cancel') {
-          ElMessage.error('删除失败')
-        }
-      }
-      break
-  }
-}
-
-// 组件挂载时获取知识数据
-onMounted(async () => {
-  try {
-    await knowledgeStore.fetchKnowledgeList()
-  } catch (error) {
-    ElMessage.error('获取知识数据失败')
-  }
-})
 </script>
 
 <style scoped>
-.knowledge-management-container {
-  padding: 0;
+/* 知识库分类 */
+.knowledge-section {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.page-header {
+.section-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #1890ff;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.section-icon {
+  color: #1890ff;
+}
+
+/* 知识库卡片网格 */
+.knowledge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.knowledge-card {
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.knowledge-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #1890ff, #40a9ff);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+  transform-origin: left;
+}
+
+.knowledge-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border-color: #1890ff;
+  background: #fff;
+}
+
+.knowledge-card:hover::before {
+  transform: scaleX(1);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-right: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.card-description {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  min-height: 48px;
+}
+
+.card-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 12px;
+  color: #999;
+  padding: 12px 0;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.card-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+/* 知识库详情模态框 */
+.knowledge-detail-dialog .el-dialog__body {
+  padding: 24px;
+}
+
+.category-detail {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
   margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
-.header-left {
-  flex: 1;
+.detail-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-right: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.page-title {
-  font-size: 24px;
+.detail-info h3 {
+  font-size: 20px;
   font-weight: 600;
   color: #333;
   margin: 0 0 8px 0;
 }
 
-.page-description {
+.detail-info p {
   color: #666;
   font-size: 14px;
+  line-height: 1.5;
   margin: 0;
 }
 
-.header-right {
+.detail-stats {
   display: flex;
-  gap: 12px;
-}
-
-.search-section {
+  gap: 32px;
   margin-bottom: 24px;
-}
-
-.knowledge-section {
-  margin-bottom: 24px;
-}
-
-.loading-container {
-  padding: 24px;
-}
-
-.empty-container {
-  padding: 60px 0;
-}
-
-.knowledge-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.knowledge-item {
-  transition: transform 0.2s;
-}
-
-.knowledge-item:hover {
-  transform: translateY(-1px);
-}
-
-.knowledge-card {
+  padding: 16px;
+  background: #f8f9fa;
   border-radius: 8px;
 }
 
-.knowledge-header {
+.stat-item {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
-}
-
-.knowledge-title {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
+  color: #666;
+  font-size: 14px;
 }
 
-.knowledge-title h3 {
+.stat-item .el-icon {
+  color: #1890ff;
+}
+
+.file-list h4 {
   font-size: 16px;
   font-weight: 600;
   color: #333;
-  margin: 0;
-}
-
-.knowledge-tags {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.knowledge-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.knowledge-content {
-  padding: 0;
-}
-
-.knowledge-excerpt {
-  color: #666;
-  font-size: 14px;
-  line-height: 1.6;
   margin: 0 0 16px 0;
 }
 
-.knowledge-meta {
+.file-items {
   display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.meta-item {
+.file-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  color: #666;
+  justify-content: space-between;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  transition: all 0.2s ease;
+}
+
+.file-item:hover {
+  border-color: #1890ff;
+  background: #f0f9ff;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.file-details {
+  flex: 1;
+}
+
+.file-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.file-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 12px;
 }
 
-.meta-item .el-icon {
+.file-date {
   color: #999;
 }
 
-.pagination-container {
+.file-actions {
   display: flex;
-  justify-content: center;
-  margin-top: 24px;
+  gap: 8px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 0;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .page-header {
+  .knowledge-management-container {
+    padding: 16px;
+  }
+
+  .knowledge-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-stats {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
-  }
-
-  .header-right {
-    width: 100%;
-    justify-content: flex-end;
-  }
-
-  .knowledge-meta {
-    flex-direction: column;
     gap: 8px;
   }
 
-  .knowledge-tags {
+  .detail-stats {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .detail-header {
     flex-direction: column;
     align-items: flex-start;
+    text-align: left;
+  }
+
+  .detail-icon {
+    margin-right: 0;
+    margin-bottom: 16px;
   }
 }
 </style>

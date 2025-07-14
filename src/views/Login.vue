@@ -132,7 +132,7 @@ const redirectLogin = () => {
     if (authStore.userRole === 'admin') {
       router.push('/admin/user-management')
     } else {
-      router.push('/dashboard/home')
+      router.push('/app/home')
     }
   }
 }

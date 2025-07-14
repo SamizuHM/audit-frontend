@@ -234,7 +234,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
 import { ArrowLeft, Plus, Close, Document, View, Download, Delete } from '@element-plus/icons-vue'
 import { useProjectStore } from '@/stores/project'
-import type { EvidenceGroup, AuditProject } from '@/services/api'
+import type { EvidenceGroup } from '@/services/api'
 
 const router = useRouter()
 const route = useRoute()
@@ -306,7 +306,7 @@ const getResultTagType = (result: string) => {
 
 // 返回上一页
 const goBack = () => {
-  router.push('/dashboard/audit-projects')
+  router.push('/app/projects')
 }
 
 // 添加证据文件
@@ -392,7 +392,7 @@ const handleSave = async () => {
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     ElMessage.success(isEdit.value ? '证据组更新成功' : '证据组创建成功')
-    router.push('/dashboard/audit-projects')
+    router.push('/app/projects')
   } catch (error) {
     ElMessage.error(error instanceof Error ? error.message : '保存失败')
   } finally {

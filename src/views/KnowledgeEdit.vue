@@ -204,7 +204,7 @@ const previewContent = computed(() => {
 
 // 返回上一页
 const goBack = () => {
-  router.push('/dashboard/knowledge-management')
+  router.push('/app/knowledge-management')
 }
 
 // 插入文本
@@ -255,7 +255,7 @@ const handleSave = async () => {
       ElMessage.success('知识创建成功')
     }
 
-    router.push('/dashboard/knowledge-management')
+    router.push('/app/knowledge-management')
   } catch (error) {
     ElMessage.error(error instanceof Error ? error.message : '保存失败')
   }
@@ -272,7 +272,7 @@ const loadKnowledgeData = async () => {
     Object.assign(knowledgeForm, knowledge)
   } else {
     ElMessage.error('知识不存在')
-    router.push('/dashboard/knowledge-management')
+    router.push('/app/knowledge-management')
   }
 }
 
