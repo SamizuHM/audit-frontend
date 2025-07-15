@@ -155,7 +155,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'admin-knowledge-management',
         name: 'AdminKnowledgeManagement',
-        component: () => import('../views/admin/KnowledgeManagement.vue'),
+        component: () => import('../views/KnowledgeManagement.vue'),
         meta: {
           requiresAuth: true,
           permission: 'admin:knowledge:list',
