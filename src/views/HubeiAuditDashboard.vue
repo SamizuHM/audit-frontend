@@ -317,6 +317,7 @@ import {
   FileBarChart,
 } from 'lucide-vue-next'
 import * as echarts from 'echarts'
+import 'echarts-gl'
 import type { ECElementEvent } from 'echarts'
 // 导入 mock 数据和类型
 import {
@@ -660,46 +661,81 @@ const initMap = async () => {
         },
         calculable: true,
       },
-      geo: {
-        map: 'hubei',
-        roam: false,
-        zoom: 1.1,
-        center: [112, 31.2],
-        itemStyle: {
-          areaColor: '#f3f4f6',
-          borderColor: '#e5e7eb',
-          borderWidth: 1,
-        },
-        emphasis: {
-          itemStyle: {
-            areaColor: '#3b82f6',
-            borderColor: '#1e40af',
-            borderWidth: 2,
-          },
-          label: {
-            show: true,
-            color: '#ffffff',
-            fontSize: 12,
-          },
-        },
-        select: {
-          itemStyle: {
-            areaColor: '#1e40af',
-            borderColor: '#1e3a8a',
-            borderWidth: 2,
-          },
-          label: {
-            show: true,
-            color: '#ffffff',
-            fontSize: 12,
-          },
-        },
-      },
       series: [
         {
           name: '项目分布',
-          type: 'map',
-          geoIndex: 0,
+          type: 'map3D',
+          map: 'hubei',
+          regionHeight: 10,
+          boxWidth: 200,
+          boxHeight: 20,
+          boxDepth: 130,
+          roam: true,
+          light: {
+            main: {
+              intensity: 1.2,
+              shadow: true,
+              shadowQuality: 'high',
+              color: '#ffffff',
+              beta: 20,
+            },
+            ambient: {
+              intensity: 0.3,
+              color: '#ffffff',
+            },
+          },
+          viewControl: {
+            alpha: 45,
+            beta: 0,
+            distance: 220,
+            center: [0, 0, 0],
+            animationDurationUpdate: 1000,
+            animationEasingUpdate: 'cubicInOut',
+          },
+          itemStyle: {
+            areaColor: '#f3f4f6',
+            borderColor: '#e5e7eb',
+            borderWidth: 1,
+            opacity: 1,
+          },
+          label: {
+            show: true,
+            color: '#374151',
+            fontSize: 11,
+            fontWeight: 'bold',
+            distance: 50,
+            position: 'top',
+          },
+          emphasis: {
+            itemStyle: {
+              areaColor: '#3b82f6',
+              borderColor: '#1e40af',
+              borderWidth: 2,
+              opacity: 1,
+            },
+            label: {
+              show: true,
+              color: '#ffffff',
+              fontSize: 12,
+              distance: 50,
+              position: 'top',
+            },
+          },
+          select: {
+            itemStyle: {
+              areaColor: '#1e40af',
+              borderColor: '#1e3a8a',
+              borderWidth: 2,
+              opacity: 1,
+            },
+            label: {
+              show: true,
+              color: '#ffffff',
+              fontSize: 12,
+              distance: 50,
+              position: 'top',
+            },
+          },
           data: hubeiCitiesData.value.map((item) => ({
             name: item.name,
             value: item.value,
