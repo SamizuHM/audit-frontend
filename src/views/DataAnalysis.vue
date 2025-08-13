@@ -1,7 +1,7 @@
 <template>
   <div class="data-analysis-container">
     <!-- 页面标题和操作按钮 -->
-    <div class="page-header">
+    <!-- <div class="page-header">
       <div class="header-left">
         <h2 class="page-title">数据分析</h2>
         <p class="page-description">基于AI的智能数据分析平台</p>
@@ -12,7 +12,7 @@
           刷新数据
         </el-button>
       </div>
-    </div>
+    </div> -->
 
     <!-- 主要内容区域 -->
     <el-row :gutter="24">
@@ -30,17 +30,20 @@
 
           <!-- 聊天消息区域 -->
           <div class="chat-messages" ref="messagesContainer">
-            <div
-              v-for="(message, index) in messages"
-              :key="index"
-              class="message"
-              :class="message.role"
-            >
-              <div class="message-content">
-                <div class="message-text">{{ message.content }}</div>
-                <div class="message-time">{{ formatTime(message.time) }}</div>
+              <div
+                v-for="(message, index) in messages"
+                :key="index"
+                class="message"
+                :class="message.role"
+              >
+                <div class="message-content">
+                  <!-- 关键：加上 style 或类名 -->
+                  <div class="message-text" style="white-space: pre-line">
+                    {{ message.content }}
+                  </div>
+                  <div class="message-time">{{ formatTime(message.time) }}</div>
+                </div>
               </div>
-            </div>
 
             <!-- 正在输入提示 -->
             <div v-if="isTyping" class="message assistant">
@@ -85,159 +88,179 @@
 
       <!-- 右侧：数据库和模型管理 -->
       <el-col :span="8">
-        <!-- 数据库管理 -->
-        <div class="management-section">
-          <div class="section-header" @click="toggleSection('database')">
-            <span>数据库管理</span>
-            <div class="header-actions">
-              <el-button
-                type="text"
-                size="small"
-                style="margin-right: 8px"
-                @click.stop="() => (showAddDatabaseModal = true)"
-              >
-                <el-icon><Plus /></el-icon>
+        <div class="management-panel">
+          <div class="management-header">
+            <div class="header-left">
+              <h3 class="panel-title">管理面板</h3>
+            </div>
+            <div class="header-right">
+              <el-button type="primary" size="small" @click="handleRefresh">
+                <el-icon><Refresh /></el-icon>
+                刷新数据
               </el-button>
-              <el-icon><ArrowDown v-if="openSections.database" /><ArrowRight v-else /></el-icon>
             </div>
           </div>
-
-          <div v-show="openSections.database" class="section-content">
-            <div class="database-list">
-              <div
-                v-for="database in databases"
-                :key="database.id"
-                class="database-item"
-                :class="{ selected: database.selected }"
-                @click="toggleDatabase(database)"
-              >
-                <div class="database-info">
-                  <div class="database-name">{{ database.name }}</div>
-                  <div class="database-meta">{{ database.tables }}个表 · {{ database.size }}</div>
-                </div>
-                <div class="database-actions">
-                  <el-dropdown @command="(command) => handleDatabaseAction(command, database)">
-                    <el-button type="text" size="small">
-                      <el-icon><More /></el-icon>
-                    </el-button>
-                    <template #dropdown>
-                      <el-dropdown-menu>
-                        <el-dropdown-item command="connect">连接</el-dropdown-item>
-                        <el-dropdown-item command="refresh">刷新</el-dropdown-item>
-                        <el-dropdown-item command="export">导出</el-dropdown-item>
-                        <el-dropdown-item command="delete" divided>删除</el-dropdown-item>
-                      </el-dropdown-menu>
-                    </template>
-                  </el-dropdown>
+          <div class="management-content">
+            <!-- 数据库管理 -->
+            <div class="management-section">
+              <div class="section-header" @click="toggleSection('database')">
+                <span>数据库管理</span>
+                <div class="header-actions">
+                  <el-button
+                    type="text"
+                    size="small"
+                    style="margin-right: 8px"
+                    @click.stop="() => (showAddDatabaseModal = true)"
+                  >
+                    <el-icon><Plus /></el-icon>
+                  </el-button>
+                  <el-icon><ArrowDown v-if="openSections.database" /><ArrowRight v-else /></el-icon>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- 模型管理 -->
-        <div class="management-section">
-          <div class="section-header" @click="toggleSection('model')">
-            <span>分析模型</span>
-            <div class="header-actions">
-              <el-button
-                type="text"
-                size="small"
-                style="margin-right: 8px"
-                @click.stop="() => (showAddModelModal = true)"
-              >
-                <el-icon><Plus /></el-icon>
-              </el-button>
-              <el-icon><ArrowDown v-if="openSections.model" /><ArrowRight v-else /></el-icon>
-            </div>
-          </div>
-
-          <div v-show="openSections.model" class="section-content">
-            <div class="model-list">
-              <div
-                v-for="model in models"
-                :key="model.id"
-                class="model-item"
-                :class="{ selected: model.selected }"
-                @click="toggleModel(model)"
-              >
-                <div class="model-info">
-                  <div class="model-name">{{ model.name }}</div>
-                  <div class="model-meta">
-                    <el-tag :type="getModelStatusType(model.status)" size="small">
-                      {{ model.status }}
-                    </el-tag>
-                    <span class="model-accuracy">准确率: {{ model.accuracy }}%</span>
+              <div v-show="openSections.database" class="section-content">
+                <div class="database-list">
+                  <div
+                    v-for="database in databases"
+                    :key="database.id"
+                    class="database-item"
+                    :class="{ selected: database.selected }"
+                    @click="toggleDatabase(database)"
+                  >
+                    <div class="database-info">
+                      <div class="database-name">{{ database.name }}</div>
+                      <div class="database-meta">{{ database.tables }}个表 · {{ database.size }}</div>
+                    </div>
+                    <div class="database-actions">
+                      <el-dropdown @command="(command) => handleDatabaseAction(command, database)">
+                        <el-button type="text" size="small">
+                          <el-icon><More /></el-icon>
+                        </el-button>
+                        <template #dropdown>
+                          <el-dropdown-menu>
+                            <el-dropdown-item command="connect">连接</el-dropdown-item>
+                            <el-dropdown-item command="refresh">刷新</el-dropdown-item>
+                            <el-dropdown-item command="export">导出</el-dropdown-item>
+                            <el-dropdown-item command="delete" divided>删除</el-dropdown-item>
+                          </el-dropdown-menu>
+                        </template>
+                      </el-dropdown>
+                    </div>
                   </div>
                 </div>
-                <div class="model-actions">
-                  <el-dropdown @command="(command) => handleModelAction(command, model)">
-                    <el-button type="text" size="small">
-                      <el-icon><More /></el-icon>
-                    </el-button>
-                    <template #dropdown>
-                      <el-dropdown-menu>
-                        <el-dropdown-item command="apply">应用</el-dropdown-item>
-                        <el-dropdown-item command="train">训练</el-dropdown-item>
-                        <el-dropdown-item command="export">导出</el-dropdown-item>
-                        <el-dropdown-item command="delete" divided>删除</el-dropdown-item>
-                      </el-dropdown-menu>
-                    </template>
-                  </el-dropdown>
+              </div>
+            </div>
+
+            <!-- 模型管理 -->
+            <div class="management-section">
+              <div class="section-header" @click="toggleSection('model')">
+                <span>分析模型</span>
+                <div class="header-actions">
+                  <el-button
+                    type="text"
+                    size="small"
+                    style="margin-right: 8px"
+                    @click.stop="() => (showAddModelModal = true)"
+                  >
+                    <el-icon><Plus /></el-icon>
+                  </el-button>
+                  <el-icon><ArrowDown v-if="openSections.model" /><ArrowRight v-else /></el-icon>
+                </div>
+              </div>
+              
+              <div v-show="openSections.model" class="section-content">
+                <div class="model-list">
+                  <div
+                    v-for="model in models"
+                    :key="model.id"
+                    class="model-item"
+                    :class="{ selected: model.selected }"
+                    @click="toggleModel(model)"
+                  >
+                    <div class="model-info">
+                      <div class="model-name">{{ model.name }}</div>
+                      <div class="model-meta">
+                        <el-tag :type="getModelStatusType(model.status)" size="small">
+                          {{ model.status }}
+                        </el-tag>
+                        <span class="model-accuracy">准确率: {{ model.accuracy }}%</span>
+                      </div>
+                    </div>
+                    <div class="model-actions">
+                      <el-dropdown @command="(command) => handleModelAction(command, model)">
+                        <el-button type="text" size="small">
+                          <el-icon><More /></el-icon>
+                        </el-button>
+                        <template #dropdown>
+                          <el-dropdown-menu>
+                            <el-dropdown-item command="apply">应用</el-dropdown-item>
+                            <el-dropdown-item command="train">训练</el-dropdown-item>
+                            <el-dropdown-item command="export">导出</el-dropdown-item>
+                            <el-dropdown-item command="delete" divided>删除</el-dropdown-item>
+                          </el-dropdown-menu>
+                        </template>
+                      </el-dropdown>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 模板管理 -->
+            <div class="management-section">
+              <div class="section-header" @click="toggleSection('template')">
+                <span>分析模板</span>
+                <div class="header-actions">
+                  <el-button
+                    type="text"
+                    size="small"
+                    style="margin-right: 8px"
+                    @click.stop="() => (showTemplateModal = true)"
+                  >
+                    <el-icon><Plus /></el-icon>
+                  </el-button>
+                  <el-icon><ArrowDown v-if="openSections.template" /><ArrowRight v-else /></el-icon>
+                </div>
+              </div>
+
+              <div v-show="openSections.template" class="section-content">
+                <div class="template-list">
+                  <div
+                    v-for="template in templates"
+                    :key="template.id"
+                    class="template-item"
+                    @click="applyTemplate(template)"
+                  >
+                    <div class="template-info">
+                      <div class="template-name">{{ template.name }}</div>
+                      <div class="template-desc">{{ template.description }}</div>
+                    </div>
+                    <div class="template-actions">
+                      <el-dropdown @command="(command) => handleTemplateAction(command, template)">
+                        <el-button type="text" size="small">
+                          <el-icon><More /></el-icon>
+                        </el-button>
+                        <template #dropdown>
+                          <el-dropdown-menu>
+                            <el-dropdown-item command="apply">应用</el-dropdown-item>
+                            <el-dropdown-item command="edit">编辑</el-dropdown-item>
+                            <el-dropdown-item command="copy">复制</el-dropdown-item>
+                            <el-dropdown-item command="delete" divided>删除</el-dropdown-item>
+                          </el-dropdown-menu>
+                        </template>
+                      </el-dropdown>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
+          
+
         </div>
 
-        <!-- 模板管理 -->
-        <div class="management-section">
-          <div class="section-header" @click="toggleSection('template')">
-            <span>分析模板</span>
-            <div class="header-actions">
-              <el-button
-                type="text"
-                size="small"
-                style="margin-right: 8px"
-                @click.stop="() => (showTemplateModal = true)"
-              >
-                <el-icon><Plus /></el-icon>
-              </el-button>
-              <el-icon><ArrowDown v-if="openSections.template" /><ArrowRight v-else /></el-icon>
-            </div>
-          </div>
-
-          <div v-show="openSections.template" class="section-content">
-            <div class="template-list">
-              <div
-                v-for="template in templates"
-                :key="template.id"
-                class="template-item"
-                @click="applyTemplate(template)"
-              >
-                <div class="template-info">
-                  <div class="template-name">{{ template.name }}</div>
-                  <div class="template-desc">{{ template.description }}</div>
-                </div>
-                <div class="template-actions">
-                  <el-dropdown @command="(command) => handleTemplateAction(command, template)">
-                    <el-button type="text" size="small">
-                      <el-icon><More /></el-icon>
-                    </el-button>
-                    <template #dropdown>
-                      <el-dropdown-menu>
-                        <el-dropdown-item command="apply">应用</el-dropdown-item>
-                        <el-dropdown-item command="edit">编辑</el-dropdown-item>
-                        <el-dropdown-item command="copy">复制</el-dropdown-item>
-                        <el-dropdown-item command="delete" divided>删除</el-dropdown-item>
-                      </el-dropdown-menu>
-                    </template>
-                  </el-dropdown>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        
       </el-col>
     </el-row>
 
@@ -359,7 +382,14 @@ const openSections = reactive({
 const messages = ref([
   {
     role: 'assistant',
-    content: '您好！我是数据分析助手，可以帮助您进行数据分析。请上传数据文件或描述您的分析需求。',
+
+    content: "您好！我是AI数据分析助手，有什么可以帮助您分析的吗？\n"+
+                                "比如你可以问：\n" +
+                                "\n1：我想要查询森林资源数据库中树木的种类\n" +
+                                "2：我想要查询森林资源数据库中哪一种树木的数量最少\n" +
+                                "3：我想要查询森林资源数据库中树的健康状态\n" +
+                                "\n您也可以上传要文件或使用右侧的提示词模板。\n",
+
     time: new Date(),
   },
 ])
@@ -739,13 +769,16 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  /* 字体加粗 */
+  font-weight: 500;
 }
 
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 0;
+  padding: 0 0 220px 0;
   max-height: 500px;
+  font-size: 14px;
 }
 
 .message {
@@ -762,10 +795,11 @@ onMounted(() => {
 }
 
 .message-content {
-  max-width: 70%;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border: 1px solid #bae6fd;
+  max-width: 90%;
   padding: 12px 16px;
   border-radius: 12px;
-  background: #f5f7fa;
 }
 
 .message.user .message-content {
@@ -821,8 +855,10 @@ onMounted(() => {
 }
 
 .chat-input {
+  /* 置于页面底端 */
+
   border-top: 1px solid #e4e7ed;
-  padding-top: 16px;
+  padding: 16px;
 }
 
 .input-container {
@@ -831,15 +867,63 @@ onMounted(() => {
   align-items: center;
 }
 
-.management-section {
+.management-title {
   margin-bottom: 16px;
+}
+
+.management-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e4e7ed;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.panel-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+}
+
+.management-panel {
+  height: 700px;
+  display: flex;
+  flex-direction: column;
+}
+
+.management-content {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.management-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.management-content::-webkit-scrollbar-thumb {
+  background: #dcdfe6;
+  border-radius: 2px;
+}
+
+.management-section {
+  margin-bottom: 12px;
   border: 1px solid #e4e7ed;
   border-radius: 6px;
   background: white;
+  overflow: hidden;
 }
 
 .section-header {
-  padding: 12px 16px;
+  padding: 10px 16px;
   border-bottom: 1px solid #e4e7ed;
   cursor: pointer;
   display: flex;
@@ -847,20 +931,23 @@ onMounted(() => {
   align-items: center;
   font-weight: 500;
   color: #333;
+  background: #f8f9fa;
+  transition: all 0.3s;
 }
 
 .section-header:hover {
-  background: #f5f7fa;
+  background: #f0f2f5;
+  color: #409eff;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
 }
 
 .section-content {
-  padding: 16px;
+  padding: 12px;
 }
 
 .database-list,
@@ -874,14 +961,22 @@ onMounted(() => {
 .database-item,
 .model-item,
 .template-item {
-  padding: 12px;
-  border: 1px solid #e4e7ed;
-  border-radius: 6px;
+  padding: 10px 12px;
+  border: 1px solid #ebeef5;
+  border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 8px;
+  background: #fff;
+}
+
+.database-item:last-child,
+.model-item:last-child,
+.template-item:last-child {
+  margin-bottom: 0;
 }
 
 .database-item:hover,
@@ -889,6 +984,8 @@ onMounted(() => {
 .template-item:hover {
   border-color: #409eff;
   background: #f0f2f5;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .database-item.selected,
@@ -907,18 +1004,27 @@ onMounted(() => {
 .model-name,
 .template-name {
   font-weight: 500;
-  color: #333;
+  color: #303133;
   margin-bottom: 4px;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 .database-meta,
 .model-meta,
 .template-desc {
   font-size: 12px;
-  color: #666;
+  color: #909399;
   display: flex;
   gap: 8px;
   align-items: center;
+  line-height: 1.4;
+}
+
+.model-meta .el-tag {
+  padding: 0 6px;
+  height: 20px;
+  line-height: 18px;
 }
 
 .model-accuracy {

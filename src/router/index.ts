@@ -74,7 +74,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'audit-assistant',
         name: 'AuditAssistant',
-        component: () => import('../views/AuditAssistant.vue'),
+        component: () => import('../views/AuditAssistant2.vue'),
         meta: {
           requiresAuth: true,
           permission: 'user:audit:assistant',

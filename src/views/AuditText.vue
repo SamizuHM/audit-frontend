@@ -101,10 +101,19 @@
               <div class="prompt-template-title">审计文书生成助手使用指南</div>
             </div>
             <div class="prompt-template-content">
-              您好！我是智能审计文书生成助手，专门帮助您高效生成各类审计文书。 **我可以帮助您：** •
-              自动生成审计工作方案 • 创建审计实施方案 • 生成审计取证单 • 编制审计工作底稿 •
-              撰写审计意见书 • 生成综合审计报告 **使用建议：** • 请明确说明您需要生成的文书类型 •
-              提供具体要求和背景信息 • 对于复杂文书，可分段描述需求 • 上传相关文件可提高生成准确性
+              您好！我是智能审计文书生成助手，专门帮助您高效生成各类审计文书。<br />
+              <strong>我可以帮助您：</strong><br />
+              • 自动生成审计工作方案<br />
+              • 创建审计实施方案<br />
+              • 生成审计取证单<br />
+              • 编制审计工作底稿<br />
+              • 撰写审计意见书<br />
+              • 生成综合审计报告<br />
+              <strong>使用建议：</strong><br />
+              • 请明确说明您需要生成的文书类型<br />
+              • 提供具体要求和背景信息<br />
+              • 对于复杂文书，可分段描述需求<br />
+              • 上传相关文件可提高生成准确性
             </div>
             <div class="example-questions">
               <div class="example-questions-title">
@@ -1543,6 +1552,7 @@ onMounted(() => {
   flex: 1;
   overflow-y: auto;
   padding: 8px;
+  font-size: 14px;
 }
 
 .history-item {
@@ -1563,6 +1573,7 @@ onMounted(() => {
 .history-item.active {
   background: #e6f7ff;
   color: #1890ff;
+  border-left: 3px solid #1890ff;
 }
 
 .history-item-title {
@@ -1592,10 +1603,10 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   background: #fff;
-  margin: 16px;
+  /* margin: 16px; */
   border-radius: 6px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  height: calc(100% - 32px);
+  height: 100%;
 }
 
 .chat-header {
